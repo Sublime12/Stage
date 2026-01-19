@@ -10,6 +10,10 @@ const c = @cImport({
 const gl = @cImport(
     @cInclude("gl.h")
 );
+const cmath = @cImport(
+    @cInclude("linmath.h")
+);
+const math = std.math;
 
 const vertex_shader_raw = @embedFile("vertex.shader");
 const fragment_shader_raw = @embedFile("fragment.shader");
@@ -19,15 +23,19 @@ const vertex_shader_text: [1][*c]const u8 = .{ vertex_shader_raw.ptr };
 const fragment_shader_text: [1][*c]const u8 = .{ fragment_shader_raw.ptr };
 
 const Vertex = extern struct {
-    pos: [2]f32,
+    pos: [3]f32,
     col: [3]f32,
 };
 
-const vertices: [3]Vertex = .{
-    .{ .pos = .{ -0.6, -0.4 }, .col = .{ 1.0, 0.0, 0.0 } },
-    .{ .pos = .{  0.6, -0.4 }, .col = .{ 0.0, 1.0, 0.0 } },
-    .{ .pos = .{  0.0,  0.6 }, .col = .{ 0.0, 0.0, 1.0 } },
+const vertices: [6]Vertex = .{
+    .{ .pos = .{  0.0,  0.6, 0.2 }, .col = .{ 0.0, 0.0, 1.0 } },
+    .{ .pos = .{  0.6, -0.4, 0.4 }, .col = .{ 0.0, 1.0, 0.0 } },
+    .{ .pos = .{ -0.6, -0.4, 0.7 }, .col = .{ 1.0, 0.0, 0.0 } },
+    .{ .pos = .{  0.3,  0.7, 0.5 }, .col = .{ 0.5, 0.5, 1.0 } },
+    .{ .pos = .{  -0.3, -0.0, -0.4 }, .col = .{ 0.9, 0.0, 0.2 } },
+    .{ .pos = .{ 0.6, -0.4, -0.7 }, .col = .{ 0.0, 0.9, 0.4 } },
 };
+
 
 fn error_callback(err: c_int, description: [*c]const u8) callconv(.c) void {
     _ = err;
@@ -70,18 +78,17 @@ pub fn main() !void {
     gl.glAttachShader(program, fragment_shader);
     gl.glLinkProgram(program);
 
-    std.debug.print("shader text: {s}\n fragment shader: {s}\n", 
-        .{ vertex_shader_text[0], fragment_shader_text[0] });
-    const vpos_unsigned = gl.glGetAttribLocation(program, "vPos");
-    std.debug.print("Vpos unsigned {}\n", .{ vpos_unsigned });
-    const vpos_location: c_uint = @intCast(vpos_unsigned);
+    // std.debug.print("shader text: {s}\n fragment shader: {s}\n", 
+    //     .{ vertex_shader_text[0], fragment_shader_text[0] });
+    const vpos_location: c_uint = @intCast(gl.glGetAttribLocation(program, "vPos"));
     const vcol_location: c_uint = @intCast(gl.glGetAttribLocation(program, "vCol"));
+    const mvp_location: c_int = @intCast(gl.glGetUniformLocation(program, "MVP"));
 
     var vertex_array: gl.GLuint = 0;
     gl.glGenVertexArrays(1, &vertex_array);
     gl.glBindVertexArray(vertex_array);
     gl.glEnableVertexAttribArray(vpos_location);
-    gl.glVertexAttribPointer(vpos_location, 2, gl.GL_FLOAT, gl.GL_FALSE,
+    gl.glVertexAttribPointer(vpos_location, 3, gl.GL_FLOAT, gl.GL_FALSE,
         @sizeOf(Vertex), @ptrFromInt(@offsetOf(Vertex, "pos")),
     );
 
@@ -89,7 +96,13 @@ pub fn main() !void {
     gl.glVertexAttribPointer(vcol_location, 3, gl.GL_FLOAT, gl.GL_FALSE,
         @sizeOf(Vertex), @ptrFromInt(@offsetOf(Vertex, "col")),
     );
-
+    var mvp: [4][4]f32 = .{
+        .{ 1, 0, 0, 0 },
+        .{ 0, 1, 0, 0 },
+        .{ 0, 0, 1, 0 },
+        .{ 0, 0, 0, 1 },
+    };
+ 
     while (glfw.glfwWindowShouldClose(window) == 0) {
         var width: i32 = 0;
         var height: i32 = 0;
@@ -98,9 +111,52 @@ pub fn main() !void {
         gl.glViewport(0, 0, width, height);
         gl.glClear(gl.GL_COLOR_BUFFER_BIT);
 
+        const cos = math.cos(math.pi / 90.0);
+        const sin = math.sin(math.pi / 90.0);
+         const rz: [4][4]f32 = .{
+            .{ cos, -sin, 0, 0 },
+            .{ sin,  cos, 0, 0 },
+            .{   0,    0, 1, 0 },
+            .{   0,    0, 0, 1 },
+        };
+        const rx: [4][4]f32 = .{
+            .{   1,   0,    0, 0 },
+            .{   0, cos, -sin, 0 },
+            .{   0, sin,  cos, 0 },
+            .{   0,   0,    0, 1 },
+        };
+        // _ = rz;
+        _ = rx;
+        var tx: [4][4]f32 = .{
+            .{   1,   0,    0, 0 },
+            .{   0,   1,    0, 0 },
+            .{   0,   0,    1, 0 },
+            .{   0,   0.03, 0, 1 },
+        };
+
+        var rt: [4][4]f32 = undefined;
+        cmath.mat4x4_mul(&rt, &rz, &tx);
+        // cmath.mat4x4_transpose(tx, tx);
+        // _ = tx;
+ 
+        cmath.mat4x4_mul(&mvp, &mvp, &rt);
+        //    [ cos(θ)  -sin(θ)   0   0 ]
+        //    [ sin(θ)   cos(θ)   0   0 ]
+        //    [   0        0      1   0 ]
+        //    [   0        0      0   1 ]
+        // cmath.mat4x4_rotate_Z(&mvp, &mvp, 0.001);
+
+        for (mvp) |row| {
+            for (row) |el| {
+                std.debug.print("{} ", .{el});
+            }
+            std.debug.print("\n", .{});
+        }
+
         gl.glUseProgram(program);
+        gl.glUniformMatrix4fv(mvp_location, 1, gl.GL_FALSE, @ptrCast(&mvp));
         gl.glBindVertexArray(vertex_array);
-        gl.glDrawArrays(gl.GL_TRIANGLES, 0, 3);
+        gl.glDrawArrays(gl.GL_TRIANGLES, 0, 6);
 
         glfw.glfwSwapBuffers(window);
         glfw.glfwPollEvents();
