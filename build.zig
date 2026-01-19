@@ -83,14 +83,16 @@ pub fn build(b: *std.Build) void {
         }),
     });
 
+    // Add glfw and opengl
+    exe.addIncludePath(b.path("src/c"));
+    
     exe.addCSourceFile(.{
-        .file = b.path("external/gl/gl.c"),
+        .file = b.path("src/c/gl.c"),
         .flags = &.{},
     });
-    exe.addIncludePath(b.path("external/gl"));
+
     exe.linkLibC();
     exe.linkSystemLibrary("glfw");
-    exe.linkSystemLibrary("GL");
 
     // This declares intent for the executable to be installed into the
     // install prefix when running `zig build` (i.e. when executing the default
