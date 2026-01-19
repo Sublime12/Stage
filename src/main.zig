@@ -1,5 +1,4 @@
 const std = @import("std");
-// const renderer = @import("_3DRenderer");
 const glfw = @cImport(
     @cInclude("GLFW/glfw3.h")
 );
@@ -49,7 +48,6 @@ pub fn main() !void {
         c.exit(c.EXIT_FAILURE);
     }
     
-    // glfw.glfwSetKeyCallback(window, key_callback);
     glfw.glfwMakeContextCurrent(window);
     _ = gl.gladLoadGL(glfw.glfwGetProcAddress);
     glfw.glfwSwapInterval(1);
@@ -67,20 +65,48 @@ pub fn main() !void {
     gl.glShaderSource(fragment_shader, 1, &fragment_shader_text, null);
     gl.glCompileShader(fragment_shader);
 
-    const program = gl.glCreateProgram();
+    const program: gl.GLuint = gl.glCreateProgram();
     gl.glAttachShader(program, vertex_shader);
     gl.glAttachShader(program, fragment_shader);
     gl.glLinkProgram(program);
 
-    while (true) {}
+    std.debug.print("shader text: {s}\n fragment shader: {s}\n", 
+        .{ vertex_shader_text[0], fragment_shader_text[0] });
+    const vpos_unsigned = gl.glGetAttribLocation(program, "vPos");
+    std.debug.print("Vpos unsigned {}\n", .{ vpos_unsigned });
+    const vpos_location: c_uint = @intCast(vpos_unsigned);
+    const vcol_location: c_uint = @intCast(gl.glGetAttribLocation(program, "vCol"));
 
-    while (glfw.glfwWindowShouldClose(window) != 0) {
+    var vertex_array: gl.GLuint = 0;
+    gl.glGenVertexArrays(1, &vertex_array);
+    gl.glBindVertexArray(vertex_array);
+    gl.glEnableVertexAttribArray(vpos_location);
+    gl.glVertexAttribPointer(vpos_location, 2, gl.GL_FLOAT, gl.GL_FALSE,
+        @sizeOf(Vertex), @ptrFromInt(@offsetOf(Vertex, "pos")),
+    );
+
+    gl.glEnableVertexAttribArray(vcol_location);
+    gl.glVertexAttribPointer(vcol_location, 3, gl.GL_FLOAT, gl.GL_FALSE,
+        @sizeOf(Vertex), @ptrFromInt(@offsetOf(Vertex, "col")),
+    );
+
+    while (glfw.glfwWindowShouldClose(window) == 0) {
         var width: i32 = 0;
         var height: i32 = 0;
         glfw.glfwGetFramebufferSize(window, &width, &height);
         const ratio: f32 = @as(f32, @floatFromInt(width)) / @as(f32, @floatFromInt(height));
         gl.glViewport(0, 0, width, height);
         gl.glClear(gl.GL_COLOR_BUFFER_BIT);
+
+        gl.glUseProgram(program);
+        gl.glBindVertexArray(vertex_array);
+        gl.glDrawArrays(gl.GL_TRIANGLES, 0, 3);
+
+        glfw.glfwSwapBuffers(window);
+        glfw.glfwPollEvents();
         _ = ratio;
     }
+
+    glfw.glfwDestroyWindow(window);
+    glfw.glfwTerminate();
 }
