@@ -15,8 +15,8 @@ const cmath = @cImport(
 );
 const math = std.math;
 
-const vertex_shader_raw = @embedFile("vertex.shader");
-const fragment_shader_raw = @embedFile("fragment.shader");
+const vertex_shader_raw = @embedFile("shaders/vertex.shader");
+const fragment_shader_raw = @embedFile("shaders/fragment.shader");
 
 // wrap in array of C string pointers for glShaderSource
 const vertex_shader_text: [1][*c]const u8 = .{ vertex_shader_raw.ptr };
