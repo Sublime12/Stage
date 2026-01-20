@@ -11,13 +11,32 @@ const math = std.math;
 
 const Stage = @import("App.zig");
 const App = Stage.App;
+const Scene = @import("Scene.zig").Scene;
+const Geometry = @import("Scene.zig").Geometry;
+const Node = @import("Scene.zig").Node;
 
 pub fn main() !void {
+    // Create allocator
+    var gpa = std.heap.GeneralPurposeAllocator(.{}){};
+    defer _ = gpa.deinit();
+    const allocator = gpa.allocator();
+    
+    // ...
     const app = try App.init("Stage window", 640, 480);
     defer app.deinit();
-    while (true) {}
 
-    // const scene = Scene.empty;
+    var scene = Scene.init();
+    defer scene.deinit(allocator);
+
+    const triangleGeometry = try Geometry.makeTriangle(allocator);
+    const triangle = Node.init(triangleGeometry);
+    try scene.addNode(triangle, allocator);
+
+    std.Thread.sleep(std.time.ns_per_s * 5);
+
+    // app.render(scene);
+
+
     // const earthGeometry = Geometry.Sphere();
     // const earth = Node.init(earthGeometry, gpa);
     // scene.addNode(earth);
