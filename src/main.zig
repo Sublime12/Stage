@@ -16,6 +16,18 @@ pub fn main() !void {
     const app = try App.init("Stage window", 640, 480);
     defer app.deinit();
     while (true) {}
+
+    // const scene = Scene.empty;
+    // const earthGeometry = Geometry.Sphere();
+    // const earth = Node.init(earthGeometry, gpa);
+    // scene.addNode(earth);
+
+    // const luneGeo = Geometry.Sphere();
+    // const lune = Node.init(luneGeo);
+
+    // earth.addNode(lune, alloc);
+
+    // app.render(scene);
 }
 
 // const vertex_shader_raw = @embedFile("shaders/vertex.shader");
