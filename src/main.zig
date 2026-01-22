@@ -26,9 +26,28 @@ pub fn main() !void {
     var scene = Scene.init(allocator);
     defer scene.deinit();
 
-    const triangleGeo = try Geometry.makeTriangle(allocator);
-    const triangleNode = Node.init(triangleGeo);
-    try scene.addNode(triangleNode);
+    const triangleGeo = try Geometry.makeTriangle(allocator, 0, 0, 0);
+    var triangleNode = Node.init(triangleGeo);
+
+    const triangleGeo2 = try Geometry.makeTriangle(allocator, -0.2, -0.2, 0);
+    var triangleNode2 = Node.init(triangleGeo2);
+    try triangleNode.addChild(allocator, &triangleNode2);
+
+    const triangleGeo3 = try Geometry.makeTriangle(allocator, -0.4, -0.4, 0);
+    const triangleNode3 = Node.init(triangleGeo3);
+    try triangleNode.addChild(allocator, &triangleNode3);
+
+    const triangleGeo4 = try Geometry.makeTriangle(allocator, -0.6, -0.6, 0);
+    const triangleNode4 = Node.init(triangleGeo4);
+    try triangleNode2.addChild(allocator, &triangleNode4);
+
+    // const triangleGeo3 = try Geometry.makeTriangle(allocator, -0.4, -0.4, 0);
+    // const triangleNode3 = Node.init(triangleGeo3);
+    // try triangleNode.addChild(allocator, &triangleNode3);
+
+    std.debug.print("node tree: {any}\n", .{triangleNode});
+
+    try scene.addNode(&triangleNode);
 
     try app.render(allocator, &scene);
 

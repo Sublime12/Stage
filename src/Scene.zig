@@ -17,11 +17,20 @@ pub const Scene = struct {
 
     /// Recursively cleans up the entire tree.
     pub fn deinit(self: *Self) void {
+        std.debug.print("IN DEINIT SCENE\n", .{});
         self.root.deinit(self.allocator);
     }
 
     /// Add a node to the root
-    pub fn addNode(self: *Self, node: Node) !void {
+    pub fn addNode(self: *Self, node: *const Node) !void {
+        var vertices = std.ArrayList(Vertex).empty;
+        try generateVertices(self, self.allocator, &vertices);
+
+        std.debug.print("\n\nnb vertex: {}\n", .{vertices.items.len});
+        for (vertices.items) |vertex| {
+            std.debug.print("v: {any}\n", .{vertex});
+        }
+
         try self.root.addChild(self.allocator, node);
     }
 
@@ -61,13 +70,15 @@ pub const Node = struct {
         }
     }
 
-    pub fn addChild(self: *Self, allocator: Allocator, node: Node) !void {
-        try self.children.append(allocator, node);
+    pub fn addChild(self: *Self, allocator: Allocator, node: *const Node) !void {
+        try self.children.append(allocator, node.*);
     }
 };
 
 fn generateVerticesRec(node: *Node, allocator: Allocator, vertices: *std.ArrayList(Vertex)) !void {
+    std.debug.print("children len : {}\n", .{node.children.items.len});
     if (node.geometry) |geometry| {
+        std.debug.print("triangles: {}\n", .{geometry.shape.items.len});
         for (geometry.shape.items) |triangle| {
             try vertices.appendSlice(allocator, &triangle.vertices);
         }
@@ -94,11 +105,11 @@ pub const Geometry = struct {
         self.shape.deinit(allocator);
     }
 
-    pub fn makeTriangle(allocator: Allocator) !Geometry {
+    pub fn makeTriangle(allocator: Allocator, tx: f32, ty: f32, tz: f32) !Geometry {
         const triangle = Triangle.init(
-            .{ .position = .{ 0.0, 0.5, 0.0 }, .color = .{ 0.0, 0.0, 0.5 } },
-            .{ .position = .{ 0.5, 0.0, 0.0 }, .color = .{ 0.0, 0.5, 0.0 } },
-            .{ .position = .{ 0.0, 0.0, 0.0 }, .color = .{ 0.5, 0.0, 0.0 } },
+            .{ .position = .{ tx + 0.0, ty + 0.5, tz + 0.0 }, .color = .{ 0.0, 0.0, 0.5 } },
+            .{ .position = .{ tx + 0.5, ty + 0.0, tz + 0.0 }, .color = .{ 0.0, 0.5, 0.0 } },
+            .{ .position = .{ tx + 0.0, ty + 0.0, tz + 0.0 }, .color = .{ 0.5, 0.0, 0.0 } },
         );
 
         var geometry = Geometry.init();

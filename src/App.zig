@@ -152,7 +152,7 @@ pub const App = struct {
         gl.glClear(gl.GL_COLOR_BUFFER_BIT);
         gl.glUseProgram(self.program);
         gl.glBindVertexArray(vertex_array);
-        gl.glDrawArrays(gl.GL_TRIANGLES, 0, 3);
+        gl.glDrawArrays(gl.GL_TRIANGLES, 0, @as(c_int, @intCast(vertices.items.len)));
 
         glfw.glfwSwapBuffers(self.window);
         glfw.glfwPollEvents();
