@@ -30,10 +30,9 @@ pub fn main() !void {
     const triangleNode = Node.init(triangleGeo);
     try scene.addNode(triangleNode);
 
-    std.Thread.sleep(std.time.ns_per_s * 1);
-
     try app.render(allocator, &scene);
 
+    std.Thread.sleep(std.time.ns_per_s * 2);
     // const earthGeometry = Geometry.Sphere();
     // const earth = Node.init(earthGeometry, gpa);
     // scene.addNode(earth);
