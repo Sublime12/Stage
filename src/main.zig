@@ -19,8 +19,8 @@ pub fn main() !void {
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
     defer _ = gpa.deinit();
     const allocator = gpa.allocator();
-    
-    const app = try App.init("Stage window", 640, 480);
+
+    var app = try App.init("Stage window", 640, 480);
     defer app.deinit();
 
     var scene = Scene.init(allocator);
@@ -30,10 +30,9 @@ pub fn main() !void {
     const triangleNode = Node.init(triangleGeo);
     try scene.addNode(triangleNode);
 
-    std.Thread.sleep(std.time.ns_per_s * 5);
+    std.Thread.sleep(std.time.ns_per_s * 1);
 
-    // app.render(scene);
-
+    try app.render(allocator, &scene);
 
     // const earthGeometry = Geometry.Sphere();
     // const earth = Node.init(earthGeometry, gpa);

@@ -1,7 +1,9 @@
 const glfw = @cImport(@cInclude("GLFW/glfw3.h"));
 const gl = @cImport(@cInclude("gl.h"));
 const std = @import("std");
-
+const Scene = @import("Scene.zig").Scene;
+const Vertex = @import("Scene.zig").Vertex;
+const Allocator = std.mem.Allocator;
 /// A callback function for handling C-style errors from GLFW.
 /// Follows the C calling convention to ensure compatibility with external libraries.
 fn error_callback(err_code: c_int, description: [*c]const u8) callconv(.c) void {
@@ -9,7 +11,7 @@ fn error_callback(err_code: c_int, description: [*c]const u8) callconv(.c) void 
 }
 
 /// Failures related to the display lifecycle, from initialisation to rendering.
-pub const GraphicsError = error {
+pub const GraphicsError = error{
     // Initialisation errors
     InitFailed,
     WindowCreationFailed,
@@ -59,5 +61,12 @@ pub const App = struct {
     }
 
     /// TODO
-    pub fn render() void {}
+    pub fn render(self: *Self, allocator: Allocator, scene: *Scene) !void {
+        _ = self;
+        var vertices = std.ArrayList(Vertex).empty;
+        defer vertices.deinit(allocator);
+        try scene.generateVertices(allocator, &vertices);
+
+        std.debug.print("vertices: {any}", .{vertices.items});
+    }
 };

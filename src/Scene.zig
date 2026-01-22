@@ -24,6 +24,10 @@ pub const Scene = struct {
     pub fn addNode(self: *Self, node: Node) !void {
         try self.root.addChild(self.allocator, node);
     }
+
+    pub fn generateVertices(self: *Self, allocator: Allocator, vertices: *std.ArrayList(Vertex)) !void {
+        try generateVerticesRec(&self.root, allocator, vertices);
+    }
 };
 
 pub const Node = struct {
@@ -62,6 +66,18 @@ pub const Node = struct {
     }
 };
 
+fn generateVerticesRec(node: *Node, allocator: Allocator, vertices: *std.ArrayList(Vertex)) !void {
+    if (node.geometry) |geometry| {
+        for (geometry.shape.items) |triangle| {
+            try vertices.appendSlice(allocator, &triangle.vertices);
+        }
+    }
+
+    for (node.children.items) |*child| {
+        try generateVerticesRec(child, allocator, vertices);
+    }
+}
+
 pub const Geometry = struct {
     const Self = @This();
 
@@ -84,7 +100,7 @@ pub const Geometry = struct {
             .{ .position = .{ 1.0, 0.0, 0.0 }, .color = .{ 0.0, 1.0, 0.0 } },
             .{ .position = .{ 0.0, 0.0, 0.0 }, .color = .{ 1.0, 0.0, 0.0 } },
         );
-        
+
         var geometry = Geometry.init();
         try geometry.shape.append(allocator, triangle);
 
@@ -97,12 +113,12 @@ const Triangle = struct {
 
     pub fn init(v1: Vertex, v2: Vertex, v3: Vertex) Triangle {
         return .{
-            .vertices = .{v1, v2, v3},
+            .vertices = .{ v1, v2, v3 },
         };
     }
 };
 
-const Vertex = struct {
+pub const Vertex = struct {
     position: [3]f32,
     color: [3]f32,
 
