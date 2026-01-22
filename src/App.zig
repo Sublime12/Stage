@@ -2,11 +2,15 @@ const glfw = @cImport(@cInclude("GLFW/glfw3.h"));
 const gl = @cImport(@cInclude("gl.h"));
 const std = @import("std");
 
-fn error_callback(err: c_int, description: [*c]const u8) callconv(.c) void {
-    std.debug.print("Errors: num {} -> {s}", .{ err, description });
+/// A callback function for handling C-style errors from GLFW.
+/// Follows the C calling convention to ensure compatibility with external libraries.
+fn error_callback(err_code: c_int, description: [*c]const u8) callconv(.c) void {
+    std.debug.print("Error [{d}]: {s}\n", .{ err_code, description });
 }
 
-pub const GlfwError = error{
+/// Failures related to the display lifecycle, from initialisation to rendering.
+pub const GraphicsError = error {
+    // Initialisation errors
     InitFailed,
     WindowCreationFailed,
     MakeContextFailed,
@@ -14,24 +18,28 @@ pub const GlfwError = error{
 };
 
 pub const App = struct {
+    const Self = @This();
+
     window: *glfw.struct_GLFWwindow,
 
-    pub fn init(title: [*]const u8, width: c_int, height: c_int) GlfwError!App {
+    /// Initializes GLFW, creates a window, and loads OpenGL function pointers.
+    /// Caller must call 'deinit' on success to free resources.
+    pub fn init(title: [*]const u8, width: c_int, height: c_int) GraphicsError!App {
         _ = glfw.glfwSetErrorCallback(error_callback);
 
         if (glfw.glfwInit() == 0) {
-            return GlfwError.InitFailed;
+            return GraphicsError.InitFailed;
         }
         errdefer glfw.glfwTerminate();
 
         const window = glfw.glfwCreateWindow(width, height, title, null, null) orelse {
-            return GlfwError.WindowCreationFailed;
+            return GraphicsError.WindowCreationFailed;
         };
         errdefer glfw.glfwDestroyWindow(window);
 
         glfw.glfwMakeContextCurrent(window);
         if (glfw.glfwGetCurrentContext() == null) {
-            return GlfwError.MakeContextFailed;
+            return GraphicsError.MakeContextFailed;
         }
 
         if (gl.gladLoadGL(glfw.glfwGetProcAddress) == 0) {
@@ -44,10 +52,12 @@ pub const App = struct {
         };
     }
 
-    pub fn deinit(self: @This()) void {
+    /// Cleans up all resources associated with the application.
+    pub fn deinit(self: Self) void {
         glfw.glfwDestroyWindow(self.window);
         glfw.glfwTerminate();
     }
 
+    /// TODO
     pub fn render() void {}
 };
