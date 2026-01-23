@@ -1,4 +1,14 @@
 const std = @import("std");
+const math = std.math;
+
+const Geometry = @import("Scene.zig").Geometry;
+const node = @import("Node.zig");
+const Node = node.Node;
+const NodePool = node.NodePool;
+const Scene = @import("Scene.zig").Scene;
+const stage = @import("App.zig");
+const App = stage.App;
+
 const glfw = @cImport(@cInclude("GLFW/glfw3.h"));
 const c = @cImport({
     @cInclude("stdio.h");
@@ -7,13 +17,6 @@ const c = @cImport({
 
 const gl = @cImport(@cInclude("gl.h"));
 const cmath = @cImport(@cInclude("linmath.h"));
-const math = std.math;
-
-const Stage = @import("App.zig");
-const App = Stage.App;
-const Scene = @import("Scene.zig").Scene;
-const Geometry = @import("Scene.zig").Geometry;
-const Node = @import("Scene.zig").Node;
 
 pub fn main() !void {
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
@@ -23,31 +26,29 @@ pub fn main() !void {
     var app = try App.init("Stage window", 640, 480);
     defer app.deinit();
 
-    var scene = Scene.init(allocator);
-    defer scene.deinit();
+    var scene = Scene.init();
+
+    var pool = NodePool.init(allocator);
+    defer pool.deinit();
 
     const triangleGeo = try Geometry.makeTriangle(allocator, 0, 0, 0);
-    var triangleNode = Node.init(triangleGeo);
+    var node1 = try pool.createNode(Node.init(triangleGeo));
 
     const triangleGeo2 = try Geometry.makeTriangle(allocator, -0.2, -0.2, 0);
-    var triangleNode2 = Node.init(triangleGeo2);
-    const node2 = try triangleNode.addChild(allocator, &triangleNode2);
+    var node2 = try pool.createNode(Node.init(triangleGeo2));
+    try node1.get().addChild(allocator, node2);
 
     const triangleGeo3 = try Geometry.makeTriangle(allocator, -0.4, -0.4, 0);
-    const triangleNode3 = Node.init(triangleGeo3);
-    _ = try triangleNode.addChild(allocator, &triangleNode3);
+    var node3 = try pool.createNode(Node.init(triangleGeo3));
+    try node2.get().addChild(allocator, node3);
 
-    const triangleGeo4 = try Geometry.makeTriangle(allocator, -0.6, -0.6, 0);
-    const triangleNode4 = Node.init(triangleGeo4);
-    _ = try node2.get().addChild(allocator, &triangleNode4);
+    const triangleGeo4 = try Geometry.makeTriangle(allocator, 0.4, -0.4, 0.1);
+    const node4 = try pool.createNode(Node.init(triangleGeo4));
+    try node3.get().addChild(allocator, node4);
 
-    // const triangleGeo3 = try Geometry.makeTriangle(allocator, -0.4, -0.4, 0);
-    // const triangleNode3 = Node.init(triangleGeo3);
-    // try triangleNode.addChild(allocator, &triangleNode3);
+    std.debug.print("node tree: {any}\n", .{node1});
 
-    std.debug.print("node tree: {any}\n", .{triangleNode});
-
-    try scene.addNode(&triangleNode);
+    try scene.addRoot(node1);
 
     try app.render(allocator, &scene);
 

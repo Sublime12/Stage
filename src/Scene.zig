@@ -1,106 +1,30 @@
 const std = @import("std");
 const Allocator = std.mem.Allocator;
+const Node = @import("Node.zig").Node;
+const NodeHandle = @import("Node.zig").NodeHandle;
 
 pub const Scene = struct {
     const Self = @This();
 
-    allocator: Allocator,
-    root: Node,
+    root: ?NodeHandle,
 
     /// Initilize the scene with an empty tree.
-    pub fn init(allocator: Allocator) Scene {
+    pub fn init() Scene {
         return .{
-            .allocator = allocator,
-            .root = Node.initEmpty(),
+            .root = null,
         };
-    }
-
-    /// Recursively cleans up the entire tree.
-    pub fn deinit(self: *Self) void {
-        std.debug.print("IN DEINIT SCENE\n", .{});
-        self.root.deinit(self.allocator);
     }
 
     /// Add a node to the root
-    pub fn addNode(self: *Self, node: *const Node) !void {
-        var vertices = std.ArrayList(Vertex).empty;
-        try generateVertices(self, self.allocator, &vertices);
-
-        std.debug.print("\n\nnb vertex: {}\n", .{vertices.items.len});
-        for (vertices.items) |vertex| {
-            std.debug.print("v: {any}\n", .{vertex});
-        }
-
-        _ = try self.root.addChild(self.allocator, node);
+    pub fn addRoot(self: *Self, node: NodeHandle) !void {
+        self.root = node;
     }
 
     pub fn generateVertices(self: *Self, allocator: Allocator, vertices: *std.ArrayList(Vertex)) !void {
-        try generateVerticesRec(&self.root, allocator, vertices);
+        if (self.root == null) return;
+        try Node.generateVerticesRec(self.root.?.get(), allocator, vertices);
     }
 };
-
-pub const Node = struct {
-    const Self = @This();
-
-    children: std.ArrayList(Node),
-    geometry: ?Geometry,
-
-    pub fn init(geometry: Geometry) Node {
-        return .{
-            .children = std.ArrayList(Node).empty,
-            .geometry = geometry,
-        };
-    }
-
-    pub fn initEmpty() Node {
-        return .{
-            .children = std.ArrayList(Node).empty,
-            .geometry = null,
-        };
-    }
-
-    pub fn deinit(self: *Self, allocator: Allocator) void {
-        for (self.children.items) |*child| {
-            child.deinit(allocator);
-        }
-        self.children.deinit(allocator);
-
-        if (self.geometry != null) {
-            self.geometry.?.deinit(allocator);
-        }
-    }
-
-    pub fn addChild(self: *Self, allocator: Allocator, node: *const Node) Allocator.Error!NodeHandle {
-        try self.children.append(allocator, node.*);
-        return .{
-            .list = &self.children,
-            .index = self.children.items.len - 1,
-        };
-    }
-
-    const NodeHandle = struct {
-        list: *std.ArrayList(Node),
-        index: usize,
-
-        pub fn get(self: NodeHandle) *Node {
-            return &self.list.items[self.index];
-        }
-    };
-};
-
-fn generateVerticesRec(node: *Node, allocator: Allocator, vertices: *std.ArrayList(Vertex)) !void {
-    std.debug.print("children len : {}\n", .{node.children.items.len});
-    if (node.geometry) |geometry| {
-        std.debug.print("triangles: {}\n", .{geometry.shape.items.len});
-        for (geometry.shape.items) |triangle| {
-            try vertices.appendSlice(allocator, &triangle.vertices);
-        }
-    }
-
-    for (node.children.items) |*child| {
-        try generateVerticesRec(child, allocator, vertices);
-    }
-}
 
 pub const Geometry = struct {
     const Self = @This();
