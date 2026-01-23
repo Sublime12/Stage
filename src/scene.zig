@@ -1,7 +1,7 @@
 const std = @import("std");
 const Allocator = std.mem.Allocator;
-const Node = @import("Node.zig").Node;
-const NodeHandle = @import("Node.zig").NodeHandle;
+const Node = @import("node.zig").Node;
+const NodeHandle = @import("node.zig").NodeHandle;
 
 pub const Scene = struct {
     const Self = @This();

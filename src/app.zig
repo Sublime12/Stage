@@ -1,8 +1,8 @@
 const std = @import("std");
 const Allocator = std.mem.Allocator;
 
-const Scene = @import("Scene.zig").Scene;
-const Vertex = @import("Scene.zig").Vertex;
+const Scene = @import("scene.zig").Scene;
+const Vertex = @import("scene.zig").Vertex;
 
 const glfw = @cImport(@cInclude("GLFW/glfw3.h"));
 const gl = @cImport(@cInclude("gl.h"));

@@ -1,8 +1,8 @@
 const std = @import("std");
 const Allocator = std.mem.Allocator;
 
-const Geometry = @import("Scene.zig").Geometry;
-const Vertex = @import("Scene.zig").Vertex;
+const Geometry = @import("scene.zig").Geometry;
+const Vertex = @import("scene.zig").Vertex;
 
 pub const NodeHandle = struct {
     pool: *NodePool,
@@ -45,9 +45,6 @@ pub const NodePool = struct {
 pub const Node = struct {
     const Self = @This();
 
-    // Child handles are owned by the caller
-    // You must not free the handles themselves
-    // but just free the arraylist containing it
     children: std.ArrayList(NodeHandle),
     geometry: ?Geometry,
 
@@ -66,6 +63,9 @@ pub const Node = struct {
     }
 
     pub fn deinit(self: *Self, allocator: Allocator) void {
+        // Child handles are owned by the caller
+        // You must not free the handles themselves
+        // but just free the arraylist containing it
         self.children.deinit(allocator);
         if (self.geometry) |*geo| {
             geo.deinit(allocator);
@@ -77,9 +77,9 @@ pub const Node = struct {
     }
 
     pub fn generateVerticesRec(node: *Node, allocator: Allocator, vertices: *std.ArrayList(Vertex)) !void {
-        std.debug.print("children len : {}\n", .{node.children.items.len});
+        // std.debug.print("children len : {}\n", .{node.children.items.len});
         if (node.geometry) |geometry| {
-            std.debug.print("triangles: {}\n", .{geometry.shape.items.len});
+            // std.debug.print("triangles: {}\n", .{geometry.shape.items.len});
             for (geometry.shape.items) |triangle| {
                 try vertices.appendSlice(allocator, &triangle.vertices);
             }

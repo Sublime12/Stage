@@ -1,12 +1,14 @@
 const std = @import("std");
 const math = std.math;
 
-const Geometry = @import("Scene.zig").Geometry;
-const node = @import("Node.zig");
+const scene_pkg = @import("scene.zig");
+const node = @import("node.zig");
+const stage = @import("app.zig");
+
+const Geometry = scene_pkg.Geometry;
+const Scene = scene_pkg.Scene;
 const Node = node.Node;
 const NodePool = node.NodePool;
-const Scene = @import("Scene.zig").Scene;
-const stage = @import("App.zig");
 const App = stage.App;
 
 const glfw = @cImport(@cInclude("GLFW/glfw3.h"));
