@@ -3,11 +3,16 @@ const Allocator = std.mem.Allocator;
 
 const Geometry = @import("scene.zig").Geometry;
 const Vertex = @import("scene.zig").Vertex;
+const math = @import("transform.zig");
+const Transform = math.Transform;
 
 pub const NodeHandle = struct {
     pool: *NodePool,
     index: usize,
 
+    /// return the pointer to the element in the array pool
+    /// The user must not stored it for long because it can be invalided
+    /// on array list resizing
     pub fn get(self: *NodeHandle) *Node {
         return &self.pool.nodes.items[self.index];
     }
@@ -47,11 +52,13 @@ pub const Node = struct {
 
     children: std.ArrayList(NodeHandle),
     geometry: ?Geometry,
+    transform: Transform,
 
     pub fn init(geometry: Geometry) Node {
         return .{
             .children = std.ArrayList(NodeHandle).empty,
             .geometry = geometry,
+            .transform = comptime Transform.init(),
         };
     }
 
