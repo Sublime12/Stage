@@ -31,7 +31,7 @@ pub const Scene = struct {
             std.debug.print("v: {any}\n", .{vertex});
         }
 
-        try self.root.addChild(self.allocator, node);
+        _ = try self.root.addChild(self.allocator, node);
     }
 
     pub fn generateVertices(self: *Self, allocator: Allocator, vertices: *std.ArrayList(Vertex)) !void {
@@ -70,9 +70,22 @@ pub const Node = struct {
         }
     }
 
-    pub fn addChild(self: *Self, allocator: Allocator, node: *const Node) !void {
+    pub fn addChild(self: *Self, allocator: Allocator, node: *const Node) Allocator.Error!NodeHandle {
         try self.children.append(allocator, node.*);
+        return .{
+            .list = &self.children,
+            .index = self.children.items.len - 1,
+        };
     }
+
+    const NodeHandle = struct {
+        list: *std.ArrayList(Node),
+        index: usize,
+
+        pub fn get(self: NodeHandle) *Node {
+            return &self.list.items[self.index];
+        }
+    };
 };
 
 fn generateVerticesRec(node: *Node, allocator: Allocator, vertices: *std.ArrayList(Vertex)) !void {

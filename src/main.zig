@@ -31,15 +31,15 @@ pub fn main() !void {
 
     const triangleGeo2 = try Geometry.makeTriangle(allocator, -0.2, -0.2, 0);
     var triangleNode2 = Node.init(triangleGeo2);
-    try triangleNode.addChild(allocator, &triangleNode2);
+    const node2 = try triangleNode.addChild(allocator, &triangleNode2);
 
     const triangleGeo3 = try Geometry.makeTriangle(allocator, -0.4, -0.4, 0);
     const triangleNode3 = Node.init(triangleGeo3);
-    try triangleNode.addChild(allocator, &triangleNode3);
+    _ = try triangleNode.addChild(allocator, &triangleNode3);
 
     const triangleGeo4 = try Geometry.makeTriangle(allocator, -0.6, -0.6, 0);
     const triangleNode4 = Node.init(triangleGeo4);
-    try triangleNode2.addChild(allocator, &triangleNode4);
+    _ = try node2.get().addChild(allocator, &triangleNode4);
 
     // const triangleGeo3 = try Geometry.makeTriangle(allocator, -0.4, -0.4, 0);
     // const triangleNode3 = Node.init(triangleGeo3);
