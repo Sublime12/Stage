@@ -33,7 +33,7 @@ pub const NodePool = struct {
         self.nodes.deinit(self.allocator);
     }
 
-    pub fn createNode(self: *NodePool, node: Node) !NodeHandle {
+    pub fn create(self: *NodePool, node: Node) !NodeHandle {
         try self.nodes.append(self.allocator, node);
         return .{
             .pool = self,
