@@ -3,8 +3,8 @@ const Allocator = std.mem.Allocator;
 
 const Geometry = @import("scene.zig").Geometry;
 const Vertex = @import("scene.zig").Vertex;
-const math = @import("transform.zig");
-const Transform = math.Transform;
+const transform = @import("transform.zig");
+const Transform = transform.Transform;
 
 pub const NodeHandle = struct {
     pool: *NodePool,
