@@ -2,6 +2,7 @@ const std = @import("std");
 const Allocator = std.mem.Allocator;
 const Node = @import("node.zig").Node;
 const NodeHandle = @import("node.zig").NodeHandle;
+const Transform = @import("transform.zig").Transform;
 
 pub const Scene = struct {
     const Self = @This();
@@ -20,9 +21,24 @@ pub const Scene = struct {
         self.root = node;
     }
 
-    pub fn generateVertices(self: *Self, allocator: Allocator, vertices: *std.ArrayList(Vertex)) !void {
+    pub fn generateVertices(
+        self: *Self,
+        allocator: Allocator,
+        vertices: *std.ArrayList(Vertex),
+    ) !void {
         if (self.root == null) return;
-        try Node.generateVerticesRec(self.root.?.get(), allocator, vertices);
+
+        var transforms = std.ArrayList(Transform).empty;
+        defer transforms.deinit(allocator);
+        try transforms.append(allocator, Transform.init());
+        try Node.generateVerticesRec(
+            self.root.?.get(),
+            allocator,
+            vertices,
+            &transforms,
+        );
+
+        std.debug.assert(transforms.items.len == 1);
     }
 };
 

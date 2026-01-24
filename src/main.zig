@@ -35,18 +35,22 @@ pub fn main() !void {
 
     const triangleGeo = try Geometry.makeTriangle(allocator, 0, 0, 0);
     var node1 = try pool.create(Node.init(triangleGeo));
+    node1.get().transform.translate(0.2, 0, 0);
 
-    const triangleGeo2 = try Geometry.makeTriangle(allocator, -0.2, -0.2, 0);
+    const triangleGeo2 = try Geometry.makeTriangle(allocator, 0, 0, 0);
     var node2 = try pool.create(Node.init(triangleGeo2));
     try node1.get().addChild(allocator, node2);
+    node2.get().transform.translate(0, 0.4, 0);
 
-    const triangleGeo3 = try Geometry.makeTriangle(allocator, -0.4, -0.4, 0);
+    const triangleGeo3 = try Geometry.makeTriangle(allocator, 0, 0, 0);
     var node3 = try pool.create(Node.init(triangleGeo3));
     try node2.get().addChild(allocator, node3);
+    node3.get().transform.translate(0.2, 0, 0);
 
-    const triangleGeo4 = try Geometry.makeTriangle(allocator, 0.4, -0.4, 0.1);
-    const node4 = try pool.create(Node.init(triangleGeo4));
+    const triangleGeo4 = try Geometry.makeTriangle(allocator, 0, 0, 0);
+    var node4 = try pool.create(Node.init(triangleGeo4));
     try node3.get().addChild(allocator, node4);
+    node4.get().transform.translate(0.2, 0, 0);
 
     std.debug.print("node tree: {any}\n", .{node1});
 

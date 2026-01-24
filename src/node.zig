@@ -83,17 +83,32 @@ pub const Node = struct {
         try self.children.append(allocator, node);
     }
 
-    pub fn generateVerticesRec(node: *Node, allocator: Allocator, vertices: *std.ArrayList(Vertex)) !void {
+    pub fn generateVerticesRec(
+        node: *Node,
+        allocator: Allocator,
+        vertices: *std.ArrayList(Vertex),
+        transforms: *std.ArrayList(Transform),
+    ) !void {
+        const top_transform = transforms.getLast();
+        const current_transform = Transform.from(&top_transform, &node.transform);
+        try transforms.append(allocator, current_transform);
+        defer _ = transforms.pop();
+
         // std.debug.print("children len : {}\n", .{node.children.items.len});
         if (node.geometry) |geometry| {
             // std.debug.print("triangles: {}\n", .{geometry.shape.items.len});
             for (geometry.shape.items) |triangle| {
-                try vertices.appendSlice(allocator, &triangle.vertices);
+                // try vertices.appendSlice(allocator, &triangle.vertices);
+
+                for (triangle.vertices) |vertex| {
+                    const newVertex = current_transform.transformVertex(&vertex);
+                    try vertices.append(allocator, newVertex);
+                }
             }
         }
 
         for (node.children.items) |*child| {
-            try generateVerticesRec(child.get(), allocator, vertices);
+            try generateVerticesRec(child.get(), allocator, vertices, transforms);
         }
     }
 };
