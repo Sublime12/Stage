@@ -52,16 +52,21 @@ pub fn main() !void {
     try node3.get().addChild(allocator, node4);
     node4.get().transform.translate(0.2, 0, 0);
 
-    std.debug.print("node tree: {any}\n", .{node1});
+    const cubeGeo = try Geometry.makeCube(allocator);
+    var node5 = try pool.create(Node.init(cubeGeo));
+    try node1.get().addChild(allocator, node5);
+
+    // std.debug.print("node tree: {any}\n", .{node1});
 
     try scene.addRoot(node1);
 
     for (0..1000) |_| {
         try app.render(allocator, &scene);
-        node1.get().transform.translate(-0.001, 0, 0);
-        node2.get().transform.rotateX(math.pi / 180.0);
-        node3.get().transform.rotateY(math.pi / 180.0);
-        node4.get().transform.rotateZ(math.pi / 180.0);
+        // node1.get().transform.translate(-0.001, 0, 0);
+        // node2.get().transform.rotateX(math.pi / 180.0);
+        // node3.get().transform.rotateY(math.pi / 180.0);
+        node5.get().transform.rotateX(math.pi / 300.0);
+        node5.get().transform.rotateY(math.pi / 300.0);
     }
     // std.Thread.sleep(std.time.ns_per_s * 2);
     // const earthGeometry = Geometry.Sphere();

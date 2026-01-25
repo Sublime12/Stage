@@ -53,6 +53,8 @@ pub const App = struct {
         }
         glfw.glfwSwapInterval(1);
 
+        gl.glEnable(gl.GL_DEPTH_TEST);
+
         const program = try compile();
 
         return .{
@@ -120,7 +122,7 @@ pub const App = struct {
             self.program,
             "vCol",
         ));
-        std.debug.print("v pos: {}, v col {}\n", .{ vpos_location, vcol_location });
+        // std.debug.print("v pos: {}, v col {}\n", .{ vpos_location, vcol_location });
 
         var vertex_array: gl.GLuint = 0;
         gl.glGenVertexArrays(1, &vertex_array);
@@ -149,7 +151,8 @@ pub const App = struct {
         glfw.glfwGetFramebufferSize(self.window, &width, &height);
         const ratio: f32 = @as(f32, @floatFromInt(width)) / @as(f32, @floatFromInt(height));
         gl.glViewport(0, 0, width, height);
-        gl.glClear(gl.GL_COLOR_BUFFER_BIT);
+        // gl.glClear(gl.GL_COLOR_BUFFER_BIT);
+        gl.glClear(gl.GL_COLOR_BUFFER_BIT | gl.GL_DEPTH_BUFFER_BIT); 
         gl.glUseProgram(self.program);
         gl.glBindVertexArray(vertex_array);
         gl.glDrawArrays(gl.GL_TRIANGLES, 0, @as(c_int, @intCast(vertices.items.len)));
@@ -159,8 +162,8 @@ pub const App = struct {
         _ = ratio;
         //
 
-        for (vertices.items) |vertex| {
-            std.debug.print("vertex: {any}\n", .{vertex});
-        }
+        // for (vertices.items) |vertex| {
+        //     std.debug.print("vertex: {any}\n", .{vertex});
+        // }
     }
 };

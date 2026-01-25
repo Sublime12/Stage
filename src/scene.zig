@@ -70,6 +70,112 @@ pub const Geometry = struct {
 
         return geometry;
     }
+
+    pub fn makeCube(allocator: Allocator) !Geometry {
+        // Face 1
+        const blue = .{0.0, 0.0, 1.0};
+        const triangle1 = Triangle.init(
+            .{ .position = .{ 0.0, 0.0, 0.0 }, .color = blue },
+            .{ .position = .{ 0.0, 0.5, 0.0 }, .color = blue },
+            .{ .position = .{ 0.5, 0.0, 0.0 }, .color = blue },
+        );
+
+        const triangle2 = Triangle.init(
+            .{ .position = .{ 0.5, 0.5, 0.0 }, .color = blue },
+            .{ .position = .{ 0.0, 0.5, 0.0 }, .color = blue },
+            .{ .position = .{ 0.5, 0.0, 0.0 }, .color = blue },
+        );
+
+        // Face 2
+        const red = .{1.0, 0.0, 0.0};
+
+        const triangle3 = Triangle.init(
+            .{ .position = .{ 0.0, 0.0, 0.0 }, .color = red },
+            .{ .position = .{ 0.0, 0.0, 0.5 }, .color = red },
+            .{ .position = .{ 0.0, 0.5, 0.0 }, .color = red },
+        );
+
+        const triangle4 = Triangle.init(
+            .{ .position = .{ 0.0, 0.5, 0.5 }, .color = red },
+            .{ .position = .{ 0.0, 0.0, 0.5 }, .color = red },
+            .{ .position = .{ 0.0, 0.5, 0.0 }, .color = red },
+        );
+
+        // Face 3
+        const gray = .{0.5, 0.5, 0.5};
+        const triangle5 = Triangle.init(
+            .{ .position = .{ 0.0, 0.0, 0.5 }, .color = gray },
+            .{ .position = .{ 0.0, 0.5, 0.5 }, .color = gray },
+            .{ .position = .{ 0.5, 0.0, 0.5 }, .color = gray },
+        );
+
+        const triangle6 = Triangle.init(
+            .{ .position = .{ 0.5, 0.5, 0.5 }, .color = gray },
+            .{ .position = .{ 0.0, 0.5, 0.5 }, .color = gray },
+            .{ .position = .{ 0.5, 0.0, 0.5 }, .color = gray },
+        );
+
+        // Face 4
+        const orange = .{1.0, 1.0, 0.0};
+
+        const triangle7 = Triangle.init(
+            .{ .position = .{ 0.5, 0.0, 0.0 }, .color = orange },
+            .{ .position = .{ 0.5, 0.0, 0.5 }, .color = orange },
+            .{ .position = .{ 0.5, 0.5, 0.0 }, .color = orange },
+        );
+
+        const triangle8 = Triangle.init(
+            .{ .position = .{ 0.5, 0.5, 0.5 }, .color = orange },
+            .{ .position = .{ 0.5, 0.0, 0.5 }, .color = orange },
+            .{ .position = .{ 0.5, 0.5, 0.0 }, .color = orange },
+        );
+
+        // Face 4
+        const violet = .{0.0, 1.0, 1.0};
+
+        const triangle9 = Triangle.init(
+            .{ .position = .{ 0.0, 0.0, 0.0 }, .color = violet },
+            .{ .position = .{ 0.5, 0.0, 0.0 }, .color = violet },
+            .{ .position = .{ 0.0, 0.0, 0.5 }, .color = violet },
+        );
+
+        const triangle10 = Triangle.init(
+            .{ .position = .{ 0.5, 0.0, 0.5 }, .color = violet },
+            .{ .position = .{ 0.5, 0.0, 0.0 }, .color = violet },
+            .{ .position = .{ 0.0, 0.0, 0.5 }, .color = violet },
+        );
+
+        // Face 6
+        const pink = .{1.0, 0.0, 1.0};
+
+        const triangle11 = Triangle.init(
+            .{ .position = .{ 0.0, 0.5, 0.0 }, .color = pink },
+            .{ .position = .{ 0.5, 0.5, 0.0 }, .color = pink },
+            .{ .position = .{ 0.0, 0.5, 0.5 }, .color = pink },
+        );
+
+        const triangle12 = Triangle.init(
+            .{ .position = .{ 0.5, 0.5, 0.5 }, .color = pink },
+            .{ .position = .{ 0.5, 0.5, 0.0 }, .color = pink },
+            .{ .position = .{ 0.0, 0.5, 0.5 }, .color = pink },
+        );
+
+        var geometry = Geometry.init();
+        try geometry.shape.append(allocator, triangle1);
+        try geometry.shape.append(allocator, triangle2);
+        try geometry.shape.append(allocator, triangle3);
+        try geometry.shape.append(allocator, triangle4);
+        try geometry.shape.append(allocator, triangle5);
+        try geometry.shape.append(allocator, triangle6);
+        try geometry.shape.append(allocator, triangle7);
+        try geometry.shape.append(allocator, triangle8);
+        try geometry.shape.append(allocator, triangle9);
+        try geometry.shape.append(allocator, triangle10);
+        try geometry.shape.append(allocator, triangle11);
+        try geometry.shape.append(allocator, triangle12);
+
+        return geometry;
+    }
 };
 
 const Triangle = struct {
