@@ -56,9 +56,14 @@ pub fn main() !void {
 
     try scene.addRoot(node1);
 
-    try app.render(allocator, &scene);
-
-    std.Thread.sleep(std.time.ns_per_s * 2);
+    for (0..1000) |_| {
+        try app.render(allocator, &scene);
+        node1.get().transform.translate(-0.001, 0, 0);
+        node2.get().transform.rotateX(math.pi / 180.0);
+        node3.get().transform.rotateY(math.pi / 180.0);
+        node4.get().transform.rotateZ(math.pi / 180.0);
+    }
+    // std.Thread.sleep(std.time.ns_per_s * 2);
     // const earthGeometry = Geometry.Sphere();
     // const earth = Node.init(earthGeometry, gpa);
     // scene.addNode(earth);

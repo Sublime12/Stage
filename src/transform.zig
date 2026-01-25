@@ -27,6 +27,41 @@ pub const Transform = struct {
 
         math.multiplyMat4x4(&self.mat, &self.mat, &translation_matrice);
     }
+    pub fn rotateX(self: *Self, angle: f32) void {
+        var rotateXMatrice = math.identity();
+        const cos = @cos(angle);
+        const sin = @sin(angle);
+        rotateXMatrice[1][1] = cos;
+        rotateXMatrice[1][2] = -sin;
+        rotateXMatrice[2][1] = sin;
+        rotateXMatrice[2][2] = cos;
+
+        math.multiplyMat4x4(&self.mat, &self.mat, &rotateXMatrice);
+    }
+
+    pub fn rotateY(self: *Self, angle: f32) void {
+        var rotateYMatrice = math.identity();
+        const cos = @cos(angle);
+        const sin = @sin(angle);
+        rotateYMatrice[0][0] = cos;
+        rotateYMatrice[0][2] = sin;
+        rotateYMatrice[2][0] = -sin;
+        rotateYMatrice[2][2] = cos;
+
+        math.multiplyMat4x4(&self.mat, &self.mat, &rotateYMatrice);
+    }
+
+    pub fn rotateZ(self: *Self, angle: f32) void {
+        var rotateZMatrice = math.identity();
+        const cos = @cos(angle);
+        const sin = @sin(angle);
+        rotateZMatrice[0][0] = cos;
+        rotateZMatrice[0][1] = -sin;
+        rotateZMatrice[1][0] = sin;
+        rotateZMatrice[1][1] = cos;
+
+        math.multiplyMat4x4(&self.mat, &self.mat, &rotateZMatrice);
+    }
 
     pub fn transformVertex(self: *const Self, v: *const Vertex) Vertex {
         var newVertex: Vertex = v.*;
