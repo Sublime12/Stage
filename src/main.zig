@@ -4,12 +4,14 @@ const math = std.math;
 const scene_pkg = @import("scene.zig");
 const node = @import("node.zig");
 const stage = @import("app.zig");
+const camera_pkg = @import("camera.zig");
 
 const Geometry = scene_pkg.Geometry;
 const Scene = scene_pkg.Scene;
 const Node = node.Node;
 const NodePool = node.NodePool;
 const App = stage.App;
+const Camera = camera_pkg.Camera;
 
 const glfw = @cImport(@cInclude("GLFW/glfw3.h"));
 const c = @cImport({
@@ -33,52 +35,21 @@ pub fn main() !void {
     var pool = NodePool.init(allocator);
     defer pool.deinit();
 
-    const triangleGeo = try Geometry.makeTriangle(allocator, 0, 0, 0);
-    var node1 = try pool.create(Node.init(triangleGeo));
-    node1.get().transform.translate(0.2, 0, 0);
-
-    const triangleGeo2 = try Geometry.makeTriangle(allocator, 0, 0, 0);
-    var node2 = try pool.create(Node.init(triangleGeo2));
-    try node1.get().addChild(allocator, node2);
-    node2.get().transform.translate(0, 0.4, 0);
-
-    const triangleGeo3 = try Geometry.makeTriangle(allocator, 0, 0, 0);
-    var node3 = try pool.create(Node.init(triangleGeo3));
-    try node2.get().addChild(allocator, node3);
-    node3.get().transform.translate(0.2, 0, 0);
-
-    const triangleGeo4 = try Geometry.makeTriangle(allocator, 0, 0, 0);
-    var node4 = try pool.create(Node.init(triangleGeo4));
-    try node3.get().addChild(allocator, node4);
-    node4.get().transform.translate(0.2, 0, 0);
-
     const cubeGeo = try Geometry.makeCube(allocator);
     var node5 = try pool.create(Node.init(cubeGeo));
-    try node1.get().addChild(allocator, node5);
 
-    // std.debug.print("node tree: {any}\n", .{node1});
 
-    try scene.addRoot(node1);
+    try scene.addRoot(node5);
+
+    const camera = Camera.init(math.pi / 4.0, 640.0 / 420.0, 0.01, 100);
+    node5.get().transform.translate(0, 0, -15);
 
     for (0..1000) |_| {
-        try app.render(allocator, &scene);
-        // node1.get().transform.translate(-0.001, 0, 0);
-        // node2.get().transform.rotateX(math.pi / 180.0);
-        // node3.get().transform.rotateY(math.pi / 180.0);
-        node5.get().transform.rotateX(math.pi / 300.0);
+        try app.render(allocator, &scene, &camera);
+        // camera.view.rotateY(math.pi / 300.0);
+        // node5.get().transform.rotateX(math.pi / 300.0);
         node5.get().transform.rotateY(math.pi / 300.0);
     }
-    // std.Thread.sleep(std.time.ns_per_s * 2);
-    // const earthGeometry = Geometry.Sphere();
-    // const earth = Node.init(earthGeometry, gpa);
-    // scene.addNode(earth);
-
-    // const luneGeo = Geometry.Sphere();
-    // const lune = Node.init(luneGeo);
-
-    // earth.addNode(lune, alloc);
-
-    // app.render(scene);
 }
 
 // const vertex_shader_raw = @embedFile("shaders/vertex.shader");
