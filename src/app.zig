@@ -100,7 +100,6 @@ pub const App = struct {
         glfw.glfwTerminate();
     }
 
-    /// TODO
     pub fn render(
         self: *Self,
         allocator: Allocator,
@@ -139,12 +138,6 @@ pub const App = struct {
             "view",
         ));
 
-        // _ = camera;
-        // _ = proj_location;
-        // _ = view_location;
-
-       // std.debug.print("v pos: {}, v col {}\n", .{ vpos_location, vcol_location });
-
         var vertex_array: gl.GLuint = 0;
         gl.glGenVertexArrays(1, &vertex_array);
         gl.glBindVertexArray(vertex_array);
@@ -176,18 +169,8 @@ pub const App = struct {
         gl.glClear(gl.GL_COLOR_BUFFER_BIT | gl.GL_DEPTH_BUFFER_BIT);
         gl.glUseProgram(self.program);
 
-        gl.glUniformMatrix4fv(@intCast(proj_location), 1, gl.GL_FALSE, @ptrCast(&camera.projection.mat));
-        gl.glUniformMatrix4fv(@intCast(view_location), 1, gl.GL_FALSE, @ptrCast(&camera.view.mat));
-
-        // const view: [4][4]f32 = .{
-        //     .{1, 0, 0, 0},
-        //     .{0   , 1, 0, 0},
-        //     .{0   , 0, 0, -1},
-        //     .{0   , 0, -1, 0},
-        // };
-        // _ = camera;
-        // gl.glUniformMatrix4fv(@intCast(proj_location), 1, gl.GL_FALSE, @ptrCast(&view));
-         
+        gl.glUniformMatrix4fv(@intCast(proj_location), 1, gl.GL_TRUE, @ptrCast(&camera.projection.mat));
+        gl.glUniformMatrix4fv(@intCast(view_location), 1, gl.GL_TRUE, @ptrCast(&camera.view.mat));
 
         gl.glBindVertexArray(vertex_array);
         gl.glDrawArrays(gl.GL_TRIANGLES, 0, @as(c_int, @intCast(vertices.items.len)));
@@ -195,10 +178,5 @@ pub const App = struct {
         glfw.glfwSwapBuffers(self.window);
         glfw.glfwPollEvents();
         _ = ratio;
-        //
-
-        // for (vertices.items) |vertex| {
-        //     std.debug.print("vertex: {any}\n", .{vertex});
-        // }
-    }
+   }
 };
