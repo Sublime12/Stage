@@ -51,15 +51,30 @@ pub fn main() !void {
         const window = glfw.glfwGetCurrentContext();
         // var window : ?*glfw.GLFWwindow = null;
         // window = &app.window;
-         if (glfw.glfwGetKey(window, glfw.GLFW_KEY_UP) == glfw.GLFW_PRESS) {
+        if (glfw.glfwGetKey(window, glfw.GLFW_KEY_UP) == glfw.GLFW_PRESS) {
             std.debug.print("UP\n", .{});
+            camera.view.translate(0, -0.01, 0);
+        }
+        if (glfw.glfwGetKey(window, glfw.GLFW_KEY_DOWN) == glfw.GLFW_PRESS) {
+            std.debug.print("DOWN\n", .{});
             camera.view.translate(0, 0.01, 0);
-        }       
+        }
         if (glfw.glfwGetKey(window, glfw.GLFW_KEY_RIGHT) == glfw.GLFW_PRESS) {
             std.debug.print("RIGHT\n", .{});
             camera.view.translate(0.01, 0, 0);
         }
+          if (glfw.glfwGetKey(window, glfw.GLFW_KEY_LEFT) == glfw.GLFW_PRESS) {
+            std.debug.print("LEFT\n", .{});
+            camera.view.translate(-0.01, 0, 0);
+        }
+        if (glfw.glfwGetKey(window, glfw.GLFW_KEY_W) == glfw.GLFW_PRESS) {
+            std.debug.print("FORWARD\n", .{});
+            camera.view.translate(0, 0, 0.01);
+        }
+        if (glfw.glfwGetKey(window, glfw.GLFW_KEY_S) == glfw.GLFW_PRESS) {
+            std.debug.print("BACKWARD\n", .{});
+            camera.view.translate(0, 0, -0.01);
+        }
         node5.get().transform.rotateY(math.pi / 300.0);
     }
 }
-

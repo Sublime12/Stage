@@ -178,5 +178,5 @@ pub const App = struct {
         glfw.glfwSwapBuffers(self.window);
         glfw.glfwPollEvents();
         _ = ratio;
-   }
+    }
 };
