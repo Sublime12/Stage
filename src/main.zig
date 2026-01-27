@@ -42,7 +42,7 @@ pub fn main() !void {
 
     var camera = Camera.init(math.pi / 4.0, 640.0 / 420.0, 0.01, 100);
     node5.get().transform.translate(0, 0, 0.0);
-    camera.lookAt(.{10.0, 10.0, 10.0}, .{0.0, 0.0, 0.0}, .{0.0, 1.0, 0.0});
+    camera.lookAt(.{3.0, 3.0, 3.0}, .{0.0, 0.0, 0.0}, .{0.0, 1.0, 0.0});
 
     const window = glfw.glfwGetCurrentContext();
     
