@@ -41,8 +41,8 @@ pub fn main() !void {
     try scene.addRoot(node5);
 
     var camera = Camera.init(math.pi / 4.0, 640.0 / 420.0, 0.01, 100);
-    node5.get().transform.translate(0, 0, 0);
-    camera.lookAt(.{3.0, 0.0, 3.0}, .{0.0, 0.0, 0.0}, .{0.0, 1.0, 0.0});
+    node5.get().transform.translate(0, 0, 0.0);
+    camera.lookAt(.{10.0, 10.0, 10.0}, .{0.0, 0.0, 0.0}, .{0.0, 1.0, 0.0});
 
     const window = glfw.glfwGetCurrentContext();
     
@@ -74,6 +74,11 @@ pub fn main() !void {
             camera.view.translate(0, 0, -0.01);
         }
 
-        node5.get().transform.rotateY(math.pi / 300.0);
+        // const radius:f32 = 10.0;
+        // const camX:f32 = @sin(@as(f32, @floatCast(glfw.glfwGetTime()))) * radius;
+        // const camZ:f32 = @cos(@as(f32, @floatCast(glfw.glfwGetTime()))) * radius;
+        // camera.lookAt(.{camX, 0.0, camZ}, .{0.0, 0.0, 0.0}, .{0.0, 1.0, 0.0});  
+
+        // node5.get().transform.rotateY(math.pi / 300.0);
     }
 }

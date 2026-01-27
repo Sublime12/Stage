@@ -96,16 +96,16 @@ pub const Camera = struct {
         math.crossVec3(&u, &s,&f);
 
         self.view.mat[0][0] = s[0];
-        self.view.mat[1][0] = s[1];
-        self.view.mat[2][0] = s[2];
-        self.view.mat[0][1] = u[0];
+        self.view.mat[0][1] = s[1];
+        self.view.mat[0][2] = s[2];
+        self.view.mat[1][0] = u[0];
         self.view.mat[1][1] = u[1];
-        self.view.mat[2][1] = u[2];
-        self.view.mat[0][2] = -f[0];
-        self.view.mat[1][2] = -f[1];
+        self.view.mat[1][2] = u[2];
+        self.view.mat[2][0] = -f[0];
+        self.view.mat[2][1] = -f[1];
         self.view.mat[2][2] = -f[2];
-        self.view.mat[3][0] = -math.dotVec3(&s, &eye);
-        self.view.mat[3][1] = -math.dotVec3(&u, &eye);
-        self.view.mat[3][2] = math.dotVec3(&f, &eye);
+        self.view.mat[0][3] = -math.dotVec3(&s, &eye);
+        self.view.mat[1][3] = -math.dotVec3(&u, &eye);
+        self.view.mat[2][3] = math.dotVec3(&f, &eye);
     }
 };
