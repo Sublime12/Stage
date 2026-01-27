@@ -41,16 +41,14 @@ pub fn main() !void {
     try scene.addRoot(node5);
 
     var camera = Camera.init(math.pi / 4.0, 640.0 / 420.0, 0.01, 100);
-    node5.get().transform.translate(0, 0, -1);
+    node5.get().transform.translate(0, 0, 0);
+    camera.lookAt(.{3.0, 0.0, 3.0}, .{0.0, 0.0, 0.0}, .{0.0, 1.0, 0.0});
 
-    for (0..1000) |_| {
+    const window = glfw.glfwGetCurrentContext();
+    
+    while (glfw.glfwWindowShouldClose(window) == 0) {
         try app.render(allocator, &scene, &camera);
-        // camera.view.rotateY(math.pi / 300.0);
-        // node5.get().transform.rotateX(math.pi / 300.0);
-
-        const window = glfw.glfwGetCurrentContext();
-        // var window : ?*glfw.GLFWwindow = null;
-        // window = &app.window;
+        
         if (glfw.glfwGetKey(window, glfw.GLFW_KEY_UP) == glfw.GLFW_PRESS) {
             std.debug.print("UP\n", .{});
             camera.view.translate(0, -0.01, 0);
@@ -75,6 +73,7 @@ pub fn main() !void {
             std.debug.print("BACKWARD\n", .{});
             camera.view.translate(0, 0, -0.01);
         }
+
         node5.get().transform.rotateY(math.pi / 300.0);
     }
 }
