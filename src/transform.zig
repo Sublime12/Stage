@@ -25,7 +25,7 @@ pub const Transform = struct {
         translation_matrice[1][3] = ty;
         translation_matrice[2][3] = tz;
 
-        math.multiplyMat4x4(&self.mat, &self.mat, &translation_matrice);
+        math.multiplyMat4x4(&self.mat, &translation_matrice, &self.mat);
     }
     pub fn rotateX(self: *Self, angle: f32) void {
         var rotateXMatrice = math.identity();

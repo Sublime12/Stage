@@ -1,5 +1,5 @@
 pub const Mat4x4 = [4][4]f32;
-const Vector3 = [3]f32;
+pub const Vector3 = [3]f32;
 
 pub inline fn identity() Mat4x4 {
     return .{
@@ -44,4 +44,49 @@ pub fn multiplyMat4x4Vec3(
         m[1][0] * x + m[1][1] * y + m[1][2] * z + m[1][3],
         m[2][0] * x + m[2][1] * y + m[2][2] * z + m[2][3],
     };
+}
+
+pub fn substractVec3(
+    result: *Vector3,
+    vec1: *const Vector3,
+    vec2: *const Vector3
+) void {
+    result.* = .{
+        vec1[0] - vec2[0],
+        vec1[1] - vec2[1],
+        vec1[2] - vec2[2],
+    };
+}
+
+pub fn normalizeVec3(
+    result: *Vector3,
+    vec: *const Vector3
+) void {
+    const length = @sqrt(vec[0] * vec[0] + vec[1] * vec[1] + vec[2] * vec[2]); 
+    result.* = .{
+        vec[0] / length,
+        vec[1] / length,
+        vec[2] / length,
+    };
+}
+
+pub fn crossVec3(
+    result: *Vector3,
+    vec1: *const Vector3,
+    vec2: *const Vector3
+) void {
+    result.* = .{
+        vec1[1] * vec2[2] - vec1[2] * vec2[1],
+        vec1[2] * vec2[0] - vec1[0] * vec2[2],
+        vec1[0] * vec2[1] - vec1[1] * vec2[0],
+    };
+}
+
+pub fn dotVec3(
+    vec1: *const Vector3,
+    vec2: *const Vector3,
+) f32 {
+    return (vec1[0] * vec2[0])
+            + (vec1[1] * vec2[1])
+            + (vec1[2] * vec2[2]); 
 }

@@ -3,6 +3,7 @@ const Allocator = std.mem.Allocator;
 
 const Scene = @import("scene.zig").Scene;
 const Vertex = @import("scene.zig").Vertex;
+const Camera = @import("camera.zig").Camera;
 
 const glfw = @cImport(@cInclude("GLFW/glfw3.h"));
 const gl = @cImport(@cInclude("gl.h"));
@@ -99,8 +100,12 @@ pub const App = struct {
         glfw.glfwTerminate();
     }
 
-    /// TODO
-    pub fn render(self: *Self, allocator: Allocator, scene: *Scene) !void {
+    pub fn render(
+        self: *Self,
+        allocator: Allocator,
+        scene: *Scene,
+        camera: *const Camera,
+    ) !void {
         var vertices = std.ArrayList(Vertex).empty;
         defer vertices.deinit(allocator);
         try scene.generateVertices(allocator, &vertices);
@@ -122,7 +127,16 @@ pub const App = struct {
             self.program,
             "vCol",
         ));
-        // std.debug.print("v pos: {}, v col {}\n", .{ vpos_location, vcol_location });
+
+        const proj_location: c_uint = @intCast(gl.glGetUniformLocation(
+            self.program,
+            "proj",
+        ));
+
+        const view_location: c_uint = @intCast(gl.glGetUniformLocation(
+            self.program,
+            "view",
+        ));
 
         var vertex_array: gl.GLuint = 0;
         gl.glGenVertexArrays(1, &vertex_array);
@@ -146,24 +160,23 @@ pub const App = struct {
             @sizeOf(Vertex),
             @ptrFromInt(@offsetOf(Vertex, "color")),
         );
+
         var width: i32 = 0;
         var height: i32 = 0;
         glfw.glfwGetFramebufferSize(self.window, &width, &height);
         const ratio: f32 = @as(f32, @floatFromInt(width)) / @as(f32, @floatFromInt(height));
         gl.glViewport(0, 0, width, height);
-        // gl.glClear(gl.GL_COLOR_BUFFER_BIT);
-        gl.glClear(gl.GL_COLOR_BUFFER_BIT | gl.GL_DEPTH_BUFFER_BIT); 
+        gl.glClear(gl.GL_COLOR_BUFFER_BIT | gl.GL_DEPTH_BUFFER_BIT);
         gl.glUseProgram(self.program);
+
+        gl.glUniformMatrix4fv(@intCast(proj_location), 1, gl.GL_TRUE, @ptrCast(&camera.projection.mat));
+        gl.glUniformMatrix4fv(@intCast(view_location), 1, gl.GL_TRUE, @ptrCast(&camera.view.mat));
+
         gl.glBindVertexArray(vertex_array);
         gl.glDrawArrays(gl.GL_TRIANGLES, 0, @as(c_int, @intCast(vertices.items.len)));
 
         glfw.glfwSwapBuffers(self.window);
         glfw.glfwPollEvents();
         _ = ratio;
-        //
-
-        // for (vertices.items) |vertex| {
-        //     std.debug.print("vertex: {any}\n", .{vertex});
-        // }
     }
 };

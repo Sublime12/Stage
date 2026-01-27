@@ -4,12 +4,14 @@ const math = std.math;
 const scene_pkg = @import("scene.zig");
 const node = @import("node.zig");
 const stage = @import("app.zig");
+const camera_pkg = @import("camera.zig");
 
 const Geometry = scene_pkg.Geometry;
 const Scene = scene_pkg.Scene;
 const Node = node.Node;
 const NodePool = node.NodePool;
 const App = stage.App;
+const Camera = camera_pkg.Camera;
 
 const glfw = @cImport(@cInclude("GLFW/glfw3.h"));
 const c = @cImport({
@@ -33,200 +35,50 @@ pub fn main() !void {
     var pool = NodePool.init(allocator);
     defer pool.deinit();
 
-    const triangleGeo = try Geometry.makeTriangle(allocator, 0, 0, 0);
-    var node1 = try pool.create(Node.init(triangleGeo));
-    node1.get().transform.translate(0.2, 0, 0);
-
-    const triangleGeo2 = try Geometry.makeTriangle(allocator, 0, 0, 0);
-    var node2 = try pool.create(Node.init(triangleGeo2));
-    try node1.get().addChild(allocator, node2);
-    node2.get().transform.translate(0, 0.4, 0);
-
-    const triangleGeo3 = try Geometry.makeTriangle(allocator, 0, 0, 0);
-    var node3 = try pool.create(Node.init(triangleGeo3));
-    try node2.get().addChild(allocator, node3);
-    node3.get().transform.translate(0.2, 0, 0);
-
-    const triangleGeo4 = try Geometry.makeTriangle(allocator, 0, 0, 0);
-    var node4 = try pool.create(Node.init(triangleGeo4));
-    try node3.get().addChild(allocator, node4);
-    node4.get().transform.translate(0.2, 0, 0);
-
     const cubeGeo = try Geometry.makeCube(allocator);
     var node5 = try pool.create(Node.init(cubeGeo));
-    try node1.get().addChild(allocator, node5);
 
-    // std.debug.print("node tree: {any}\n", .{node1});
+    try scene.addRoot(node5);
 
-    try scene.addRoot(node1);
+    var camera = Camera.init(math.pi / 4.0, 640.0 / 420.0, 0.01, 100);
+    node5.get().transform.translate(0, 0, 0.0);
+    camera.lookAt(.{3.0, 3.0, 3.0}, .{0.0, 0.0, 0.0}, .{0.0, 1.0, 0.0});
 
-    for (0..1000) |_| {
-        try app.render(allocator, &scene);
-        // node1.get().transform.translate(-0.001, 0, 0);
-        // node2.get().transform.rotateX(math.pi / 180.0);
-        // node3.get().transform.rotateY(math.pi / 180.0);
-        node5.get().transform.rotateX(math.pi / 300.0);
-        node5.get().transform.rotateY(math.pi / 300.0);
+    const window = glfw.glfwGetCurrentContext();
+    
+    while (glfw.glfwWindowShouldClose(window) == 0) {
+        try app.render(allocator, &scene, &camera);
+        
+        if (glfw.glfwGetKey(window, glfw.GLFW_KEY_UP) == glfw.GLFW_PRESS) {
+            std.debug.print("UP\n", .{});
+            camera.view.translate(0, -0.01, 0);
+        }
+        if (glfw.glfwGetKey(window, glfw.GLFW_KEY_DOWN) == glfw.GLFW_PRESS) {
+            std.debug.print("DOWN\n", .{});
+            camera.view.translate(0, 0.01, 0);
+        }
+        if (glfw.glfwGetKey(window, glfw.GLFW_KEY_RIGHT) == glfw.GLFW_PRESS) {
+            std.debug.print("RIGHT\n", .{});
+            camera.view.translate(0.01, 0, 0);
+        }
+          if (glfw.glfwGetKey(window, glfw.GLFW_KEY_LEFT) == glfw.GLFW_PRESS) {
+            std.debug.print("LEFT\n", .{});
+            camera.view.translate(-0.01, 0, 0);
+        }
+        if (glfw.glfwGetKey(window, glfw.GLFW_KEY_W) == glfw.GLFW_PRESS) {
+            std.debug.print("FORWARD\n", .{});
+            camera.view.translate(0, 0, 0.01);
+        }
+        if (glfw.glfwGetKey(window, glfw.GLFW_KEY_S) == glfw.GLFW_PRESS) {
+            std.debug.print("BACKWARD\n", .{});
+            camera.view.translate(0, 0, -0.01);
+        }
+
+        // const radius:f32 = 10.0;
+        // const camX:f32 = @sin(@as(f32, @floatCast(glfw.glfwGetTime()))) * radius;
+        // const camZ:f32 = @cos(@as(f32, @floatCast(glfw.glfwGetTime()))) * radius;
+        // camera.lookAt(.{camX, 0.0, camZ}, .{0.0, 0.0, 0.0}, .{0.0, 1.0, 0.0});  
+
+        // node5.get().transform.rotateY(math.pi / 300.0);
     }
-    // std.Thread.sleep(std.time.ns_per_s * 2);
-    // const earthGeometry = Geometry.Sphere();
-    // const earth = Node.init(earthGeometry, gpa);
-    // scene.addNode(earth);
-
-    // const luneGeo = Geometry.Sphere();
-    // const lune = Node.init(luneGeo);
-
-    // earth.addNode(lune, alloc);
-
-    // app.render(scene);
 }
-
-// const vertex_shader_raw = @embedFile("shaders/vertex.shader");
-// const fragment_shader_raw = @embedFile("shaders/fragment.shader");
-//
-// // wrap in array of C string pointers for glShaderSource
-// const vertex_shader_text: [1][*c]const u8 = .{ vertex_shader_raw.ptr };
-// const fragment_shader_text: [1][*c]const u8 = .{ fragment_shader_raw.ptr };
-//
-// const Vertex = extern struct {
-//     pos: [3]f32,
-//     col: [3]f32,
-// };
-//
-// const vertices: [6]Vertex = .{
-//     .{ .pos = .{  0.0,  0.6, 0.2 }, .col = .{ 0.0, 0.0, 1.0 } },
-//     .{ .pos = .{  0.6, -0.4, 0.4 }, .col = .{ 0.0, 1.0, 0.0 } },
-//     .{ .pos = .{ -0.6, -0.4, 0.7 }, .col = .{ 1.0, 0.0, 0.0 } },
-//     .{ .pos = .{  0.3,  0.7, 0.5 }, .col = .{ 0.5, 0.5, 1.0 } },
-//     .{ .pos = .{  -0.3, -0.0, -0.4 }, .col = .{ 0.9, 0.0, 0.2 } },
-//     .{ .pos = .{ 0.6, -0.4, -0.7 }, .col = .{ 0.0, 0.9, 0.4 } },
-// };
-//
-//
-// fn error_callback(err: c_int, description: [*c]const u8) callconv(.c) void {
-//     _ = err;
-//     _ = c.fprintf(c.stderr, "Error: %s\n", description);
-// }
-// pub fn main() !void {
-//     _ = glfw.glfwSetErrorCallback(error_callback);
-//
-//     if (glfw.glfwInit() == 0) {
-//         c.exit(c.EXIT_FAILURE);
-//     }
-//
-//     const window = glfw.glfwCreateWindow(640, 480, "OpenGl Triangle", null, null);
-//     if (window == null) {
-//         glfw.glfwTerminate();
-//         c.exit(c.EXIT_FAILURE);
-//     }
-//
-//     glfw.glfwMakeContextCurrent(window);
-//     _ = gl.gladLoadGL(glfw.glfwGetProcAddress);
-//     glfw.glfwSwapInterval(1);
-//
-//     var vertex_buffer: gl.GLuint = 0;
-//     gl.glGenBuffers(1, &vertex_buffer);
-//     gl.glBindBuffer(gl.GL_ARRAY_BUFFER, vertex_buffer);
-//     gl.glBufferData(gl.GL_ARRAY_BUFFER, @sizeOf(@TypeOf(vertices)), &vertices, gl.GL_STATIC_DRAW);
-//
-//     const vertex_shader = gl.glCreateShader(gl.GL_VERTEX_SHADER);
-//     gl.glShaderSource(vertex_shader, 1, &vertex_shader_text, null);
-//     gl.glCompileShader(vertex_shader);
-//
-//     const fragment_shader = gl.glCreateShader(gl.GL_FRAGMENT_SHADER);
-//     gl.glShaderSource(fragment_shader, 1, &fragment_shader_text, null);
-//     gl.glCompileShader(fragment_shader);
-//
-//     const program: gl.GLuint = gl.glCreateProgram();
-//     gl.glAttachShader(program, vertex_shader);
-//     gl.glAttachShader(program, fragment_shader);
-//     gl.glLinkProgram(program);
-//
-//     // std.debug.print("shader text: {s}\n fragment shader: {s}\n",
-//     //     .{ vertex_shader_text[0], fragment_shader_text[0] });
-//     const vpos_location: c_uint = @intCast(gl.glGetAttribLocation(program, "vPos"));
-//     const vcol_location: c_uint = @intCast(gl.glGetAttribLocation(program, "vCol"));
-//     const mvp_location: c_int = @intCast(gl.glGetUniformLocation(program, "MVP"));
-//
-//     var vertex_array: gl.GLuint = 0;
-//     gl.glGenVertexArrays(1, &vertex_array);
-//     gl.glBindVertexArray(vertex_array);
-//     gl.glEnableVertexAttribArray(vpos_location);
-//     gl.glVertexAttribPointer(vpos_location, 3, gl.GL_FLOAT, gl.GL_FALSE,
-//         @sizeOf(Vertex), @ptrFromInt(@offsetOf(Vertex, "pos")),
-//     );
-//
-//     gl.glEnableVertexAttribArray(vcol_location);
-//     gl.glVertexAttribPointer(vcol_location, 3, gl.GL_FLOAT, gl.GL_FALSE,
-//         @sizeOf(Vertex), @ptrFromInt(@offsetOf(Vertex, "col")),
-//     );
-//     var mvp: [4][4]f32 = .{
-//         .{ 1, 0, 0, 0 },
-//         .{ 0, 1, 0, 0 },
-//         .{ 0, 0, 1, 0 },
-//         .{ 0, 0, 0, 1 },
-//     };
-//
-//     while (glfw.glfwWindowShouldClose(window) == 0) {
-//         var width: i32 = 0;
-//         var height: i32 = 0;
-//         glfw.glfwGetFramebufferSize(window, &width, &height);
-//         const ratio: f32 = @as(f32, @floatFromInt(width)) / @as(f32, @floatFromInt(height));
-//         gl.glViewport(0, 0, width, height);
-//         gl.glClear(gl.GL_COLOR_BUFFER_BIT);
-//
-//         const cos = math.cos(math.pi / 90.0);
-//         const sin = math.sin(math.pi / 90.0);
-//          const rz: [4][4]f32 = .{
-//             .{ cos, -sin, 0, 0 },
-//             .{ sin,  cos, 0, 0 },
-//             .{   0,    0, 1, 0 },
-//             .{   0,    0, 0, 1 },
-//         };
-//         const rx: [4][4]f32 = .{
-//             .{   1,   0,    0, 0 },
-//             .{   0, cos, -sin, 0 },
-//             .{   0, sin,  cos, 0 },
-//             .{   0,   0,    0, 1 },
-//         };
-//         // _ = rz;
-//         _ = rx;
-//         var tx: [4][4]f32 = .{
-//             .{   1,   0,    0, 0 },
-//             .{   0,   1,    0, 0 },
-//             .{   0,   0,    1, 0 },
-//             .{   0,   0.03, 0, 1 },
-//         };
-//
-//         var rt: [4][4]f32 = undefined;
-//         cmath.mat4x4_mul(&rt, &rz, &tx);
-//         // cmath.mat4x4_transpose(tx, tx);
-//         // _ = tx;
-//
-//         cmath.mat4x4_mul(&mvp, &mvp, &rt);
-//         //    [ cos(θ)  -sin(θ)   0   0 ]
-//         //    [ sin(θ)   cos(θ)   0   0 ]
-//         //    [   0        0      1   0 ]
-//         //    [   0        0      0   1 ]
-//         // cmath.mat4x4_rotate_Z(&mvp, &mvp, 0.001);
-//
-//         for (mvp) |row| {
-//             for (row) |el| {
-//                 std.debug.print("{} ", .{el});
-//             }
-//             std.debug.print("\n", .{});
-//         }
-//
-//         gl.glUseProgram(program);
-//         gl.glUniformMatrix4fv(mvp_location, 1, gl.GL_FALSE, @ptrCast(&mvp));
-//         gl.glBindVertexArray(vertex_array);
-//         gl.glDrawArrays(gl.GL_TRIANGLES, 0, 6);
-//
-//         glfw.glfwSwapBuffers(window);
-//         glfw.glfwPollEvents();
-//         _ = ratio;
-//     }
-//
-//     glfw.glfwDestroyWindow(window);
-//     glfw.glfwTerminate();
-// }
