@@ -39,19 +39,27 @@ pub fn main() !void {
     defer pool.deinit();
 
     const cubeGeo = try Geometry.makeCube(allocator);
-    var node5 = try pool.create(Node.init(cubeGeo));
+    var node1 = try pool.create(Node.init(cubeGeo));
 
-    try scene.addRoot(node5);
+    try scene.addRoot(node1);
 
     var camera = Camera.init(math.pi / 4.0, 640.0 / 420.0, 0.01, 100);
-    node5.get().transform.translate(0, 0, 0.0);
-    camera.lookAt(.{ 1.0, 1.0, 1.0 }, .{ 0.0, 0.0, 0.0 }, .{ 0.0, 1.0, 0.0 });
+    node1.get().transform.translate(0, 0, 0.0);
+    camera.lookAt(.{ 2.0, 2.0, 2.0 }, .{ 1.0, 1.0, 1.0 }, .{ 0.0, 1.0, 0.0 });
+
+    // const cubeGeo2 = try Geometry.makeTriangle(allocator, 1, 1, 1);
+    const cubeGeo2 = try Geometry.makeCube(allocator);
+    var node2 = try pool.create(Node.init(cubeGeo2));
+    node2.get().transform.translate(2, 0, 0);
+
+    try node1.get().addChild(allocator, node2);
 
     const vertex = Vertex.init(
         .{ 0.0, 2.0, 0.0 },
         .{ 1.0, 1.0, 1.0 },
     );
     var light = Light.init(&vertex, 4.0);
+    light.node = node2;
     scene.addLight(&light);
 
     const window = glfw.glfwGetCurrentContext();
@@ -60,6 +68,8 @@ pub fn main() !void {
         try app.render(allocator, &scene, &camera);
         light.vertex.position[0] += 0.0001;
         scene.addLight(&light);
+
+        node2.get().transform.rotateX(0.01);
 
         if (glfw.glfwGetKey(window, glfw.GLFW_KEY_UP) == glfw.GLFW_PRESS) {
             std.debug.print("UP\n", .{});

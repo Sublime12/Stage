@@ -18,7 +18,7 @@ void main()
     vec3 lightDir = normalize(lightPos - vPos);
     float diff = max(dot(norm, lightDir), 0.0);
     vec3 diffuse = diff * lightColor * lightStrength;
-    vec3 result = diffuse * vCol;
+    vec3 result = diffuse * vCol + 0.2;
     color = result;
     gl_Position = proj * view * vec4(vPos, 1.0);
 }

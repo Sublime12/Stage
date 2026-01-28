@@ -102,6 +102,10 @@ pub const Node = struct {
         node.worldTransform = current_transform;
         try transforms.append(allocator, current_transform);
         defer _ = transforms.pop();
+
+        for (node.children.items) |child| {
+            try updateWorldTransform(child.get(), allocator, transforms);
+        }
     }
 
     pub fn generateVerticesRec(
@@ -110,12 +114,8 @@ pub const Node = struct {
         vertices: *std.ArrayList(Vertex),
     ) !void {
         const current_transform = node.worldTransform;
-        // std.debug.print("children len : {}\n", .{node.children.items.len});
         if (node.geometry) |geometry| {
-            // std.debug.print("triangles: {}\n", .{geometry.shape.items.len});
             for (geometry.shape.items) |triangle| {
-                // try vertices.appendSlice(allocator, &triangle.vertices);
-
                 for (triangle.vertices) |vertex| {
                     const newVertex = current_transform.transformVertex(&vertex);
                     try vertices.append(allocator, newVertex);
