@@ -46,10 +46,10 @@ pub fn main() !void {
     var camera = Camera.init(math.pi / 4.0, 640.0 / 420.0, 0.01, 100);
     node5.get().transform.translate(0, 0, 0.0);
     camera.lookAt(.{ 1.0, 1.0, 1.0 }, .{ 0.0, 0.0, 0.0 }, .{ 0.0, 1.0, 0.0 });
-   
+
     const vertex = Vertex.init(
-        .{ 0.0, 2.0, 0.0},
-        .{ 1.0, 1.0, 1.0},
+        .{ 0.0, 2.0, 0.0 },
+        .{ 1.0, 1.0, 1.0 },
     );
     var light = Light.init(&vertex, 4.0);
     app.addLight(&light);
@@ -90,21 +90,20 @@ pub fn main() !void {
             std.debug.print("rotate left\n", .{});
             camera.view.rotateY(-0.01);
         }
-          if (glfw.glfwGetKey(window, glfw.GLFW_KEY_M) == glfw.GLFW_PRESS) {
+        if (glfw.glfwGetKey(window, glfw.GLFW_KEY_M) == glfw.GLFW_PRESS) {
             std.debug.print("rotate right\n", .{});
             camera.view.rotateY(0.01);
         }
 
-       if (glfw.glfwGetKey(window, glfw.GLFW_KEY_H) == glfw.GLFW_PRESS) {
+        if (glfw.glfwGetKey(window, glfw.GLFW_KEY_H) == glfw.GLFW_PRESS) {
             std.debug.print("rotate right\n", .{});
             camera.view.rotateX(0.01);
         }
 
-       if (glfw.glfwGetKey(window, glfw.GLFW_KEY_B) == glfw.GLFW_PRESS) {
+        if (glfw.glfwGetKey(window, glfw.GLFW_KEY_B) == glfw.GLFW_PRESS) {
             std.debug.print("rotate right\n", .{});
             camera.view.rotateX(-0.01);
         }
-
 
         // const radius:f32 = 10.0;
         // const camX:f32 = @sin(@as(f32, @floatCast(glfw.glfwGetTime()))) * radius;

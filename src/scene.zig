@@ -31,11 +31,15 @@ pub const Scene = struct {
         var transforms = std.ArrayList(Transform).empty;
         defer transforms.deinit(allocator);
         try transforms.append(allocator, Transform.init());
+        try Node.updateWorldTransform(
+            self.root.?.get(),
+            allocator,
+            &transforms,
+        );
         try Node.generateVerticesRec(
             self.root.?.get(),
             allocator,
             vertices,
-            &transforms,
         );
 
         std.debug.assert(transforms.items.len == 1);
@@ -192,13 +196,13 @@ pub const Vertex = struct {
     position: [3]f32,
     color: [3]f32,
     // TODO initialize correct normal for all vertices
-    normal: [3]f32 = .{0, 0, -1},
+    normal: [3]f32 = .{ 0, 0, -1 },
 
     pub fn init(position: [3]f32, color: [3]f32) Vertex {
         return .{
             .position = position,
             .color = color,
-            .normal = .{0, 0, 1},
+            .normal = .{ 0, 0, 1 },
         };
     }
 };

@@ -22,4 +22,12 @@ pub const Light = struct {
             .node = null,
         };
     }
+
+    pub fn getTransformedVertex(self: *const Self) Vertex {
+        if (self.node) |n| {
+            const newTransform = Transform.from(&n.get().worldTransform, &self.transform);
+            return newTransform.transformVertex(&self.vertex);
+        }
+        return self.transform.transformVertex(&self.vertex);
+    }
 };

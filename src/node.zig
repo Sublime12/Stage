@@ -13,7 +13,7 @@ pub const NodeHandle = struct {
     /// return the pointer to the element in the array pool
     /// The user must not stored it for long because it can be invalided
     /// on array list resizing
-    pub fn get(self: *NodeHandle) *Node {
+    pub fn get(self: *const NodeHandle) *Node {
         return &self.pool.nodes.items[self.index];
     }
 };
@@ -92,18 +92,24 @@ pub const Node = struct {
         try self.children.append(allocator, node);
     }
 
-    pub fn generateVerticesRec(
+    pub fn updateWorldTransform(
         node: *Node,
         allocator: Allocator,
-        vertices: *std.ArrayList(Vertex),
         transforms: *std.ArrayList(Transform),
     ) !void {
         const top_transform = transforms.getLast();
         const current_transform = Transform.from(&top_transform, &node.transform);
-        // node.totalTransform = current_transform;
+        node.worldTransform = current_transform;
         try transforms.append(allocator, current_transform);
         defer _ = transforms.pop();
+    }
 
+    pub fn generateVerticesRec(
+        node: *Node,
+        allocator: Allocator,
+        vertices: *std.ArrayList(Vertex),
+    ) !void {
+        const current_transform = node.worldTransform;
         // std.debug.print("children len : {}\n", .{node.children.items.len});
         if (node.geometry) |geometry| {
             // std.debug.print("triangles: {}\n", .{geometry.shape.items.len});
@@ -118,7 +124,7 @@ pub const Node = struct {
         }
 
         for (node.children.items) |*child| {
-            try generateVerticesRec(child.get(), allocator, vertices, transforms);
+            try generateVerticesRec(child.get(), allocator, vertices);
         }
     }
 };
