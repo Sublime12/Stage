@@ -52,13 +52,22 @@ pub const Node = struct {
 
     children: std.ArrayList(NodeHandle),
     geometry: ?Geometry,
+    // lumiere
+    // camera
+    // camera: ?Camera,
+    // lumiere: ?Lumiere,
     transform: Transform,
+    worldTransform: Transform,
+    // totalTransform
+    // cameraWorld = camera.node.get().totalTransform * camera.transform
+    // lumiereWorld = lumiere.node.get().totalTransform * lumiere.transform
 
     pub fn init(geometry: Geometry) Node {
         return .{
             .children = std.ArrayList(NodeHandle).empty,
             .geometry = geometry,
             .transform = comptime Transform.init(),
+            .worldTransform = comptime Transform.init(),
         };
     }
 
@@ -91,6 +100,7 @@ pub const Node = struct {
     ) !void {
         const top_transform = transforms.getLast();
         const current_transform = Transform.from(&top_transform, &node.transform);
+        // node.totalTransform = current_transform;
         try transforms.append(allocator, current_transform);
         defer _ = transforms.pop();
 

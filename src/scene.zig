@@ -191,11 +191,14 @@ const Triangle = struct {
 pub const Vertex = struct {
     position: [3]f32,
     color: [3]f32,
+    // TODO initialize correct normal for all vertices
+    normal: [3]f32 = .{0, 0, -1},
 
     pub fn init(position: [3]f32, color: [3]f32) Vertex {
         return .{
             .position = position,
             .color = color,
+            .normal = .{0, 0, 1},
         };
     }
 };
