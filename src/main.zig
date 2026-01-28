@@ -52,14 +52,14 @@ pub fn main() !void {
         .{ 1.0, 1.0, 1.0 },
     );
     var light = Light.init(&vertex, 4.0);
-    app.addLight(&light);
+    scene.addLight(&light);
 
     const window = glfw.glfwGetCurrentContext();
 
     while (glfw.glfwWindowShouldClose(window) == 0) {
         try app.render(allocator, &scene, &camera);
         light.vertex.position[0] += 0.0001;
-        app.addLight(&light);
+        scene.addLight(&light);
 
         if (glfw.glfwGetKey(window, glfw.GLFW_KEY_UP) == glfw.GLFW_PRESS) {
             std.debug.print("UP\n", .{});

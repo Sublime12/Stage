@@ -29,7 +29,6 @@ pub const App = struct {
 
     window: *glfw.struct_GLFWwindow,
     program: gl.GLuint,
-    light: ?Light,
 
     /// Initializes GLFW, creates a window, and loads OpenGL function pointers.
     /// Caller must call 'deinit' on success to free resources.
@@ -63,7 +62,6 @@ pub const App = struct {
         return .{
             .window = window,
             .program = program,
-            .light = null,
         };
     }
 
@@ -101,10 +99,6 @@ pub const App = struct {
     pub fn deinit(self: Self) void {
         glfw.glfwDestroyWindow(self.window);
         glfw.glfwTerminate();
-    }
-
-    pub fn addLight(self: *Self, light: *const Light) void {
-        self.light = light.*;
     }
 
     pub fn render(
@@ -207,8 +201,8 @@ pub const App = struct {
             "lightStrength",
         ));
 
-        std.debug.assert(self.light != null);
-        const light = self.light.?;
+        std.debug.assert(scene.light != null);
+        const light = scene.light.?;
 
         const lightPos = light.getTransformedVertex();
         gl.glUniformMatrix4fv(@intCast(proj_location), 1, gl.GL_TRUE, @ptrCast(&camera.projection.mat));

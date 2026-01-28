@@ -3,17 +3,24 @@ const Allocator = std.mem.Allocator;
 const Node = @import("node.zig").Node;
 const NodeHandle = @import("node.zig").NodeHandle;
 const Transform = @import("transform.zig").Transform;
+const Light = @import("light.zig").Light;
 
 pub const Scene = struct {
     const Self = @This();
 
     root: ?NodeHandle,
+    light: ?Light,
 
     /// Initilize the scene with an empty tree.
     pub fn init() Scene {
         return .{
             .root = null,
+            .light = null,
         };
+    }
+
+    pub fn addLight(self: *Self, light: *const Light) void {
+        self.light = light.*;
     }
 
     /// Add a node to the root
