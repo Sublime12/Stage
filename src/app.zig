@@ -4,6 +4,7 @@ const Allocator = std.mem.Allocator;
 const Scene = @import("scene.zig").Scene;
 const Vertex = @import("scene.zig").Vertex;
 const Camera = @import("camera.zig").Camera;
+const Light = @import("light.zig").Light;
 
 const glfw = @cImport(@cInclude("GLFW/glfw3.h"));
 const gl = @cImport(@cInclude("gl.h"));
@@ -119,6 +120,7 @@ pub const App = struct {
             vertices.items.ptr,
             gl.GL_STATIC_DRAW,
         );
+
         const vpos_location: c_uint = @intCast(gl.glGetAttribLocation(
             self.program,
             "vPos",
@@ -126,6 +128,11 @@ pub const App = struct {
         const vcol_location: c_uint = @intCast(gl.glGetAttribLocation(
             self.program,
             "vCol",
+        ));
+
+        const normal_location: c_uint = @intCast(gl.glGetAttribLocation(
+            self.program,
+            "normal",
         ));
 
         const proj_location: c_uint = @intCast(gl.glGetUniformLocation(
@@ -161,6 +168,16 @@ pub const App = struct {
             @ptrFromInt(@offsetOf(Vertex, "color")),
         );
 
+        gl.glEnableVertexAttribArray(normal_location);
+        gl.glVertexAttribPointer(
+            normal_location,
+            3,
+            gl.GL_FLOAT,
+            gl.GL_FALSE,
+            @sizeOf(Vertex),
+            @ptrFromInt(@offsetOf(Vertex, "normal")),
+        );
+
         var width: i32 = 0;
         var height: i32 = 0;
         glfw.glfwGetFramebufferSize(self.window, &width, &height);
@@ -169,8 +186,43 @@ pub const App = struct {
         gl.glClear(gl.GL_COLOR_BUFFER_BIT | gl.GL_DEPTH_BUFFER_BIT);
         gl.glUseProgram(self.program);
 
+        const lightPosLocation: c_uint = @intCast(gl.glGetUniformLocation(
+            self.program,
+            "lightPos",
+        ));
+
+        const lightColorLocation: c_uint = @intCast(gl.glGetUniformLocation(
+            self.program,
+            "lightColor",
+        ));
+
+        const lightStrenghLocation: c_uint = @intCast(gl.glGetUniformLocation(
+            self.program,
+            "lightStrength",
+        ));
+
+        std.debug.assert(scene.light != null);
+        const light = scene.light.?;
+
+        const lightPos = light.getTransformedVertex();
         gl.glUniformMatrix4fv(@intCast(proj_location), 1, gl.GL_TRUE, @ptrCast(&camera.projection.mat));
         gl.glUniformMatrix4fv(@intCast(view_location), 1, gl.GL_TRUE, @ptrCast(&camera.view.mat));
+        gl.glUniform3f(
+            @intCast(lightPosLocation),
+            lightPos.position[0],
+            lightPos.position[1],
+            lightPos.position[2],
+        );
+        gl.glUniform3f(
+            @intCast(lightColorLocation),
+            light.vertex.color[0],
+            light.vertex.color[1],
+            light.vertex.color[2],
+        );
+        gl.glUniform1f(
+            @intCast(lightStrenghLocation),
+            light.strength,
+        );
 
         gl.glBindVertexArray(vertex_array);
         gl.glDrawArrays(gl.GL_TRIANGLES, 0, @as(c_int, @intCast(vertices.items.len)));

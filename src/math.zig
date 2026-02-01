@@ -46,11 +46,7 @@ pub fn multiplyMat4x4Vec3(
     };
 }
 
-pub fn substractVec3(
-    result: *Vector3,
-    vec1: *const Vector3,
-    vec2: *const Vector3
-) void {
+pub fn substractVec3(result: *Vector3, vec1: *const Vector3, vec2: *const Vector3) void {
     result.* = .{
         vec1[0] - vec2[0],
         vec1[1] - vec2[1],
@@ -58,11 +54,8 @@ pub fn substractVec3(
     };
 }
 
-pub fn normalizeVec3(
-    result: *Vector3,
-    vec: *const Vector3
-) void {
-    const length = @sqrt(vec[0] * vec[0] + vec[1] * vec[1] + vec[2] * vec[2]); 
+pub fn normalizeVec3(result: *Vector3, vec: *const Vector3) void {
+    const length = @sqrt(vec[0] * vec[0] + vec[1] * vec[1] + vec[2] * vec[2]);
     result.* = .{
         vec[0] / length,
         vec[1] / length,
@@ -70,11 +63,7 @@ pub fn normalizeVec3(
     };
 }
 
-pub fn crossVec3(
-    result: *Vector3,
-    vec1: *const Vector3,
-    vec2: *const Vector3
-) void {
+pub fn crossVec3(result: *Vector3, vec1: *const Vector3, vec2: *const Vector3) void {
     result.* = .{
         vec1[1] * vec2[2] - vec1[2] * vec2[1],
         vec1[2] * vec2[0] - vec1[0] * vec2[2],
@@ -86,7 +75,5 @@ pub fn dotVec3(
     vec1: *const Vector3,
     vec2: *const Vector3,
 ) f32 {
-    return (vec1[0] * vec2[0])
-            + (vec1[1] * vec2[1])
-            + (vec1[2] * vec2[2]); 
+    return (vec1[0] * vec2[0]) + (vec1[1] * vec2[1]) + (vec1[2] * vec2[2]);
 }

@@ -3,17 +3,24 @@ const Allocator = std.mem.Allocator;
 const Node = @import("node.zig").Node;
 const NodeHandle = @import("node.zig").NodeHandle;
 const Transform = @import("transform.zig").Transform;
+const Light = @import("light.zig").Light;
 
 pub const Scene = struct {
     const Self = @This();
 
     root: ?NodeHandle,
+    light: ?Light,
 
     /// Initilize the scene with an empty tree.
     pub fn init() Scene {
         return .{
             .root = null,
+            .light = null,
         };
+    }
+
+    pub fn addLight(self: *Self, light: *const Light) void {
+        self.light = light.*;
     }
 
     /// Add a node to the root
@@ -31,11 +38,15 @@ pub const Scene = struct {
         var transforms = std.ArrayList(Transform).empty;
         defer transforms.deinit(allocator);
         try transforms.append(allocator, Transform.init());
+        try Node.updateWorldTransform(
+            self.root.?.get(),
+            allocator,
+            &transforms,
+        );
         try Node.generateVerticesRec(
             self.root.?.get(),
             allocator,
             vertices,
-            &transforms,
         );
 
         std.debug.assert(transforms.items.len == 1);
@@ -75,9 +86,9 @@ pub const Geometry = struct {
         // Face 1
         const blue = .{ 0.0, 0.0, 1.0 };
         const triangle1 = Triangle.init(
-            .{ .position = .{ 0.0, 0.0, 0.0 }, .color = blue },
             .{ .position = .{ 0.0, 0.5, 0.0 }, .color = blue },
             .{ .position = .{ 0.5, 0.0, 0.0 }, .color = blue },
+            .{ .position = .{ 0.0, 0.0, 0.0 }, .color = blue },
         );
 
         const triangle2 = Triangle.init(
@@ -91,22 +102,25 @@ pub const Geometry = struct {
 
         const triangle3 = Triangle.init(
             .{ .position = .{ 0.0, 0.0, 0.0 }, .color = red },
+
             .{ .position = .{ 0.0, 0.0, 0.5 }, .color = red },
+
             .{ .position = .{ 0.0, 0.5, 0.0 }, .color = red },
         );
 
         const triangle4 = Triangle.init(
             .{ .position = .{ 0.0, 0.5, 0.5 }, .color = red },
-            .{ .position = .{ 0.0, 0.0, 0.5 }, .color = red },
             .{ .position = .{ 0.0, 0.5, 0.0 }, .color = red },
+
+            .{ .position = .{ 0.0, 0.0, 0.5 }, .color = red },
         );
 
         // Face 3
         const gray = .{ 0.5, 0.5, 0.5 };
         const triangle5 = Triangle.init(
             .{ .position = .{ 0.0, 0.0, 0.5 }, .color = gray },
-            .{ .position = .{ 0.0, 0.5, 0.5 }, .color = gray },
             .{ .position = .{ 0.5, 0.0, 0.5 }, .color = gray },
+            .{ .position = .{ 0.0, 0.5, 0.5 }, .color = gray },
         );
 
         const triangle6 = Triangle.init(
@@ -116,47 +130,53 @@ pub const Geometry = struct {
         );
 
         // Face 4
-        const orange = .{ 1.0, 1.0, 0.0 };
+        const yellow = .{ 1.0, 1.0, 0.0 };
 
         const triangle7 = Triangle.init(
-            .{ .position = .{ 0.5, 0.0, 0.0 }, .color = orange },
-            .{ .position = .{ 0.5, 0.0, 0.5 }, .color = orange },
-            .{ .position = .{ 0.5, 0.5, 0.0 }, .color = orange },
+            .{ .position = .{ 0.5, 0.0, 0.0 }, .color = yellow },
+            .{ .position = .{ 0.5, 0.5, 0.0 }, .color = yellow },
+
+            .{ .position = .{ 0.5, 0.0, 0.5 }, .color = yellow },
         );
 
         const triangle8 = Triangle.init(
-            .{ .position = .{ 0.5, 0.5, 0.5 }, .color = orange },
-            .{ .position = .{ 0.5, 0.0, 0.5 }, .color = orange },
-            .{ .position = .{ 0.5, 0.5, 0.0 }, .color = orange },
+            .{ .position = .{ 0.5, 0.5, 0.5 }, .color = yellow },
+            .{ .position = .{ 0.5, 0.0, 0.5 }, .color = yellow },
+            .{ .position = .{ 0.5, 0.5, 0.0 }, .color = yellow },
         );
 
         // Face 4
-        const violet = .{ 0.0, 1.0, 1.0 };
+        const skyblue = .{ 0.0, 1.0, 1.0 };
 
         const triangle9 = Triangle.init(
-            .{ .position = .{ 0.0, 0.0, 0.0 }, .color = violet },
-            .{ .position = .{ 0.5, 0.0, 0.0 }, .color = violet },
-            .{ .position = .{ 0.0, 0.0, 0.5 }, .color = violet },
+            .{ .position = .{ 0.0, 0.0, 0.0 }, .color = skyblue },
+
+            .{ .position = .{ 0.5, 0.0, 0.0 }, .color = skyblue },
+
+            .{ .position = .{ 0.0, 0.0, 0.5 }, .color = skyblue },
         );
 
         const triangle10 = Triangle.init(
-            .{ .position = .{ 0.5, 0.0, 0.5 }, .color = violet },
-            .{ .position = .{ 0.5, 0.0, 0.0 }, .color = violet },
-            .{ .position = .{ 0.0, 0.0, 0.5 }, .color = violet },
+            .{ .position = .{ 0.5, 0.0, 0.5 }, .color = skyblue },
+            .{ .position = .{ 0.0, 0.0, 0.5 }, .color = skyblue },
+
+            .{ .position = .{ 0.5, 0.0, 0.0 }, .color = skyblue },
         );
 
         // Face 6
         const pink = .{ 1.0, 0.0, 1.0 };
 
         const triangle11 = Triangle.init(
-            .{ .position = .{ 0.0, 0.5, 0.0 }, .color = pink },
-            .{ .position = .{ 0.5, 0.5, 0.0 }, .color = pink },
             .{ .position = .{ 0.0, 0.5, 0.5 }, .color = pink },
+            .{ .position = .{ 0.5, 0.5, 0.0 }, .color = pink },
+
+            .{ .position = .{ 0.0, 0.5, 0.0 }, .color = pink },
         );
 
         const triangle12 = Triangle.init(
             .{ .position = .{ 0.5, 0.5, 0.5 }, .color = pink },
             .{ .position = .{ 0.5, 0.5, 0.0 }, .color = pink },
+
             .{ .position = .{ 0.0, 0.5, 0.5 }, .color = pink },
         );
 
@@ -191,11 +211,14 @@ const Triangle = struct {
 pub const Vertex = struct {
     position: [3]f32,
     color: [3]f32,
+    // TODO initialize correct normal for all vertices
+    normal: [3]f32 = .{ 0, 0, -1 },
 
     pub fn init(position: [3]f32, color: [3]f32) Vertex {
         return .{
             .position = position,
             .color = color,
+            .normal = .{ 0, 0, 1 },
         };
     }
 };

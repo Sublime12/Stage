@@ -4,6 +4,8 @@ const Allocator = std.mem.Allocator;
 const Geometry = @import("scene.zig").Geometry;
 const Vertex = @import("scene.zig").Vertex;
 const transform = @import("transform.zig");
+const math = @import("math.zig");
+const Vector3 = math.Vector3;
 const Transform = transform.Transform;
 
 pub const NodeHandle = struct {
@@ -13,7 +15,7 @@ pub const NodeHandle = struct {
     /// return the pointer to the element in the array pool
     /// The user must not stored it for long because it can be invalided
     /// on array list resizing
-    pub fn get(self: *NodeHandle) *Node {
+    pub fn get(self: *const NodeHandle) *Node {
         return &self.pool.nodes.items[self.index];
     }
 };
@@ -52,13 +54,22 @@ pub const Node = struct {
 
     children: std.ArrayList(NodeHandle),
     geometry: ?Geometry,
+    // lumiere
+    // camera
+    // camera: ?Camera,
+    // lumiere: ?Lumiere,
     transform: Transform,
+    worldTransform: Transform,
+    // totalTransform
+    // cameraWorld = camera.node.get().totalTransform * camera.transform
+    // lumiereWorld = lumiere.node.get().totalTransform * lumiere.transform
 
     pub fn init(geometry: Geometry) Node {
         return .{
             .children = std.ArrayList(NodeHandle).empty,
             .geometry = geometry,
             .transform = comptime Transform.init(),
+            .worldTransform = comptime Transform.init(),
         };
     }
 
@@ -83,32 +94,63 @@ pub const Node = struct {
         try self.children.append(allocator, node);
     }
 
-    pub fn generateVerticesRec(
+    pub fn updateWorldTransform(
         node: *Node,
         allocator: Allocator,
-        vertices: *std.ArrayList(Vertex),
         transforms: *std.ArrayList(Transform),
     ) !void {
         const top_transform = transforms.getLast();
         const current_transform = Transform.from(&top_transform, &node.transform);
+        node.worldTransform = current_transform;
         try transforms.append(allocator, current_transform);
         defer _ = transforms.pop();
 
-        // std.debug.print("children len : {}\n", .{node.children.items.len});
-        if (node.geometry) |geometry| {
-            // std.debug.print("triangles: {}\n", .{geometry.shape.items.len});
-            for (geometry.shape.items) |triangle| {
-                // try vertices.appendSlice(allocator, &triangle.vertices);
+        for (node.children.items) |child| {
+            try updateWorldTransform(child.get(), allocator, transforms);
+        }
+    }
 
+    pub fn generateVerticesRec(
+        node: *Node,
+        allocator: Allocator,
+        vertices: *std.ArrayList(Vertex),
+    ) !void {
+        const current_transform = node.worldTransform;
+        if (node.geometry) |geometry| {
+            for (geometry.shape.items) |triangle| {
+                var newVertices = std.ArrayList(Vertex).initCapacity(3);
+                defer newVertices.deinit(allocator);
                 for (triangle.vertices) |vertex| {
                     const newVertex = current_transform.transformVertex(&vertex);
+                    try newVertices.append(allocator, newVertex);
                     try vertices.append(allocator, newVertex);
                 }
+                const normal = computeNormal(newVertices);
+                vertices.items[vertices.items.len - 1].normal = normal;
+                vertices.items[vertices.items.len - 2].normal = normal;
+                vertices.items[vertices.items.len - 3].normal = normal;
             }
         }
 
         for (node.children.items) |*child| {
-            try generateVerticesRec(child.get(), allocator, vertices, transforms);
+            try generateVerticesRec(child.get(), allocator, vertices);
         }
+    }
+
+    fn computeNormal(vertices: std.ArrayList(Vertex)) Vector3 {
+        std.debug.assert(vertices.items.len == 3);
+        const p1 = vertices.items[0].position;
+        const p2 = vertices.items[1].position;
+        const p3 = vertices.items[2].position;
+        var u: Vector3 = undefined;
+        math.substractVec3(&u, &p2, &p1);
+        var v: Vector3 = undefined;
+        math.substractVec3(&v, &p3, &p1);
+
+        var n: Vector3 = undefined;
+        math.crossVec3(&n, &u, &v);
+        math.normalizeVec3(&n, &n);
+
+        return n;
     }
 };

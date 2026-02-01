@@ -27,6 +27,7 @@ pub const Transform = struct {
 
         math.multiplyMat4x4(&self.mat, &translation_matrice, &self.mat);
     }
+
     pub fn rotateX(self: *Self, angle: f32) void {
         var rotateXMatrice = math.identity();
         const cos = @cos(angle);
