@@ -86,9 +86,9 @@ pub const Geometry = struct {
         // Face 1
         const blue = .{ 0.0, 0.0, 1.0 };
         const triangle1 = Triangle.init(
-            .{ .position = .{ 0.0, 0.0, 0.0 }, .color = blue },
             .{ .position = .{ 0.0, 0.5, 0.0 }, .color = blue },
             .{ .position = .{ 0.5, 0.0, 0.0 }, .color = blue },
+            .{ .position = .{ 0.0, 0.0, 0.0 }, .color = blue },
         );
 
         const triangle2 = Triangle.init(
@@ -102,22 +102,26 @@ pub const Geometry = struct {
 
         const triangle3 = Triangle.init(
             .{ .position = .{ 0.0, 0.0, 0.0 }, .color = red },
+
             .{ .position = .{ 0.0, 0.0, 0.5 }, .color = red },
+
+
             .{ .position = .{ 0.0, 0.5, 0.0 }, .color = red },
         );
 
         const triangle4 = Triangle.init(
             .{ .position = .{ 0.0, 0.5, 0.5 }, .color = red },
-            .{ .position = .{ 0.0, 0.0, 0.5 }, .color = red },
             .{ .position = .{ 0.0, 0.5, 0.0 }, .color = red },
+
+            .{ .position = .{ 0.0, 0.0, 0.5 }, .color = red },
         );
 
         // Face 3
         const gray = .{ 0.5, 0.5, 0.5 };
         const triangle5 = Triangle.init(
             .{ .position = .{ 0.0, 0.0, 0.5 }, .color = gray },
-            .{ .position = .{ 0.0, 0.5, 0.5 }, .color = gray },
             .{ .position = .{ 0.5, 0.0, 0.5 }, .color = gray },
+            .{ .position = .{ 0.0, 0.5, 0.5 }, .color = gray },
         );
 
         const triangle6 = Triangle.init(
@@ -127,47 +131,53 @@ pub const Geometry = struct {
         );
 
         // Face 4
-        const orange = .{ 1.0, 1.0, 0.0 };
+        const yellow = .{ 1.0, 1.0, 0.0 };
 
         const triangle7 = Triangle.init(
-            .{ .position = .{ 0.5, 0.0, 0.0 }, .color = orange },
-            .{ .position = .{ 0.5, 0.0, 0.5 }, .color = orange },
-            .{ .position = .{ 0.5, 0.5, 0.0 }, .color = orange },
+            .{ .position = .{ 0.5, 0.0, 0.0 }, .color = yellow },
+            .{ .position = .{ 0.5, 0.5, 0.0 }, .color = yellow },
+
+            .{ .position = .{ 0.5, 0.0, 0.5 }, .color = yellow },
         );
 
         const triangle8 = Triangle.init(
-            .{ .position = .{ 0.5, 0.5, 0.5 }, .color = orange },
-            .{ .position = .{ 0.5, 0.0, 0.5 }, .color = orange },
-            .{ .position = .{ 0.5, 0.5, 0.0 }, .color = orange },
+            .{ .position = .{ 0.5, 0.5, 0.5 }, .color = yellow },
+            .{ .position = .{ 0.5, 0.0, 0.5 }, .color = yellow },
+            .{ .position = .{ 0.5, 0.5, 0.0 }, .color = yellow },
         );
 
         // Face 4
-        const violet = .{ 0.0, 1.0, 1.0 };
+        const skyblue = .{ 0.0, 1.0, 1.0 };
 
         const triangle9 = Triangle.init(
-            .{ .position = .{ 0.0, 0.0, 0.0 }, .color = violet },
-            .{ .position = .{ 0.5, 0.0, 0.0 }, .color = violet },
-            .{ .position = .{ 0.0, 0.0, 0.5 }, .color = violet },
+            .{ .position = .{ 0.0, 0.0, 0.0 }, .color = skyblue },
+
+            .{ .position = .{ 0.5, 0.0, 0.0 }, .color = skyblue },
+
+            .{ .position = .{ 0.0, 0.0, 0.5 }, .color = skyblue },
         );
 
         const triangle10 = Triangle.init(
-            .{ .position = .{ 0.5, 0.0, 0.5 }, .color = violet },
-            .{ .position = .{ 0.5, 0.0, 0.0 }, .color = violet },
-            .{ .position = .{ 0.0, 0.0, 0.5 }, .color = violet },
+            .{ .position = .{ 0.5, 0.0, 0.5 }, .color = skyblue },
+            .{ .position = .{ 0.0, 0.0, 0.5 }, .color = skyblue },
+
+            .{ .position = .{ 0.5, 0.0, 0.0 }, .color = skyblue },
         );
 
         // Face 6
         const pink = .{ 1.0, 0.0, 1.0 };
 
         const triangle11 = Triangle.init(
-            .{ .position = .{ 0.0, 0.5, 0.0 }, .color = pink },
-            .{ .position = .{ 0.5, 0.5, 0.0 }, .color = pink },
             .{ .position = .{ 0.0, 0.5, 0.5 }, .color = pink },
+            .{ .position = .{ 0.5, 0.5, 0.0 }, .color = pink },
+
+            .{ .position = .{ 0.0, 0.5, 0.0 }, .color = pink },
         );
 
         const triangle12 = Triangle.init(
             .{ .position = .{ 0.5, 0.5, 0.5 }, .color = pink },
             .{ .position = .{ 0.5, 0.5, 0.0 }, .color = pink },
+
             .{ .position = .{ 0.0, 0.5, 0.5 }, .color = pink },
         );
 

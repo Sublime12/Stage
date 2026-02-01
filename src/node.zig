@@ -4,6 +4,8 @@ const Allocator = std.mem.Allocator;
 const Geometry = @import("scene.zig").Geometry;
 const Vertex = @import("scene.zig").Vertex;
 const transform = @import("transform.zig");
+const math = @import("math.zig");
+const Vector3 = math.Vector3;
 const Transform = transform.Transform;
 
 pub const NodeHandle = struct {
@@ -116,10 +118,16 @@ pub const Node = struct {
         const current_transform = node.worldTransform;
         if (node.geometry) |geometry| {
             for (geometry.shape.items) |triangle| {
+                var newVertices = std.ArrayList(Vertex).empty;
                 for (triangle.vertices) |vertex| {
                     const newVertex = current_transform.transformVertex(&vertex);
+                    try newVertices.append(allocator, newVertex);
                     try vertices.append(allocator, newVertex);
                 }
+                const normal = computeNormal(newVertices);
+                vertices.items[vertices.items.len - 1].normal = normal;
+                vertices.items[vertices.items.len - 2].normal = normal;
+                vertices.items[vertices.items.len - 3].normal = normal;
             }
         }
 
@@ -127,4 +135,23 @@ pub const Node = struct {
             try generateVerticesRec(child.get(), allocator, vertices);
         }
     }
+
+    fn computeNormal(vertices: std.ArrayList(Vertex)) Vector3 {
+        std.debug.assert(vertices.items.len == 3);
+        const p1 = vertices.items[0].position;
+        const p2 = vertices.items[1].position;
+        const p3 = vertices.items[2].position;
+        var u: Vector3 = undefined;
+        math.substractVec3(&u, &p2, &p1);
+        var v: Vector3 = undefined;
+        math.substractVec3(&v, &p3, &p1);
+
+        var n: Vector3 = undefined;
+        math.crossVec3(&n, &u, &v);
+        math.normalizeVec3(&n, &n);
+
+        return n;
+    }
 };
+
+
