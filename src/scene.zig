@@ -105,7 +105,6 @@ pub const Geometry = struct {
 
             .{ .position = .{ 0.0, 0.0, 0.5 }, .color = red },
 
-
             .{ .position = .{ 0.0, 0.5, 0.0 }, .color = red },
         );
 
