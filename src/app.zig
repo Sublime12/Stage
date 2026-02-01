@@ -196,10 +196,15 @@ pub const App = struct {
             "lightColor",
         ));
 
-        const lightStrenghLocation: c_uint = @intCast(gl.glGetUniformLocation(
+         const lightStrenghLocation: c_uint = @intCast(gl.glGetUniformLocation(
             self.program,
             "lightStrength",
         ));
+
+ //      const viewPosLocation: c_uint = @intCast(gl.glGetUniformLocation(
+ //           self.program,
+ //           "viewPos",
+ //       ));
 
         std.debug.assert(scene.light != null);
         const light = scene.light.?;
@@ -223,6 +228,14 @@ pub const App = struct {
             @intCast(lightStrenghLocation),
             light.strength,
         );
+
+        // uniforms for fragment shader
+ //       gl.glUniform3f(
+ //           @intCast(viewPosLocation),
+ //           camera.position.?[0],
+ //           camera.position.?[1],
+ //           camera.position.?[2],
+ //       );
 
         gl.glBindVertexArray(vertex_array);
         gl.glDrawArrays(gl.GL_TRIANGLES, 0, @as(c_int, @intCast(vertices.items.len)));

@@ -9,6 +9,7 @@ pub const Camera = struct {
 
     projection: Transform,
     view: Transform,
+    position: ?Vector3,
 
     pub fn init(fov: f32, ratio: f32, near: f32, fear: f32) Camera {
         var projection = Transform.init();
@@ -80,6 +81,7 @@ pub const Camera = struct {
         return .{
             .projection = projection,
             .view = view,
+            .position = null,
         };
     }
 
@@ -107,5 +109,7 @@ pub const Camera = struct {
         self.view.mat[0][3] = -math.dotVec3(&s, &eye);
         self.view.mat[1][3] = -math.dotVec3(&u, &eye);
         self.view.mat[2][3] = math.dotVec3(&f, &eye);
+
+        self.position = eye;
     }
 };
