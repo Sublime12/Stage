@@ -118,7 +118,8 @@ pub const Node = struct {
         const current_transform = node.worldTransform;
         if (node.geometry) |geometry| {
             for (geometry.shape.items) |triangle| {
-                var newVertices = std.ArrayList(Vertex).empty;
+                var newVertices = std.ArrayList(Vertex).initCapacity(3);
+                defer newVertices.deinit(allocator);
                 for (triangle.vertices) |vertex| {
                     const newVertex = current_transform.transformVertex(&vertex);
                     try newVertices.append(allocator, newVertex);
