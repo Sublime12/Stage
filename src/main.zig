@@ -45,7 +45,7 @@ pub fn main() !void {
 
     var camera = Camera.init(math.pi / 4.0, 640.0 / 420.0, 0.01, 100);
     node1.get().transform.translate(0, 0, 0.0);
-    camera.lookAt(.{ 0.0, 2.0, 0.0 }, .{ 0.1, 0.1, 0.1 }, .{ 0.0, 1.0, 0.0 });
+    camera.lookAt(.{ 3.0, 3.0, 3.0 }, .{ 0.1, 0.1, 0.1 }, .{ 0.0, 1.0, 0.0 });
 
     // const cubeGeo2 = try Geometry.makeTriangle(allocator, 1, 1, 1);
     const cubeGeo2 = try Geometry.makeCube(allocator);
@@ -56,7 +56,7 @@ pub fn main() !void {
 
     const vertex = Vertex.init(
         .{ 0.0, 2.0, 0.0 },
-        .{ 1.0, 1.0, 1.0 },
+        .{ 0.0, 0.0, 0.3 },
     );
     var light = Light.init(&vertex, 2.0);
     light.node = node2;
