@@ -184,6 +184,7 @@ pub const App = struct {
         glfw.glfwGetFramebufferSize(self.window, &width, &height);
         const ratio: f32 = @as(f32, @floatFromInt(width)) / @as(f32, @floatFromInt(height));
         gl.glViewport(0, 0, width, height);
+        gl.glClearColor(0, 0, 0, 1);
         gl.glClear(gl.GL_COLOR_BUFFER_BIT | gl.GL_DEPTH_BUFFER_BIT);
         gl.glUseProgram(self.program);
 
