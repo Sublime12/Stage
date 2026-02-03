@@ -188,33 +188,53 @@ pub const App = struct {
         gl.glClear(gl.GL_COLOR_BUFFER_BIT | gl.GL_DEPTH_BUFFER_BIT);
         gl.glUseProgram(self.program);
 
+        // const lightPosLocation: c_uint = @intCast(gl.glGetUniformLocation(
+        //     self.program,
+        //     "lightPos",
+        // ));
+
         const lightPosLocation: c_uint = @intCast(gl.glGetUniformLocation(
             self.program,
-            "lightPos",
+            "light.position",
         ));
 
         const ambientColorLocation: c_uint = @intCast(gl.glGetUniformLocation(
             self.program,
-            "ambientColor",
+            "light.ambient",
         ));
 
         const diffuseColorLocation: c_uint = @intCast(gl.glGetUniformLocation(
             self.program,
-            "diffuseColor",
+            "light.diffuse",
         ));
 
         const specularColorLocation: c_uint = @intCast(gl.glGetUniformLocation(
             self.program,
-            "specularColor",
+            "light.specular",
         ));
 
         const lightStrenghLocation: c_uint = @intCast(gl.glGetUniformLocation(
             self.program,
-            "lightStrength",
+            "light.strength",
         ));
 
-        std.debug.assert(scene.light != null);
-        const light = scene.light.?;
+        const lightConstantLocation: c_uint = @intCast(gl.glGetUniformLocation(
+            self.program,
+            "light.constant",
+        ));
+
+        const lightLinearLocation: c_uint = @intCast(gl.glGetUniformLocation(
+            self.program,
+            "light.linear",
+        ));
+
+        const lightQuadraticLocation: c_uint = @intCast(gl.glGetUniformLocation(
+            self.program,
+            "light.quadratic",
+        ));
+
+        std.debug.assert(scene.lights.items.len != 0);
+        const light = scene.lights.items[0].get();
 
         const lightPos = light.transformPosition();
         gl.glUniformMatrix4fv(@intCast(proj_location), 1, gl.GL_TRUE, @ptrCast(&camera.projection.mat));
@@ -244,6 +264,21 @@ pub const App = struct {
             light.color.specular[0],
             light.color.specular[1],
             light.color.specular[2],
+        );
+
+        gl.glUniform1f(
+            @intCast(lightConstantLocation),
+            light.constant,
+        );
+
+        gl.glUniform1f(
+            @intCast(lightLinearLocation),
+            light.linear,
+        );
+
+        gl.glUniform1f(
+            @intCast(lightQuadraticLocation),
+            light.quadratic,
         );
 
         gl.glUniform1f(

@@ -3,27 +3,38 @@ const Allocator = std.mem.Allocator;
 const Node = @import("node.zig").Node;
 const NodeHandle = @import("node.zig").NodeHandle;
 const Transform = @import("transform.zig").Transform;
-const Light = @import("light.zig").Light;
+const light_pkg = @import("light.zig");
+const Light = light_pkg.Light;
+const LightHandle = light_pkg.LightHandle;
 
 pub const Scene = struct {
     const Self = @This();
 
     root: ?NodeHandle,
-    light: ?Light,
+    // light: ?Light,
+    lights: std.ArrayList(LightHandle),
+    allocator: Allocator,
 
     /// Initilize the scene with an empty tree.
-    pub fn init() Scene {
+    pub fn init(allocator: Allocator) Scene {
         return .{
             .root = null,
-            .light = null,
+            .allocator = allocator,
+            .lights = .empty,
+            // .light = null,
         };
     }
 
-    pub fn addLight(self: *Self, light: *const Light) void {
-        self.light = light.*;
+    pub fn deinit(self: *Self) void {
+        self.lights.deinit(self.allocator);
     }
 
-    /// Add a node to the root
+    pub fn addLight(self: *Self, light: LightHandle) !void {
+        // self.light = light.*;
+        try self.lights.append(self.allocator, light);
+    }
+
+    // Add a node to the root
     pub fn addRoot(self: *Self, node: NodeHandle) !void {
         self.root = node;
     }

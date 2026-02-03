@@ -14,6 +14,7 @@ const NodePool = node.NodePool;
 const App = stage.App;
 const Camera = camera_pkg.Camera;
 const Light = light_pkg.Light;
+const LightPool = light_pkg.LightPool;
 const Vertex = scene_pkg.Vertex;
 
 const glfw = @cImport(@cInclude("GLFW/glfw3.h"));
@@ -33,7 +34,8 @@ pub fn main() !void {
     var app = try App.init("Stage window", 640, 480);
     defer app.deinit();
 
-    var scene = Scene.init();
+    var scene = Scene.init(allocator);
+    defer scene.deinit();
 
     var pool = NodePool.init(allocator);
     defer pool.deinit();
@@ -55,19 +57,24 @@ pub fn main() !void {
 
     try node1.get().addChild(allocator, node2);
 
-    var light = Light.init(&.{ 1.5, 1.5, 0 }, 2.0);
-    light.color.ambient = .{ 0.7, 0.7, 0.7 };
-    light.color.diffuse = .{ 0.3, 0.3, 0.3 };
+    var lightPool = LightPool.init(allocator);
+
+    var light = try lightPool.create(Light.init(&.{ 1.5, 1.5, 0 }, 2.0));
+    light.get().color.ambient = .{ 1, 1, 1 };
+    light.get().color.diffuse = .{ 0.3, 0.3, 0.3 };
+
+    light.get().quadratic = 1.05;
     // light.color.specular = .{0.3, 0.3, 0.3};
-    light.node = node2;
-    scene.addLight(&light);
+    light.get().node = node2;
+    try scene.addLight(light);
 
     const window = glfw.glfwGetCurrentContext();
 
     while (glfw.glfwWindowShouldClose(window) == 0) {
         try app.render(allocator, &scene, &camera);
         // light.vertex.position[0] += 0.0001;
-        scene.addLight(&light);
+        // light.transform.translate(0.003, 0, 0);
+        // scene.addLight(light);
 
         // node2.get().transform.rotateX(0.01);
 
