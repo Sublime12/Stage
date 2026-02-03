@@ -63,7 +63,7 @@ pub fn main() !void {
     light.get().color.ambient = .{ 1, 1, 1 };
     light.get().color.diffuse = .{ 0.3, 0.3, 0.3 };
 
-    light.get().quadratic = 1.2;
+    light.get().quadratic = 1.05;
     // light.color.specular = .{0.3, 0.3, 0.3};
     light.get().node = node2;
     try scene.addLight(light);

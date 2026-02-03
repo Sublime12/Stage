@@ -28,14 +28,56 @@ in vec3 fPos;
 in vec3 fNormal;
 in vec3 fViewPos;
 
+
+vec3 calculatePointLight(Light light, vec3 normal, vec3 fPos, vec3 fViewPos);
+
 void main()
 {
-    // ambient
+    // // ambient
+    // float ambientStrength = 0.1;
+    // vec3 ambient = ambientStrength * light.ambient;
+
+    // // diffuse
+    // vec3 norm = normalize(fNormal);
+    // vec3 lightDir = normalize(light.position - fPos);
+    // float diff = max(dot(norm, lightDir), 0.0);
+    // vec3 diffuse = diff * light.diffuse * light.strength;
+
+    // // specular
+    // vec3 specular = vec3(0.0);
+    // if (diff > 0.0) {
+    //     float specularStrength = 10;
+    //     vec3 viewDir = normalize(fViewPos - fPos);
+    //     vec3 reflectDir = reflect(-lightDir, norm);
+    //     float spec = pow(max(dot(viewDir, reflectDir), 0.0), 15);
+    //     specular = specularStrength * spec * light.specular;
+    // }
+
+    // // attenuation
+    // float distance = length(light.position - fPos);
+    // float attenuation = 1.0 / (light.constant + light.linear * distance + 
+    //                     light.quadratic * (distance * distance));
+
+    // diffuse  *= attenuation;
+    // ambient  *= attenuation;
+    // specular *= attenuation;
+    // vec3 result = (specular  + diffuse + ambient) * fCol;
+    vec3 result = vec3(0.0);
+    for (int i = 0; i < 1; i++) {
+        result += calculatePointLight(light, fNormal, fPos, fViewPos);
+    }
+
+    result = result * fCol;
+    fragment = vec4(result, 1.0);
+}
+
+vec3 calculatePointLight(Light light, vec3 normal, vec3 fPos, vec3 fViewPos) {
+     // ambient
     float ambientStrength = 0.1;
     vec3 ambient = ambientStrength * light.ambient;
 
     // diffuse
-    vec3 norm = normalize(fNormal);
+    vec3 norm = normalize(normal);
     vec3 lightDir = normalize(light.position - fPos);
     float diff = max(dot(norm, lightDir), 0.0);
     vec3 diffuse = diff * light.diffuse * light.strength;
@@ -58,9 +100,6 @@ void main()
     diffuse  *= attenuation;
     ambient  *= attenuation;
     specular *= attenuation;
-    vec3 result = (specular  + diffuse + ambient) * fCol;
-    vec3 color = result;
 
-    fragment = vec4(color, 1.0);
+    return (specular + diffuse + ambient);  
 }
-
