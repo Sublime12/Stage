@@ -12,6 +12,9 @@ pub const Light = struct {
     transform: Transform,
     node: ?NodeHandle,
     color: LigthColor,
+    constant: f32,
+    linear: f32,
+    quadratic: f32,
     // position: Vec3,
     // totalTransform
     // cameraWorld = camera.node.get().totalTransform * camera.transform
@@ -23,6 +26,9 @@ pub const Light = struct {
             .strength = strengh,
             .transform = Transform.init(),
             .node = null,
+            .constant = 1,
+            .linear = 0,
+            .quadratic = 0,
             .color = .{
                 .ambient = .{ 0.05, 0.05, 0.05 },
                 .diffuse = .{ 1.0, 1.0, 1.0 },

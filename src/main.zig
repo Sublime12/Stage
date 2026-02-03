@@ -56,8 +56,10 @@ pub fn main() !void {
     try node1.get().addChild(allocator, node2);
 
     var light = Light.init(&.{ 1.5, 1.5, 0 }, 2.0);
-    light.color.ambient = .{ 0.7, 0.7, 0.7 };
+    light.color.ambient = .{ 1, 1, 1 };
     light.color.diffuse = .{ 0.3, 0.3, 0.3 };
+
+    light.quadratic = 1.2;
     // light.color.specular = .{0.3, 0.3, 0.3};
     light.node = node2;
     scene.addLight(&light);
