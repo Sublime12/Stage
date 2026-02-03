@@ -233,8 +233,8 @@ pub const App = struct {
             "light.quadratic",
         ));
 
-        std.debug.assert(scene.light != null);
-        const light = scene.light.?;
+        std.debug.assert(scene.lights.items.len != 0);
+        const light = scene.lights.items[0].get();
 
         const lightPos = light.transformPosition();
         gl.glUniformMatrix4fv(@intCast(proj_location), 1, gl.GL_TRUE, @ptrCast(&camera.projection.mat));

@@ -1,8 +1,46 @@
+const std = @import("std");
+const Allocator = std.mem.Allocator;
+
 const NodeHandle = @import("node.zig").NodeHandle;
 const Transform = @import("transform.zig").Transform;
 const Vec3 = @import("math.zig").Vector3;
 const Vertex = @import("scene.zig").Vertex;
 const math = @import("math.zig");
+
+pub const LightPool = struct {
+    const Self = @This();
+    lights: std.ArrayList(Light),
+    allocator: Allocator,
+
+    pub fn init(allocator: Allocator) LightPool {
+        return .{
+            .allocator = allocator,
+            .lights = .empty,
+        };
+    }
+
+    pub fn deinit(self: *Self) void {
+        self.lights.deinit(self.allocator);
+    }
+
+    pub fn create(self: *Self, light: Light) !LightHandle {
+        try self.lights.append(self.allocator, light);
+        return .{
+            .index = self.lights.items.len - 1,
+            .pool = self,
+        };
+    }
+};
+
+pub const LightHandle = struct {
+    const Self = @This();
+    index: usize,
+    pool: *LightPool,
+
+    pub fn get(self: *const Self) *Light {
+        return &self.pool.lights.items[self.index];
+    }
+};
 
 pub const Light = struct {
     const Self = @This();
