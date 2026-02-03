@@ -125,6 +125,7 @@ pub const App = struct {
             self.program,
             "vPos",
         ));
+
         const vcol_location: c_uint = @intCast(gl.glGetAttribLocation(
             self.program,
             "vCol",
@@ -183,6 +184,7 @@ pub const App = struct {
         glfw.glfwGetFramebufferSize(self.window, &width, &height);
         const ratio: f32 = @as(f32, @floatFromInt(width)) / @as(f32, @floatFromInt(height));
         gl.glViewport(0, 0, width, height);
+        gl.glClearColor(0, 0, 0, 1);
         gl.glClear(gl.GL_COLOR_BUFFER_BIT | gl.GL_DEPTH_BUFFER_BIT);
         gl.glUseProgram(self.program);
 
@@ -191,9 +193,19 @@ pub const App = struct {
             "lightPos",
         ));
 
-        const lightColorLocation: c_uint = @intCast(gl.glGetUniformLocation(
+        const ambientColorLocation: c_uint = @intCast(gl.glGetUniformLocation(
             self.program,
-            "lightColor",
+            "ambientColor",
+        ));
+
+        const diffuseColorLocation: c_uint = @intCast(gl.glGetUniformLocation(
+            self.program,
+            "diffuseColor",
+        ));
+
+        const specularColorLocation: c_uint = @intCast(gl.glGetUniformLocation(
+            self.program,
+            "specularColor",
         ));
 
         const lightStrenghLocation: c_uint = @intCast(gl.glGetUniformLocation(
@@ -204,21 +216,36 @@ pub const App = struct {
         std.debug.assert(scene.light != null);
         const light = scene.light.?;
 
-        const lightPos = light.getTransformedVertex();
+        const lightPos = light.transformPosition();
         gl.glUniformMatrix4fv(@intCast(proj_location), 1, gl.GL_TRUE, @ptrCast(&camera.projection.mat));
         gl.glUniformMatrix4fv(@intCast(view_location), 1, gl.GL_TRUE, @ptrCast(&camera.view.mat));
         gl.glUniform3f(
             @intCast(lightPosLocation),
-            lightPos.position[0],
-            lightPos.position[1],
-            lightPos.position[2],
+            lightPos[0],
+            lightPos[1],
+            lightPos[2],
         );
         gl.glUniform3f(
-            @intCast(lightColorLocation),
-            light.vertex.color[0],
-            light.vertex.color[1],
-            light.vertex.color[2],
+            @intCast(ambientColorLocation),
+            light.color.ambient[0],
+            light.color.ambient[1],
+            light.color.ambient[2],
         );
+
+        gl.glUniform3f(
+            @intCast(diffuseColorLocation),
+            light.color.diffuse[0],
+            light.color.diffuse[1],
+            light.color.diffuse[2],
+        );
+
+        gl.glUniform3f(
+            @intCast(specularColorLocation),
+            light.color.specular[0],
+            light.color.specular[1],
+            light.color.specular[2],
+        );
+
         gl.glUniform1f(
             @intCast(lightStrenghLocation),
             light.strength,

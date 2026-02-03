@@ -93,8 +93,9 @@ pub const Geometry = struct {
 
         const triangle2 = Triangle.init(
             .{ .position = .{ 0.5, 0.5, 0.0 }, .color = blue },
-            .{ .position = .{ 0.0, 0.5, 0.0 }, .color = blue },
             .{ .position = .{ 0.5, 0.0, 0.0 }, .color = blue },
+
+            .{ .position = .{ 0.0, 0.5, 0.0 }, .color = blue },
         );
 
         // Face 2
@@ -164,20 +165,20 @@ pub const Geometry = struct {
         );
 
         // Face 6
-        const pink = .{ 1.0, 0.0, 1.0 };
+        const white = .{ 1.0, 1.0, 1.0 };
 
         const triangle11 = Triangle.init(
-            .{ .position = .{ 0.0, 0.5, 0.5 }, .color = pink },
-            .{ .position = .{ 0.5, 0.5, 0.0 }, .color = pink },
+            .{ .position = .{ 0.0, 0.5, 0.5 }, .color = white },
+            .{ .position = .{ 0.5, 0.5, 0.0 }, .color = white },
 
-            .{ .position = .{ 0.0, 0.5, 0.0 }, .color = pink },
+            .{ .position = .{ 0.0, 0.5, 0.0 }, .color = white },
         );
 
         const triangle12 = Triangle.init(
-            .{ .position = .{ 0.5, 0.5, 0.5 }, .color = pink },
-            .{ .position = .{ 0.5, 0.5, 0.0 }, .color = pink },
+            .{ .position = .{ 0.5, 0.5, 0.5 }, .color = white },
+            .{ .position = .{ 0.5, 0.5, 0.0 }, .color = white },
 
-            .{ .position = .{ 0.0, 0.5, 0.5 }, .color = pink },
+            .{ .position = .{ 0.0, 0.5, 0.5 }, .color = white },
         );
 
         var geometry = Geometry.init();
