@@ -46,7 +46,7 @@ pub fn main() !void {
     var camera = Camera.init(math.pi / 4.0, 640.0 / 420.0, 0.01, 100);
     node1.get().transform.translate(0, 0, 0.0);
     // TODO: Adjust the specular ligth when camara eye move
-    camera.lookAt(.{ 3.0, 3.0, 3.0 }, .{ 0.1, 0.1, 0.1 }, .{ 0.0, 1.0, 0.0 });
+    camera.lookAt(.{ 1.5, 1.5, 0 }, .{ 0.1, 0.1, 0.1 }, .{ 0.0, 1.0, 0.0 });
 
     // const cubeGeo2 = try Geometry.makeTriangle(allocator, 1, 1, 1);
     const cubeGeo2 = try Geometry.makeCube(allocator);
@@ -55,7 +55,7 @@ pub fn main() !void {
 
     try node1.get().addChild(allocator, node2);
 
-    var light = Light.init(&.{ 0.0, 2.0, 0.0 }, 2.0);
+    var light = Light.init(&.{ 1.5, 1.5, 0 }, 2.0);
     light.color.ambient = .{ 0.7, 0.7, 0.7 };
     light.color.diffuse = .{ 0.3, 0.3, 0.3 };
     // light.color.specular = .{0.3, 0.3, 0.3};

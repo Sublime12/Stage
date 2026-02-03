@@ -3,7 +3,6 @@
 // in vec3 color;
 out vec4 fragment;
 
-uniform vec3 viewPos;
 uniform vec3 ambientColor;
 uniform vec3 diffuseColor;
 uniform vec3 specularColor;
@@ -13,6 +12,7 @@ uniform float lightStrength;
 in vec3 fCol;
 in vec3 fPos;
 in vec3 fNormal;
+in vec3 fViewPos;
 
 void main()
 {
@@ -27,11 +27,14 @@ void main()
     vec3 diffuse = diff * diffuseColor * lightStrength;
 
     // specular
-    float specularStrength = 10;
-    vec3 viewDir = normalize(viewPos - fPos);
-    vec3 reflectDir = reflect(-lightDir, norm);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), 15);
-    vec3 specular = specularStrength * spec * specularColor;
+    vec3 specular = vec3(0.0);
+    if (diff > 0.0) {
+        float specularStrength = 10;
+        vec3 viewDir = normalize(fViewPos - fPos);
+        vec3 reflectDir = reflect(-lightDir, norm);
+        float spec = pow(max(dot(viewDir, reflectDir), 0.0), 15);
+        specular = specularStrength * spec * specularColor;
+    }
 
     vec3 result = (specular  + diffuse + ambient) * fCol;
     vec3 color = result;

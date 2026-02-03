@@ -212,11 +212,6 @@ pub const App = struct {
             "lightStrength",
         ));
 
-        const viewPosLocation: c_uint = @intCast(gl.glGetUniformLocation(
-            self.program,
-            "viewPos",
-        ));
-
         std.debug.assert(scene.light != null);
         const light = scene.light.?;
 
@@ -253,14 +248,6 @@ pub const App = struct {
         gl.glUniform1f(
             @intCast(lightStrenghLocation),
             light.strength,
-        );
-
-        // uniforms for fragment shader
-        gl.glUniform3f(
-            @intCast(viewPosLocation),
-            camera.position.?[0],
-            camera.position.?[1],
-            camera.position.?[2],
         );
 
         gl.glBindVertexArray(vertex_array);

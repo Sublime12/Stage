@@ -93,8 +93,9 @@ pub const Geometry = struct {
 
         const triangle2 = Triangle.init(
             .{ .position = .{ 0.5, 0.5, 0.0 }, .color = blue },
-            .{ .position = .{ 0.0, 0.5, 0.0 }, .color = blue },
             .{ .position = .{ 0.5, 0.0, 0.0 }, .color = blue },
+
+            .{ .position = .{ 0.0, 0.5, 0.0 }, .color = blue },
         );
 
         // Face 2

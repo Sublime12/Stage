@@ -14,16 +14,15 @@ in vec3 normal;
 out vec3 fCol;
 out vec3 fPos;
 out vec3 fNormal;
+out vec3 fViewPos;
 // out vec3 color;
 
 void main()
 {
-    // vec3 norm = normalize(normal);
-    // vec3 lightDir = normalize(lightPos - vPos);
-    // float diff = max(dot(norm, lightDir), 0.0);
-    // vec3 diffuse = diff * lightColor * lightStrength;
-    // vec3 result = diffuse * vCol + 0.2;
-    // color = result;
+    // TODO: expensive to calculate inverse on every vertex
+    // calculate it in the cpu code
+    mat4 inverseView = inverse(view);
+    fViewPos = inverseView[3].xyz;
     fCol = vCol;
     fPos = vPos;
     fNormal = normal;
