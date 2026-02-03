@@ -57,9 +57,7 @@ pub fn build(b: *std.Build) void {
     //
     // If neither case applies to you, feel free to delete the declaration you
     // don't need and to put everything under a single module.
-    const exe = b.addExecutable(.{
-        .name = "Stage",
-        .root_module = b.createModule(.{
+    const exe_mod =         b.createModule(.{
             // b.createModule defines a new module just like b.addModule but,
             // unlike b.addModule, it does not expose the module to consumers of
             // this package, which is why in this case we don't have to give it a name.
@@ -80,8 +78,13 @@ pub fn build(b: *std.Build) void {
                 // importing modules from different packages).
                 .{ .name = "Stage", .module = mod },
             },
-        }),
-    });
+        });
+ 
+
+    const exe = b.addExecutable(.{
+        .name = "Stage",
+        .root_module = exe_mod,
+   });
 
     // Add opengl to the project
     exe.addIncludePath(b.path("src/c/"));
@@ -98,6 +101,13 @@ pub fn build(b: *std.Build) void {
     // by passing `--prefix` or `-p`.
     b.installArtifact(exe);
 
+    const exe_check = b.addExecutable(.{
+        .name = "check",
+        .root_module = exe_mod,
+    });
+
+    const check = b.step("check", "Check if Stage compiles");
+    check.dependOn(&exe_check.step);
     // This creates a top level step. Top level steps have a name and can be
     // invoked by name when running `zig build` (e.g. `zig build run`).
     // This will evaluate the `run` step rather than the default step.
