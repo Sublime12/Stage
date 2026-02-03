@@ -9,6 +9,7 @@ const LightHandle = light_pkg.LightHandle;
 
 pub const Scene = struct {
     const Self = @This();
+    pub const MaxLights = 5;
 
     root: ?NodeHandle,
     // light: ?Light,
@@ -16,11 +17,11 @@ pub const Scene = struct {
     allocator: Allocator,
 
     /// Initilize the scene with an empty tree.
-    pub fn init(allocator: Allocator) Scene {
+    pub fn init(allocator: Allocator) !Scene {
         return .{
             .root = null,
             .allocator = allocator,
-            .lights = .empty,
+            .lights = try std.ArrayList(LightHandle).initCapacity(allocator, MaxLights),
             // .light = null,
         };
     }
@@ -29,9 +30,9 @@ pub const Scene = struct {
         self.lights.deinit(self.allocator);
     }
 
-    pub fn addLight(self: *Self, light: LightHandle) !void {
+    pub fn addLight(self: *Self, light: LightHandle) void {
         // self.light = light.*;
-        try self.lights.append(self.allocator, light);
+        self.lights.appendAssumeCapacity(light);
     }
 
     // Add a node to the root
