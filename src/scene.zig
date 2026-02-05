@@ -113,7 +113,6 @@ pub const Geometry = struct {
         // Face 2
         // const red = .{ 1.0, 0.0, 0.0 };
 
-
         const triangle3 = Triangle.init(
             .{ .position = .{ 0.0, 0.0, 0.0 }, .color = white },
 
