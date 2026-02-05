@@ -102,7 +102,7 @@ fn lengthVec3(vec: *const Vector3) f32 {
 }
 
 test "expect identity return an identity 4x4 matrix" {
-    const expect: Mat4x4 = .{
+    const expected: Mat4x4 = .{
         .{ 1, 0, 0, 0 },
         .{ 0, 1, 0, 0 },
         .{ 0, 0, 1, 0 },
@@ -110,7 +110,7 @@ test "expect identity return an identity 4x4 matrix" {
     };
     const actual: Mat4x4 = identity();
 
-    try std.testing.expectEqual(expect, actual);
+    try std.testing.expectEqual(expected, actual);
 }
 
 test "expect multiplyMat4x4 with any matrix by identity return the orignal matrix" {
@@ -143,7 +143,7 @@ test "expect multiplyMat4x4 return the product of m1 multiply by m2" {
         .{ 9, 10, 12, 2 },
         .{ 3, 12, 4, 10 },
     };
-    const expect: Mat4x4 = .{
+    const expected: Mat4x4 = .{
         .{ 210, 267, 236, 271 },
         .{ 93, 149, 104, 149 },
         .{ 171, 146, 172, 268 },
@@ -153,7 +153,7 @@ test "expect multiplyMat4x4 return the product of m1 multiply by m2" {
     var actual: Mat4x4 = undefined;
     multiplyMat4x4(&actual, &m1, &m2);
 
-    try std.testing.expectEqual(expect, actual);
+    try std.testing.expectEqual(expected, actual);
 }
 
 test "expect multiplyMat4x4Vec3 with any vector by identity matrix return the orignal vector" {
@@ -164,12 +164,12 @@ test "expect multiplyMat4x4Vec3 with any vector by identity matrix return the or
         .{ 4, 0, 4, 4 },
         .{ 1, 4, 2, 7 },
     };
-    const expect: Vector3 = .{ 56, 55, 28 };
+    const expected: Vector3 = .{ 56, 55, 28 };
 
     var actual: Vector3 = undefined;
     multiplyMat4x4Vec3(&actual, &m, &v);
 
-    try std.testing.expectEqual(expect, actual);
+    try std.testing.expectEqual(expected, actual);
 }
 
 test "expect multiplyMat4x4Vec3 return the product of m multiply by v" {
@@ -194,67 +194,67 @@ test "expect substractVec3 return the difference between vec1 and vec2" {
     const vec1: Vector3 = .{ 7, 3, 6 };
     const vec2: Vector3 = .{ 4, 0, 8 };
 
-    const expect: Vector3 = .{ 3, 3, -2 };
+    const expected: Vector3 = .{ 3, 3, -2 };
     var actual: Vector3 = undefined;
 
     substractVec3(&actual, &vec1, &vec2);
 
-    try std.testing.expectEqual(expect, actual);
+    try std.testing.expectEqual(expected, actual);
 }
 
 test "expect normalizeVec3 normalize to length of 1" {
     const vec: Vector3 = .{ 1, 4, 2 };
 
     const length = lengthVec3(&vec);
-    const expect: Vector3 = .{ vec[0] / length, vec[1] / length, vec[2] / length };
+    const expected: Vector3 = .{ vec[0] / length, vec[1] / length, vec[2] / length };
     var actual: Vector3 = undefined;
 
     normalizeVec3(&actual, &vec);
 
     try std.testing.expect(@abs(lengthVec3(&actual) - 1) <= 0.00001);
-    try std.testing.expectEqual(expect, actual);
+    try std.testing.expectEqual(expected, actual);
 }
 
 test "expect crossVec3 return 0 vector with parallel vector" {
     const vec1: Vector3 = .{ 1, 2, 3 };
     const vec2: Vector3 = .{ 3, 6, 9 };
 
-    const expect: Vector3 = .{ 0, 0, 0 };
+    const expected: Vector3 = .{ 0, 0, 0 };
     var actual: Vector3 = undefined;
 
     crossVec3(&actual, &vec1, &vec2);
 
-    try std.testing.expectEqual(expect, actual);
+    try std.testing.expectEqual(expected, actual);
 }
 
 test "expect crossVec3 return the cross product of two vector" {
     const vec1: Vector3 = .{ 7, 5, 4 };
     const vec2: Vector3 = .{ 6, 2, 0 };
 
-    const expect: Vector3 = .{ -8, 24, -16 };
+    const expected: Vector3 = .{ -8, 24, -16 };
     var actual: Vector3 = undefined;
 
     crossVec3(&actual, &vec1, &vec2);
 
-    try std.testing.expectEqual(expect, actual);
+    try std.testing.expectEqual(expected, actual);
 }
 
 test "exoect dotVec3 return 0 with perpendicular vector" {
     const vec1: Vector3 = .{ 0, 0, 1 };
     const vec2: Vector3 = .{ 0, 1, 0 };
 
-    const expect: f32 = 0;
+    const expected: f32 = 0;
     const actual: f32 = dotVec3(&vec1, &vec2);
 
-    try std.testing.expect(@abs(actual - expect) <= 0.00001);
+    try std.testing.expect(@abs(actual - expected) <= 0.00001);
 }
 
 test "exoect dotVec3 return the dot product of vec1 and vec2" {
     const vec1: Vector3 = .{ 5, 2, 0 };
     const vec2: Vector3 = .{ 9, 8, 4 };
 
-    const expect: f32 = 61;
+    const expected: f32 = 61;
     const actual: f32 = dotVec3(&vec1, &vec2);
 
-    try std.testing.expectEqual(expect, actual);
+    try std.testing.expectEqual(expected, actual);
 }
