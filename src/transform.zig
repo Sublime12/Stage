@@ -102,7 +102,7 @@ test "from expect translation from tx and ty" {
     try std.testing.expectEqual(expected, actual);
 }
 
-test "transform v(1, 0, 0) with rotateY(pi/2) expect (0, 0, 1)" {
+test "transform v(1, 0, 0) with rotateY(pi/2) expect (0, 0, -1)" {
     var transform = Transform.init();
     transform.rotateY(std.math.pi / 2.0);
 
@@ -118,6 +118,24 @@ test "transform v(1, 0, 0) with rotateY(pi/2) expect (0, 0, 1)" {
 
     const actual = transform.transformVertex(&vertex);
 
+    try std.testing.expect(areEqualApproxVertex(&expected, &actual));
+}
+
+test "tranform v(0, 0, 1) with rotateX(pi/2) expect (0, 1, 0)" {
+    var transform = Transform.init();
+    transform.rotateX(std.math.pi / 2.0);
+
+    const expected = Vertex.init(
+        .{ 0, -1, 0 },
+        .{ 1,  1, 1 },
+    );
+
+    const vertex = Vertex.init(
+        .{ 0, 0, 1 },
+        .{ 1, 1, 1 },
+    );
+
+    const actual = transform.transformVertex(&vertex);
     try std.testing.expect(areEqualApproxVertex(&expected, &actual));
 }
 
