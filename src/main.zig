@@ -63,16 +63,16 @@ pub fn main() !void {
     var light = try lightPool.create(Light.init(&.{ 1.5, 1.5, 1.5 }, 2.0));
     light.get().color.ambient = .{ 1, 1, 1 };
     light.get().color.diffuse = .{ 0.3, 0.3, 0.3 };
-    light.get().color.specular = .{ 0.0, 1, 0 };
+    light.get().color.specular = .{ 1, 0, 0 };
 
-    // // light.get().quadratic = 1;
-    // // light.color.specular = .{0.3, 0.3, 0.3};
-    // light.get().node = node2;
+    // light.get().quadratic = 1;
+    // light.color.specular = .{0.3, 0.3, 0.3};
+    light.get().node = node2;
     scene.addLight(light);
 
-    var light2 = try lightPool.create(Light.init(&.{ -1.5, -1.5, -1.5 }, 2.0));
-    light2.get().color.ambient = .{ 1, 1, 1 };
-    light2.get().color.specular = .{ 1, 0, 0 };
+    var light2 = try lightPool.create(Light.init(&.{-1.5, -1.5, -1.5}, 2.0));
+    light2.get().color.ambient = .{ 0.2, 0.1, 0.1 };
+    light2.get().color.specular = .{ 0, 1, 0 };
 
     scene.addLight(light2);
 

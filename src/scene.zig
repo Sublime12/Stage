@@ -96,88 +96,88 @@ pub const Geometry = struct {
 
     pub fn makeCube(allocator: Allocator) !Geometry {
         // Face 1
-        const blue = .{ 0.0, 0.0, 1.0 };
+        const white = .{ 1.0, 1.0, 1.0 };
         const triangle1 = Triangle.init(
-            .{ .position = .{ 0.0, 0.5, 0.0 }, .color = blue },
-            .{ .position = .{ 0.5, 0.0, 0.0 }, .color = blue },
-            .{ .position = .{ 0.0, 0.0, 0.0 }, .color = blue },
+            .{ .position = .{ 0.0, 0.5, 0.0 }, .color = white },
+            .{ .position = .{ 0.5, 0.0, 0.0 }, .color = white },
+            .{ .position = .{ 0.0, 0.0, 0.0 }, .color = white },
         );
 
         const triangle2 = Triangle.init(
-            .{ .position = .{ 0.5, 0.5, 0.0 }, .color = blue },
-            .{ .position = .{ 0.5, 0.0, 0.0 }, .color = blue },
+            .{ .position = .{ 0.5, 0.5, 0.0 }, .color = white },
+            .{ .position = .{ 0.5, 0.0, 0.0 }, .color = white },
 
-            .{ .position = .{ 0.0, 0.5, 0.0 }, .color = blue },
+            .{ .position = .{ 0.0, 0.5, 0.0 }, .color = white },
         );
 
         // Face 2
-        const red = .{ 1.0, 0.0, 0.0 };
+        // const red = .{ 1.0, 0.0, 0.0 };
+
 
         const triangle3 = Triangle.init(
-            .{ .position = .{ 0.0, 0.0, 0.0 }, .color = red },
+            .{ .position = .{ 0.0, 0.0, 0.0 }, .color = white },
 
-            .{ .position = .{ 0.0, 0.0, 0.5 }, .color = red },
+            .{ .position = .{ 0.0, 0.0, 0.5 }, .color = white },
 
-            .{ .position = .{ 0.0, 0.5, 0.0 }, .color = red },
+            .{ .position = .{ 0.0, 0.5, 0.0 }, .color = white },
         );
 
         const triangle4 = Triangle.init(
-            .{ .position = .{ 0.0, 0.5, 0.5 }, .color = red },
-            .{ .position = .{ 0.0, 0.5, 0.0 }, .color = red },
+            .{ .position = .{ 0.0, 0.5, 0.5 }, .color = white },
+            .{ .position = .{ 0.0, 0.5, 0.0 }, .color = white },
 
-            .{ .position = .{ 0.0, 0.0, 0.5 }, .color = red },
+            .{ .position = .{ 0.0, 0.0, 0.5 }, .color = white },
         );
 
         // Face 3
-        const gray = .{ 0.5, 0.5, 0.5 };
+        // const gray = .{ 0.5, 0.5, 0.5 };
         const triangle5 = Triangle.init(
-            .{ .position = .{ 0.0, 0.0, 0.5 }, .color = gray },
-            .{ .position = .{ 0.5, 0.0, 0.5 }, .color = gray },
-            .{ .position = .{ 0.0, 0.5, 0.5 }, .color = gray },
+            .{ .position = .{ 0.0, 0.0, 0.5 }, .color = white },
+            .{ .position = .{ 0.5, 0.0, 0.5 }, .color = white },
+            .{ .position = .{ 0.0, 0.5, 0.5 }, .color = white },
         );
 
         const triangle6 = Triangle.init(
-            .{ .position = .{ 0.5, 0.5, 0.5 }, .color = gray },
-            .{ .position = .{ 0.0, 0.5, 0.5 }, .color = gray },
-            .{ .position = .{ 0.5, 0.0, 0.5 }, .color = gray },
+            .{ .position = .{ 0.5, 0.5, 0.5 }, .color = white },
+            .{ .position = .{ 0.0, 0.5, 0.5 }, .color = white },
+            .{ .position = .{ 0.5, 0.0, 0.5 }, .color = white },
         );
 
         // Face 4
-        const yellow = .{ 1.0, 1.0, 0.0 };
+        // const yellow = .{ 1.0, 1.0, 0.0 };
 
         const triangle7 = Triangle.init(
-            .{ .position = .{ 0.5, 0.0, 0.0 }, .color = yellow },
-            .{ .position = .{ 0.5, 0.5, 0.0 }, .color = yellow },
-
-            .{ .position = .{ 0.5, 0.0, 0.5 }, .color = yellow },
+            .{ .position = .{ 0.5, 0.0, 0.0 }, .color = white },
+            .{ .position = .{ 0.5, 0.5, 0.0 }, .color = white },
+            .{ .position = .{ 0.5, 0.0, 0.5 }, .color = white },
         );
 
         const triangle8 = Triangle.init(
-            .{ .position = .{ 0.5, 0.5, 0.5 }, .color = yellow },
-            .{ .position = .{ 0.5, 0.0, 0.5 }, .color = yellow },
-            .{ .position = .{ 0.5, 0.5, 0.0 }, .color = yellow },
+            .{ .position = .{ 0.5, 0.5, 0.5 }, .color = white },
+            .{ .position = .{ 0.5, 0.0, 0.5 }, .color = white },
+            .{ .position = .{ 0.5, 0.5, 0.0 }, .color = white },
         );
 
         // Face 4
-        const skyblue = .{ 0.0, 1.0, 1.0 };
+        // const skyblue = .{ 0.0, 1.0, 1.0 };
 
         const triangle9 = Triangle.init(
-            .{ .position = .{ 0.0, 0.0, 0.0 }, .color = skyblue },
+            .{ .position = .{ 0.0, 0.0, 0.0 }, .color = white },
 
-            .{ .position = .{ 0.5, 0.0, 0.0 }, .color = skyblue },
+            .{ .position = .{ 0.5, 0.0, 0.0 }, .color = white },
 
-            .{ .position = .{ 0.0, 0.0, 0.5 }, .color = skyblue },
+            .{ .position = .{ 0.0, 0.0, 0.5 }, .color = white },
         );
 
         const triangle10 = Triangle.init(
-            .{ .position = .{ 0.5, 0.0, 0.5 }, .color = skyblue },
-            .{ .position = .{ 0.0, 0.0, 0.5 }, .color = skyblue },
+            .{ .position = .{ 0.5, 0.0, 0.5 }, .color = white },
+            .{ .position = .{ 0.0, 0.0, 0.5 }, .color = white },
 
-            .{ .position = .{ 0.5, 0.0, 0.0 }, .color = skyblue },
+            .{ .position = .{ 0.5, 0.0, 0.0 }, .color = white },
         );
 
         // Face 6
-        const white = .{ 1.0, 1.0, 1.0 };
+        // const white = .{ 1.0, 1.0, 1.0 };
 
         const triangle11 = Triangle.init(
             .{ .position = .{ 0.0, 0.5, 0.5 }, .color = white },
