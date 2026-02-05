@@ -1,4 +1,5 @@
 const math = @import("math.zig");
+const std = @import("std");
 
 const Vertex = @import("scene.zig").Vertex;
 
@@ -70,3 +71,88 @@ pub const Transform = struct {
         return newVertex;
     }
 };
+
+test "from expect translation from tx and ty" {
+    var transform1 = Transform.init();
+    transform1.mat = .{
+        .{ 1, 0, 0, 2 },
+        .{ 0, 1, 0, 0 },
+        .{ 0, 0, 1, 0 },
+        .{ 0, 0, 0, 1 },
+    };
+
+    var transform2 = Transform.init();
+    transform2.mat = .{
+        .{ 1, 0, 0, 0 },
+        .{ 0, 1, 0, 2 },
+        .{ 0, 0, 1, 0 },
+        .{ 0, 0, 0, 1 },
+    };
+
+    var expected = Transform.init();
+    expected.mat = .{
+        .{ 1, 0, 0, 2 },
+        .{ 0, 1, 0, 2 },
+        .{ 0, 0, 1, 0 },
+        .{ 0, 0, 0, 1 },
+    };
+
+    const actual = Transform.from(&transform1, &transform2);
+
+    try std.testing.expectEqual(expected, actual);
+}
+
+test "transform v(1, 0, 0) with rotateY(pi/2) expect (0, 0, 1)" {
+    var transform = Transform.init();
+    transform.rotateY(std.math.pi / 2.0);
+
+    const expected = Vertex.init(
+        .{ 0, 0, -1 },
+        .{ 1, 1,  1 },
+    );
+
+    const vertex = Vertex.init(
+        .{ 1, 0, 0 },
+        .{ 1, 1, 1 },
+    );
+
+    const actual = transform.transformVertex(&vertex);
+
+    try std.testing.expect(areEqualApproxVertex(&expected, &actual));
+}
+
+// translation tx = 1 and rotation Z 90
+// (0, 0, 0) -> (1, 0, 0) -> (0, 1, 0)
+test "from tx=1 and rotateZ 90 expect (0, 0, 0) -> (0, 1, 0)" {
+    var transform1 = Transform.init();
+    transform1.translate(1, 0, 0);
+
+    var transform2 = Transform.init();
+    transform2.rotateZ(std.math.pi / 2.0);
+
+    const resultTransform = Transform.from(&transform2, &transform1);
+
+    const vertex = Vertex.init(
+        .{ 0, 0, 0 },
+        .{ 1, 1, 1 },
+    );
+
+    const expected = Vertex.init(
+        .{ 0, 1, 0 },
+        .{ 1, 1, 1 },
+    );
+
+    const actual = resultTransform.transformVertex(&vertex);
+
+    // try std.testing.expectApproxEqRel(expected, actual, 0.0001);
+    // try std.testing.expectEqual(expected, actual);
+    try std.testing.expect(areEqualApproxVertex(&expected, &actual));
+}
+
+fn areEqualApproxVertex(v1: *const Vertex, v2: *const Vertex) bool {
+    if (@abs(v1.position[0] - v2.position[0]) >= 0.00001) return false;
+    if (@abs(v1.position[1] - v2.position[1]) >= 0.00001) return false;
+    if (@abs(v1.position[2] - v2.position[2]) >= 0.00001) return false;
+
+    return true;
+}
