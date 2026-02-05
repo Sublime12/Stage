@@ -34,7 +34,7 @@ pub fn main() !void {
     var app = try App.init("Stage window", 640, 480);
     defer app.deinit();
 
-    var scene = Scene.init(allocator);
+    var scene = try Scene.init(allocator);
     defer scene.deinit();
 
     var pool = NodePool.init(allocator);
@@ -48,7 +48,7 @@ pub fn main() !void {
     var camera = Camera.init(math.pi / 4.0, 640.0 / 420.0, 0.01, 100);
     node1.get().transform.translate(0, 0, 0.0);
     // TODO: Adjust the specular ligth when camara eye move
-    camera.lookAt(.{ 1.5, 1.5, 0 }, .{ 0.1, 0.1, 0.1 }, .{ 0.0, 1.0, 0.0 });
+    camera.lookAt(.{ -1.5, -1.0, -1.5 }, .{ 0.1, 0.1, 0.1 }, .{ 0.0, 1.0, 0.0 });
 
     // const cubeGeo2 = try Geometry.makeTriangle(allocator, 1, 1, 1);
     const cubeGeo2 = try Geometry.makeCube(allocator);
@@ -58,15 +58,23 @@ pub fn main() !void {
     try node1.get().addChild(allocator, node2);
 
     var lightPool = LightPool.init(allocator);
+    defer lightPool.deinit();
 
-    var light = try lightPool.create(Light.init(&.{ 1.5, 1.5, 0 }, 2.0));
+    var light = try lightPool.create(Light.init(&.{ 1.5, 1.5, 1.5 }, 2.0));
     light.get().color.ambient = .{ 1, 1, 1 };
     light.get().color.diffuse = .{ 0.3, 0.3, 0.3 };
+    light.get().color.specular = .{ 1, 0, 0 };
 
-    light.get().quadratic = 1.05;
+    // light.get().quadratic = 1;
     // light.color.specular = .{0.3, 0.3, 0.3};
     light.get().node = node2;
-    try scene.addLight(light);
+    scene.addLight(light);
+
+    var light2 = try lightPool.create(Light.init(&.{-1.5, -1.5, -1.5}, 2.0));
+    light2.get().color.ambient = .{ 0.2, 0.1, 0.1 };
+    light2.get().color.specular = .{ 0, 1, 0 };
+
+    scene.addLight(light2);
 
     const window = glfw.glfwGetCurrentContext();
 

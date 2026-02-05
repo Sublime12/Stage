@@ -9,6 +9,7 @@ out vec4 fragment;
 // uniform vec3 lightPos;
 // uniform float lightStrength;
 
+
 struct Light {
     vec3 position;
     float strength;
@@ -20,8 +21,12 @@ struct Light {
     float constant;
     float linear;
     float quadratic;
+    bool isActive;
 };
-uniform Light light;
+
+#define MAX_LIGHT 5
+
+uniform Light lights[MAX_LIGHT];
 
 in vec3 fCol;
 in vec3 fPos;
@@ -63,8 +68,10 @@ void main()
     // specular *= attenuation;
     // vec3 result = (specular  + diffuse + ambient) * fCol;
     vec3 result = vec3(0.0);
-    for (int i = 0; i < 1; i++) {
-        result += calculatePointLight(light, fNormal, fPos, fViewPos);
+    for (int i = 0; i < MAX_LIGHT; i++) {
+        if (lights[i].isActive) {
+            result += calculatePointLight(lights[i], fNormal, fPos, fViewPos);
+        }
     }
 
     result = result * fCol;

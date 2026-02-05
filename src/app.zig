@@ -136,16 +136,6 @@ pub const App = struct {
             "normal",
         ));
 
-        const proj_location: c_uint = @intCast(gl.glGetUniformLocation(
-            self.program,
-            "proj",
-        ));
-
-        const view_location: c_uint = @intCast(gl.glGetUniformLocation(
-            self.program,
-            "view",
-        ));
-
         var vertex_array: gl.GLuint = 0;
         gl.glGenVertexArrays(1, &vertex_array);
         gl.glBindVertexArray(vertex_array);
@@ -193,98 +183,130 @@ pub const App = struct {
         //     "lightPos",
         // ));
 
-        const lightPosLocation: c_uint = @intCast(gl.glGetUniformLocation(
+        const proj_location: c_uint = @intCast(gl.glGetUniformLocation(
             self.program,
-            "light.position",
+            "proj",
         ));
 
-        const ambientColorLocation: c_uint = @intCast(gl.glGetUniformLocation(
+        const view_location: c_uint = @intCast(gl.glGetUniformLocation(
             self.program,
-            "light.ambient",
+            "view",
         ));
 
-        const diffuseColorLocation: c_uint = @intCast(gl.glGetUniformLocation(
-            self.program,
-            "light.diffuse",
-        ));
-
-        const specularColorLocation: c_uint = @intCast(gl.glGetUniformLocation(
-            self.program,
-            "light.specular",
-        ));
-
-        const lightStrenghLocation: c_uint = @intCast(gl.glGetUniformLocation(
-            self.program,
-            "light.strength",
-        ));
-
-        const lightConstantLocation: c_uint = @intCast(gl.glGetUniformLocation(
-            self.program,
-            "light.constant",
-        ));
-
-        const lightLinearLocation: c_uint = @intCast(gl.glGetUniformLocation(
-            self.program,
-            "light.linear",
-        ));
-
-        const lightQuadraticLocation: c_uint = @intCast(gl.glGetUniformLocation(
-            self.program,
-            "light.quadratic",
-        ));
-
-        std.debug.assert(scene.lights.items.len != 0);
-        const light = scene.lights.items[0].get();
-
-        const lightPos = light.transformPosition();
         gl.glUniformMatrix4fv(@intCast(proj_location), 1, gl.GL_TRUE, @ptrCast(&camera.projection.mat));
         gl.glUniformMatrix4fv(@intCast(view_location), 1, gl.GL_TRUE, @ptrCast(&camera.view.mat));
-        gl.glUniform3f(
-            @intCast(lightPosLocation),
-            lightPos[0],
-            lightPos[1],
-            lightPos[2],
-        );
-        gl.glUniform3f(
-            @intCast(ambientColorLocation),
-            light.color.ambient[0],
-            light.color.ambient[1],
-            light.color.ambient[2],
-        );
 
-        gl.glUniform3f(
-            @intCast(diffuseColorLocation),
-            light.color.diffuse[0],
-            light.color.diffuse[1],
-            light.color.diffuse[2],
-        );
+        inline for (0..Scene.MaxLights) |i| {
+            const base = std.fmt.comptimePrint("lights[{d}].", .{i});
 
-        gl.glUniform3f(
-            @intCast(specularColorLocation),
-            light.color.specular[0],
-            light.color.specular[1],
-            light.color.specular[2],
-        );
+            // std.debug.print("string: {s}\n", .{base});
 
-        gl.glUniform1f(
-            @intCast(lightConstantLocation),
-            light.constant,
-        );
+            const lightActiveLocation: c_uint = @intCast(gl.glGetUniformLocation(
+                self.program,
+                base ++ "isActive",
+            ));
 
-        gl.glUniform1f(
-            @intCast(lightLinearLocation),
-            light.linear,
-        );
+            const lightPosLocation: c_uint = @intCast(gl.glGetUniformLocation(
+                self.program,
+                base ++ "position",
+            ));
 
-        gl.glUniform1f(
-            @intCast(lightQuadraticLocation),
-            light.quadratic,
-        );
+            const ambientColorLocation: c_uint = @intCast(gl.glGetUniformLocation(
+                self.program,
+                base ++ "ambient",
+            ));
 
-        gl.glUniform1f(
-            @intCast(lightStrenghLocation),
-            light.strength,
-        );
+            const diffuseColorLocation: c_uint = @intCast(gl.glGetUniformLocation(
+                self.program,
+                base ++ "diffuse",
+            ));
+
+            const specularColorLocation: c_uint = @intCast(gl.glGetUniformLocation(
+                self.program,
+                base ++ "specular",
+            ));
+
+            const lightStrenghLocation: c_uint = @intCast(gl.glGetUniformLocation(
+                self.program,
+                base ++ "strength",
+            ));
+
+            const lightConstantLocation: c_uint = @intCast(gl.glGetUniformLocation(
+                self.program,
+                base ++ "constant",
+            ));
+
+            const lightLinearLocation: c_uint = @intCast(gl.glGetUniformLocation(
+                self.program,
+                base ++ "linear",
+            ));
+
+            const lightQuadraticLocation: c_uint = @intCast(gl.glGetUniformLocation(
+                self.program,
+                base ++ "quadratic",
+            ));
+
+            const isActive = i < scene.lights.items.len;
+            gl.glUniform1i(
+                @intCast(lightActiveLocation),
+                if (isActive) 1 else 0,
+            );
+
+            // std.debug.assert(scene.lights.items.len != 0);
+
+            const light = if (isActive)
+                scene.lights.items[i].get()
+            else
+                &Light.init(&.{ 0, 0, 0 }, 0.0);
+
+            const lightPos = light.transformPosition();
+            gl.glUniform3f(
+                @intCast(lightPosLocation),
+                lightPos[0],
+                lightPos[1],
+                lightPos[2],
+            );
+            gl.glUniform3f(
+                @intCast(ambientColorLocation),
+                light.color.ambient[0],
+                light.color.ambient[1],
+                light.color.ambient[2],
+            );
+
+            gl.glUniform3f(
+                @intCast(diffuseColorLocation),
+                light.color.diffuse[0],
+                light.color.diffuse[1],
+                light.color.diffuse[2],
+            );
+
+            gl.glUniform3f(
+                @intCast(specularColorLocation),
+                light.color.specular[0],
+                light.color.specular[1],
+                light.color.specular[2],
+            );
+
+            gl.glUniform1f(
+                @intCast(lightConstantLocation),
+                light.constant,
+            );
+
+            gl.glUniform1f(
+                @intCast(lightLinearLocation),
+                light.linear,
+            );
+
+            gl.glUniform1f(
+                @intCast(lightQuadraticLocation),
+                light.quadratic,
+            );
+
+            gl.glUniform1f(
+                @intCast(lightStrenghLocation),
+                light.strength,
+            );
+        }
 
         gl.glBindVertexArray(vertex_array);
         gl.glDrawArrays(gl.GL_TRIANGLES, 0, @as(c_int, @intCast(vertices.items.len)));
