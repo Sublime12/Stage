@@ -108,7 +108,7 @@ test "transform v(1, 0, 0) with rotateY(pi/2) expect (0, 0, -1)" {
 
     const expected = Vertex.init(
         .{ 0, 0, -1 },
-        .{ 1, 1,  1 },
+        .{ 1, 1, 1 },
     );
 
     const vertex = Vertex.init(
@@ -127,7 +127,7 @@ test "tranform v(0, 0, 1) with rotateX(pi/2) expect (0, 1, 0)" {
 
     const expected = Vertex.init(
         .{ 0, -1, 0 },
-        .{ 1,  1, 1 },
+        .{ 1, 1, 1 },
     );
 
     const vertex = Vertex.init(

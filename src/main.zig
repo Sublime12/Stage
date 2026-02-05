@@ -70,7 +70,7 @@ pub fn main() !void {
     light.get().node = node2;
     scene.addLight(light);
 
-    var light2 = try lightPool.create(Light.init(&.{-1.5, -1.5, -1.5}, 2.0));
+    var light2 = try lightPool.create(Light.init(&.{ -1.5, -1.5, -1.5 }, 2.0));
     light2.get().color.ambient = .{ 0.2, 0.1, 0.1 };
     light2.get().color.specular = .{ 0, 1, 0 };
 
