@@ -11,6 +11,9 @@ const DIMENSION = @import("scene.zig").DIMENSION;
 
 const glfw = @cImport(@cInclude("GLFW/glfw3.h"));
 const gl = @cImport(@cInclude("gl.h"));
+const stb = @cImport({
+    @cInclude("stb_image.h");
+});
 /// A callback function for handling C-style errors from GLFW.
 /// Follows the C calling convention to ensure compatibility with external libraries.
 fn error_callback(err_code: c_int, description: [*c]const u8) callconv(.c) void {
@@ -222,7 +225,15 @@ pub const App = struct {
         gl.glTextureParameteri(texture, gl.GL_TEXTURE_MIN_FILTER, gl.GL_LINEAR);
         gl.glTextureParameteri(texture, gl.GL_TEXTURE_MAG_FILTER, gl.GL_LINEAR);
 
-        const board = chessboard();
+        const board = &chessboard();
+        // var widthTexture: c_int = -1;
+        // var heightTexture: c_int = -1;
+        // var nrChannels: c_int = 0;
+        // const board = stb.stbi_load("debian-logo.png", &widthTexture, &heightTexture, &nrChannels, 0);
+        // std.debug.assert(board != null);
+        // defer stb.stbi_image_free(board);
+
+        // std.debug.print("height {}, width {}\n", .{ heightTexture, widthTexture });
         gl.glTexImage2D(
             gl.GL_TEXTURE_2D,
             0,
@@ -232,7 +243,7 @@ pub const App = struct {
             0,
             gl.GL_RGB,
             gl.GL_UNSIGNED_BYTE,
-            &board,
+            board,
         );
         gl.glGenerateMipmap(gl.GL_TEXTURE_2D);
 
