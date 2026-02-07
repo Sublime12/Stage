@@ -126,6 +126,7 @@ pub const App = struct {
             vertices.items.ptr,
             gl.GL_STATIC_DRAW,
         );
+        defer gl.glDeleteBuffers(1, &vertex_buffer);
 
         const vpos_location: c_uint = @intCast(gl.glGetAttribLocation(
             self.program,
@@ -151,6 +152,7 @@ pub const App = struct {
         gl.glGenVertexArrays(1, &vertex_array);
         gl.glBindVertexArray(vertex_array);
         gl.glEnableVertexAttribArray(vpos_location);
+        defer gl.glDeleteVertexArrays(1, &vertex_array);
         gl.glVertexAttribPointer(
             vpos_location,
             3,
@@ -219,6 +221,8 @@ pub const App = struct {
 
         var texture: gl.GLuint = 0;
         gl.glGenTextures(1, &texture);
+        defer gl.glDeleteTextures(1, &texture);
+
         gl.glBindTexture(gl.GL_TEXTURE_2D, texture);
         gl.glTextureParameteri(texture, gl.GL_TEXTURE_WRAP_S, gl.GL_REPEAT);
         gl.glTextureParameteri(texture, gl.GL_TEXTURE_WRAP_T, gl.GL_REPEAT);
@@ -229,7 +233,7 @@ pub const App = struct {
         // var widthTexture: c_int = -1;
         // var heightTexture: c_int = -1;
         // var nrChannels: c_int = 0;
-        // const board = stb.stbi_load("debian-logo.png", &widthTexture, &heightTexture, &nrChannels, 0);
+        // const board = stb.stbi_load("debian-logo.png", &widthTexture, &heightTexture, &nrChannels, 3);
         // std.debug.assert(board != null);
         // defer stb.stbi_image_free(board);
 
@@ -245,7 +249,7 @@ pub const App = struct {
             gl.GL_UNSIGNED_BYTE,
             board,
         );
-        gl.glGenerateMipmap(gl.GL_TEXTURE_2D);
+        // gl.glGenerateMipmap(gl.GL_TEXTURE_2D);
 
         inline for (0..Scene.MaxLights) |i| {
             const base = std.fmt.comptimePrint("lights[{d}].", .{i});
