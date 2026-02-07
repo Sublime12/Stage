@@ -10,11 +10,13 @@ uniform mat4 view;
 in vec3 vCol;
 in vec3 vPos;
 in vec3 normal;
+in vec2 textCoord;
 
 out vec3 fCol;
 out vec3 fPos;
 out vec3 fNormal;
 out vec3 fViewPos;
+out vec2 fTextCoord;
 // out vec3 color;
 
 void main()
@@ -26,6 +28,7 @@ void main()
     fCol = vCol;
     fPos = vPos;
     fNormal = normal;
+    fTextCoord = textCoord;
     gl_Position = proj * view * vec4(vPos, 1.0);
 }
 

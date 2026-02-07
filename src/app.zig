@@ -6,6 +6,9 @@ const Vertex = @import("scene.zig").Vertex;
 const Camera = @import("camera.zig").Camera;
 const Light = @import("light.zig").Light;
 
+const chessboard = @import("scene.zig").makeChessboard;
+const DIMENSION = @import("scene.zig").DIMENSION;
+
 const glfw = @cImport(@cInclude("GLFW/glfw3.h"));
 const gl = @cImport(@cInclude("gl.h"));
 /// A callback function for handling C-style errors from GLFW.
@@ -136,6 +139,11 @@ pub const App = struct {
             "normal",
         ));
 
+        const text_location: c_uint = @intCast(gl.glGetAttribLocation(
+            self.program,
+            "textCoord",
+        ));
+
         var vertex_array: gl.GLuint = 0;
         gl.glGenVertexArrays(1, &vertex_array);
         gl.glBindVertexArray(vertex_array);
@@ -169,6 +177,16 @@ pub const App = struct {
             @ptrFromInt(@offsetOf(Vertex, "normal")),
         );
 
+        gl.glEnableVertexAttribArray(text_location);
+        gl.glVertexAttribPointer(
+            text_location,
+            2,
+            gl.GL_FLOAT,
+            gl.GL_FALSE,
+            @sizeOf(Vertex),
+            @ptrFromInt(@offsetOf(Vertex, "textCoord")),
+        );
+
         var width: i32 = 0;
         var height: i32 = 0;
         glfw.glfwGetFramebufferSize(self.window, &width, &height);
@@ -195,6 +213,28 @@ pub const App = struct {
 
         gl.glUniformMatrix4fv(@intCast(proj_location), 1, gl.GL_TRUE, @ptrCast(&camera.projection.mat));
         gl.glUniformMatrix4fv(@intCast(view_location), 1, gl.GL_TRUE, @ptrCast(&camera.view.mat));
+
+        var texture: gl.GLuint = 0;
+        gl.glGenTextures(1, &texture);
+        gl.glBindTexture(gl.GL_TEXTURE_2D, texture);
+        gl.glTextureParameteri(texture, gl.GL_TEXTURE_WRAP_S, gl.GL_REPEAT);
+        gl.glTextureParameteri(texture, gl.GL_TEXTURE_WRAP_T, gl.GL_REPEAT);
+        gl.glTextureParameteri(texture, gl.GL_TEXTURE_MIN_FILTER, gl.GL_LINEAR);
+        gl.glTextureParameteri(texture, gl.GL_TEXTURE_MAG_FILTER, gl.GL_LINEAR);
+
+        const board = chessboard();
+        gl.glTexImage2D(
+            gl.GL_TEXTURE_2D,
+            0,
+            gl.GL_RGB,
+            DIMENSION,
+            DIMENSION,
+            0,
+            gl.GL_RGB,
+            gl.GL_UNSIGNED_BYTE,
+            &board,
+        );
+        gl.glGenerateMipmap(gl.GL_TEXTURE_2D);
 
         inline for (0..Scene.MaxLights) |i| {
             const base = std.fmt.comptimePrint("lights[{d}].", .{i});
@@ -308,6 +348,7 @@ pub const App = struct {
             );
         }
 
+        gl.glBindTexture(gl.GL_TEXTURE_2D, texture);
         gl.glBindVertexArray(vertex_array);
         gl.glDrawArrays(gl.GL_TRIANGLES, 0, @as(c_int, @intCast(vertices.items.len)));
 

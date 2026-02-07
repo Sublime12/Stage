@@ -26,13 +26,14 @@ struct Light {
 
 #define MAX_LIGHT 5
 
+uniform sampler2D ourTexture;
 uniform Light lights[MAX_LIGHT];
 
 in vec3 fCol;
 in vec3 fPos;
 in vec3 fNormal;
 in vec3 fViewPos;
-
+in vec2 fTextCoord;
 
 vec3 calculatePointLight(Light light, vec3 normal, vec3 fPos, vec3 fViewPos);
 
@@ -74,7 +75,8 @@ void main()
         }
     }
 
-    result = result * fCol;
+    // use var so it does make an error in zig
+    result = result * fCol * texture(ourTexture, fTextCoord).y;
     fragment = vec4(result, 1.0);
 }
 

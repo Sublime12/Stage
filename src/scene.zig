@@ -6,6 +6,7 @@ const Transform = @import("transform.zig").Transform;
 const light_pkg = @import("light.zig");
 const Light = light_pkg.Light;
 const LightHandle = light_pkg.LightHandle;
+const Vec4i = @import("math.zig").Vec4i;
 
 pub const Scene = struct {
     const Self = @This();
@@ -98,98 +99,89 @@ pub const Geometry = struct {
         // Face 1
         const white = .{ 1.0, 1.0, 1.0 };
         const triangle1 = Triangle.init(
-            .{ .position = .{ 0.0, 0.5, 0.0 }, .color = white },
-            .{ .position = .{ 0.5, 0.0, 0.0 }, .color = white },
-            .{ .position = .{ 0.0, 0.0, 0.0 }, .color = white },
+            .{ .position = .{ 0.0, 0.5, 0.0 }, .color = white, .textCoord = .{ 0, 0 } },
+            .{ .position = .{ 0.5, 0.0, 0.0 }, .color = white, .textCoord = .{ 0, 1 } },
+            .{ .position = .{ 0.0, 0.0, 0.0 }, .color = white, .textCoord = .{ 1, 0 } },
         );
 
         const triangle2 = Triangle.init(
-            .{ .position = .{ 0.5, 0.5, 0.0 }, .color = white },
-            .{ .position = .{ 0.5, 0.0, 0.0 }, .color = white },
-
-            .{ .position = .{ 0.0, 0.5, 0.0 }, .color = white },
+            .{ .position = .{ 0.5, 0.5, 0.0 }, .color = white, .textCoord = .{ 0, 0 } },
+            .{ .position = .{ 0.5, 0.0, 0.0 }, .color = white, .textCoord = .{ 0, 1 } },
+            .{ .position = .{ 0.0, 0.5, 0.0 }, .color = white, .textCoord = .{ 1, 0 } },
         );
 
         // Face 2
         // const red = .{ 1.0, 0.0, 0.0 };
 
         const triangle3 = Triangle.init(
-            .{ .position = .{ 0.0, 0.0, 0.0 }, .color = white },
-
-            .{ .position = .{ 0.0, 0.0, 0.5 }, .color = white },
-
-            .{ .position = .{ 0.0, 0.5, 0.0 }, .color = white },
+            .{ .position = .{ 0.0, 0.0, 0.0 }, .color = white, .textCoord = .{ 0, 0 } },
+            .{ .position = .{ 0.0, 0.0, 0.5 }, .color = white, .textCoord = .{ 0, 1 } },
+            .{ .position = .{ 0.0, 0.5, 0.0 }, .color = white, .textCoord = .{ 1, 0 } },
         );
 
         const triangle4 = Triangle.init(
-            .{ .position = .{ 0.0, 0.5, 0.5 }, .color = white },
-            .{ .position = .{ 0.0, 0.5, 0.0 }, .color = white },
-
-            .{ .position = .{ 0.0, 0.0, 0.5 }, .color = white },
+            .{ .position = .{ 0.0, 0.5, 0.5 }, .color = white, .textCoord = .{ 0, 0 } },
+            .{ .position = .{ 0.0, 0.5, 0.0 }, .color = white, .textCoord = .{ 0, 1 } },
+            .{ .position = .{ 0.0, 0.0, 0.5 }, .color = white, .textCoord = .{ 1, 0 } },
         );
 
         // Face 3
         // const gray = .{ 0.5, 0.5, 0.5 };
         const triangle5 = Triangle.init(
-            .{ .position = .{ 0.0, 0.0, 0.5 }, .color = white },
-            .{ .position = .{ 0.5, 0.0, 0.5 }, .color = white },
-            .{ .position = .{ 0.0, 0.5, 0.5 }, .color = white },
+            .{ .position = .{ 0.0, 0.0, 0.5 }, .color = white, .textCoord = .{ 0, 0 } },
+            .{ .position = .{ 0.5, 0.0, 0.5 }, .color = white, .textCoord = .{ 0, 1 } },
+            .{ .position = .{ 0.0, 0.5, 0.5 }, .color = white, .textCoord = .{ 1, 0 } },
         );
 
         const triangle6 = Triangle.init(
-            .{ .position = .{ 0.5, 0.5, 0.5 }, .color = white },
-            .{ .position = .{ 0.0, 0.5, 0.5 }, .color = white },
-            .{ .position = .{ 0.5, 0.0, 0.5 }, .color = white },
+            .{ .position = .{ 0.5, 0.5, 0.5 }, .color = white, .textCoord = .{ 0, 0 } },
+            .{ .position = .{ 0.0, 0.5, 0.5 }, .color = white, .textCoord = .{ 0, 1 } },
+            .{ .position = .{ 0.5, 0.0, 0.5 }, .color = white, .textCoord = .{ 1, 0 } },
         );
 
         // Face 4
         // const yellow = .{ 1.0, 1.0, 0.0 };
 
         const triangle7 = Triangle.init(
-            .{ .position = .{ 0.5, 0.0, 0.0 }, .color = white },
-            .{ .position = .{ 0.5, 0.5, 0.0 }, .color = white },
-            .{ .position = .{ 0.5, 0.0, 0.5 }, .color = white },
+            .{ .position = .{ 0.5, 0.0, 0.0 }, .color = white, .textCoord = .{ 0, 0 } },
+            .{ .position = .{ 0.5, 0.5, 0.0 }, .color = white, .textCoord = .{ 0, 1 } },
+            .{ .position = .{ 0.5, 0.0, 0.5 }, .color = white, .textCoord = .{ 1, 0 } },
         );
 
         const triangle8 = Triangle.init(
-            .{ .position = .{ 0.5, 0.5, 0.5 }, .color = white },
-            .{ .position = .{ 0.5, 0.0, 0.5 }, .color = white },
-            .{ .position = .{ 0.5, 0.5, 0.0 }, .color = white },
+            .{ .position = .{ 0.5, 0.5, 0.5 }, .color = white, .textCoord = .{ 0, 0 } },
+            .{ .position = .{ 0.5, 0.0, 0.5 }, .color = white, .textCoord = .{ 0, 1 } },
+            .{ .position = .{ 0.5, 0.5, 0.0 }, .color = white, .textCoord = .{ 1, 0 } },
         );
 
         // Face 4
         // const skyblue = .{ 0.0, 1.0, 1.0 };
 
         const triangle9 = Triangle.init(
-            .{ .position = .{ 0.0, 0.0, 0.0 }, .color = white },
-
-            .{ .position = .{ 0.5, 0.0, 0.0 }, .color = white },
-
-            .{ .position = .{ 0.0, 0.0, 0.5 }, .color = white },
+            .{ .position = .{ 0.0, 0.0, 0.0 }, .color = white, .textCoord = .{ 0, 0 } },
+            .{ .position = .{ 0.5, 0.0, 0.0 }, .color = white, .textCoord = .{ 0, 1 } },
+            .{ .position = .{ 0.0, 0.0, 0.5 }, .color = white, .textCoord = .{ 1, 0 } },
         );
 
         const triangle10 = Triangle.init(
-            .{ .position = .{ 0.5, 0.0, 0.5 }, .color = white },
-            .{ .position = .{ 0.0, 0.0, 0.5 }, .color = white },
-
-            .{ .position = .{ 0.5, 0.0, 0.0 }, .color = white },
+            .{ .position = .{ 0.5, 0.0, 0.5 }, .color = white, .textCoord = .{ 0, 0 } },
+            .{ .position = .{ 0.0, 0.0, 0.5 }, .color = white, .textCoord = .{ 0, 1 } },
+            .{ .position = .{ 0.5, 0.0, 0.0 }, .color = white, .textCoord = .{ 1, 0 } },
         );
 
         // Face 6
         // const white = .{ 1.0, 1.0, 1.0 };
 
         const triangle11 = Triangle.init(
-            .{ .position = .{ 0.0, 0.5, 0.5 }, .color = white },
-            .{ .position = .{ 0.5, 0.5, 0.0 }, .color = white },
-
-            .{ .position = .{ 0.0, 0.5, 0.0 }, .color = white },
+            .{ .position = .{ 0.0, 0.5, 0.5 }, .color = white, .textCoord = .{ 0, 0 } },
+            .{ .position = .{ 0.5, 0.5, 0.0 }, .color = white, .textCoord = .{ 0, 1 } },
+            .{ .position = .{ 0.0, 0.5, 0.0 }, .color = white, .textCoord = .{ 1, 0 } },
         );
 
         const triangle12 = Triangle.init(
-            .{ .position = .{ 0.5, 0.5, 0.5 }, .color = white },
-            .{ .position = .{ 0.5, 0.5, 0.0 }, .color = white },
-
-            .{ .position = .{ 0.0, 0.5, 0.5 }, .color = white },
+            .{ .position = .{ 0.5, 0.5, 0.5 }, .color = white, .textCoord = .{ 0, 0 } },
+            .{ .position = .{ 0.5, 0.5, 0.0 }, .color = white, .textCoord = .{ 0, 1 } },
+            .{ .position = .{ 0.0, 0.5, 0.5 }, .color = white, .textCoord = .{ 1, 0 } },
         );
 
         var geometry = Geometry.init();
@@ -210,6 +202,22 @@ pub const Geometry = struct {
     }
 };
 
+pub const DIMENSION = 100;
+pub fn makeChessboard() [DIMENSION][DIMENSION]Vec4i {
+    var board: [DIMENSION][DIMENSION]Vec4i = undefined;
+    for (0..DIMENSION) |i| {
+        for (0..DIMENSION) |j| {
+            const i_scaled = i / 5;
+            const j_scaled = j / 5;
+            board[i][j] = (if ((i_scaled + j_scaled) % 2 == 0) .{ 0, 0, 0, 0 } else .{ 255, 255, 255, 255 });
+
+            // const medium = DIMENSION / 2;
+        }
+    }
+
+    return board;
+}
+
 const Triangle = struct {
     vertices: [3]Vertex,
 
@@ -223,13 +231,14 @@ const Triangle = struct {
 pub const Vertex = struct {
     position: [3]f32,
     color: [3]f32,
-    // TODO initialize correct normal for all vertices
     normal: [3]f32 = .{ 0, 0, -1 },
+    textCoord: [2]f32,
 
-    pub fn init(position: [3]f32, color: [3]f32) Vertex {
+    pub fn init(position: [3]f32, color: [3]f32, textCoord: [2]f32) Vertex {
         return .{
             .position = position,
             .color = color,
+            .textCoord = textCoord,
             .normal = .{ 0, 0, 1 },
         };
     }
