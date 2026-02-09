@@ -4,9 +4,12 @@ const Node = @import("node.zig").Node;
 const NodeHandle = @import("node.zig").NodeHandle;
 const Transform = @import("transform.zig").Transform;
 const light_pkg = @import("light.zig");
+const texture_pkg = @import("texture.zig");
+const TextureHandle = texture_pkg.TextureHandle;
+const TexturePool = texture_pkg.TexturePool;
 const Light = light_pkg.Light;
 const LightHandle = light_pkg.LightHandle;
-const Vec4i = @import("math.zig").Vec4i;
+const Vec4i = @import("math.zig").Vec4u;
 
 pub const Scene = struct {
     const Self = @This();
@@ -15,6 +18,7 @@ pub const Scene = struct {
     root: ?NodeHandle,
     // light: ?Light,
     lights: std.ArrayList(LightHandle),
+    textures: std.ArrayList(TextureHandle),
     allocator: Allocator,
 
     /// Initilize the scene with an empty tree.
@@ -23,17 +27,23 @@ pub const Scene = struct {
             .root = null,
             .allocator = allocator,
             .lights = try std.ArrayList(LightHandle).initCapacity(allocator, MaxLights),
+            .textures = try std.ArrayList(TextureHandle).initCapacity(allocator, TexturePool.MaxTextures),
             // .light = null,
         };
     }
 
     pub fn deinit(self: *Self) void {
         self.lights.deinit(self.allocator);
+        self.textures.deinit(self.allocator);
     }
 
     pub fn addLight(self: *Self, light: LightHandle) void {
         // self.light = light.*;
         self.lights.appendAssumeCapacity(light);
+    }
+
+    pub fn addTexture(self: *Self, texture: TextureHandle) void {
+        self.textures.appendAssumeCapacity(texture);
     }
 
     // Add a node to the root
@@ -203,15 +213,43 @@ pub const Geometry = struct {
 };
 
 pub const DIMENSION = 100;
-pub fn makeChessboard() [DIMENSION][DIMENSION]Vec4i {
-    var board: [DIMENSION][DIMENSION]Vec4i = undefined;
+pub fn makeChessboard() [DIMENSION * DIMENSION]Vec4i {
+    var board: [DIMENSION * DIMENSION]Vec4i = undefined;
     for (0..DIMENSION) |i| {
         for (0..DIMENSION) |j| {
             const i_scaled = i / 5;
             const j_scaled = j / 5;
-            board[i][j] = (if ((i_scaled + j_scaled) % 2 == 0) .{ 0, 0, 0, 0 } else .{ 255, 255, 255, 255 });
+            board[j * DIMENSION + i] = (if ((i_scaled + j_scaled) % 2 == 0)
+                .{ 0, 0, 0, 0 }
+            else
+                .{ 255, 255, 255, 255 });
 
             // const medium = DIMENSION / 2;
+        }
+    }
+
+    return board;
+}
+
+pub fn makeDisk() [DIMENSION * DIMENSION]Vec4i {
+    var board: [DIMENSION * DIMENSION]Vec4i = undefined;
+
+    for (0..DIMENSION) |i| {
+        for (0..DIMENSION) |j| {
+            const x_center: f32 = DIMENSION / 2;
+            const y_center: f32 = DIMENSION / 2;
+
+            const i_f: f32 = @floatFromInt(i);
+            const j_f: f32 = @floatFromInt(j);
+
+            const value = @sqrt(
+                (i_f - x_center) * (i_f - x_center) + (j_f - y_center) * (j_f - y_center),
+            );
+            if (value < DIMENSION / 2) {
+                board[i + j * DIMENSION] = .{ 10, 75, 150, 1 };
+            } else {
+                board[i + j * DIMENSION] = .{ 255, 255, 255, 255 };
+            }
         }
     }
 
@@ -233,6 +271,7 @@ pub const Vertex = struct {
     color: [3]f32,
     normal: [3]f32 = .{ 0, 0, -1 },
     textCoord: [2]f32,
+    textureId: i32 = -1,
 
     pub fn init(position: [3]f32, color: [3]f32, textCoord: [2]f32) Vertex {
         return .{
@@ -240,6 +279,7 @@ pub const Vertex = struct {
             .color = color,
             .textCoord = textCoord,
             .normal = .{ 0, 0, 1 },
+            .textureId = -1,
         };
     }
 };

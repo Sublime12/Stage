@@ -26,48 +26,37 @@ struct Light {
 
 #define MAX_LIGHT 5
 
-uniform sampler2D ourTexture;
+uniform sampler2D texture1;
+uniform sampler2D texture2;
+uniform sampler2D texture3;
+// uniform sampler2D ourTexture2;
+// uniform sampler2D ourTexture3;
 uniform Light lights[MAX_LIGHT];
+// 3 textures,
+// correctTexture = textures[node.textureId]
 
 in vec3 fCol;
 in vec3 fPos;
 in vec3 fNormal;
 in vec3 fViewPos;
 in vec2 fTextCoord;
+flat in int fTextureId;
+// in int textureId
 
 vec3 calculatePointLight(Light light, vec3 normal, vec3 fPos, vec3 fViewPos);
 
 void main()
 {
-    // // ambient
-    // float ambientStrength = 0.1;
-    // vec3 ambient = ambientStrength * light.ambient;
+    vec4 texColor = vec4(1.0, 1.0, 1.0, 1.0);
 
-    // // diffuse
-    // vec3 norm = normalize(fNormal);
-    // vec3 lightDir = normalize(light.position - fPos);
-    // float diff = max(dot(norm, lightDir), 0.0);
-    // vec3 diffuse = diff * light.diffuse * light.strength;
+    if (fTextureId == 0) {
+        texColor = texture(texture1, fTextCoord);
+    } else if (fTextureId == 1) {
+        texColor = texture(texture2, fTextCoord);
+    } else if (fTextureId == 2) {
+        texColor = texture(texture3, fTextCoord);
+    }
 
-    // // specular
-    // vec3 specular = vec3(0.0);
-    // if (diff > 0.0) {
-    //     float specularStrength = 10;
-    //     vec3 viewDir = normalize(fViewPos - fPos);
-    //     vec3 reflectDir = reflect(-lightDir, norm);
-    //     float spec = pow(max(dot(viewDir, reflectDir), 0.0), 15);
-    //     specular = specularStrength * spec * light.specular;
-    // }
-
-    // // attenuation
-    // float distance = length(light.position - fPos);
-    // float attenuation = 1.0 / (light.constant + light.linear * distance + 
-    //                     light.quadratic * (distance * distance));
-
-    // diffuse  *= attenuation;
-    // ambient  *= attenuation;
-    // specular *= attenuation;
-    // vec3 result = (specular  + diffuse + ambient) * fCol;
     vec3 result = vec3(0.0);
     for (int i = 0; i < MAX_LIGHT; i++) {
         if (lights[i].isActive) {
@@ -76,7 +65,7 @@ void main()
     }
 
     // use var so it does make an error in zig
-    result = result * fCol * texture(ourTexture, fTextCoord).y;
+    result = result * fCol * texColor.rgb;
     fragment = vec4(result, 1.0);
 }
 

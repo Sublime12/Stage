@@ -6,6 +6,7 @@ const node = @import("node.zig");
 const stage = @import("app.zig");
 const camera_pkg = @import("camera.zig");
 const light_pkg = @import("light.zig");
+const texture_pkg = @import("texture.zig");
 
 const Geometry = scene_pkg.Geometry;
 const Scene = scene_pkg.Scene;
@@ -16,6 +17,11 @@ const Camera = camera_pkg.Camera;
 const Light = light_pkg.Light;
 const LightPool = light_pkg.LightPool;
 const Vertex = scene_pkg.Vertex;
+const TexturePool = texture_pkg.TexturePool;
+const Texture = texture_pkg.Texture;
+
+const chessboard = @import("scene.zig").makeChessboard;
+const diskboard = @import("scene.zig").makeDisk;
 
 const glfw = @cImport(@cInclude("GLFW/glfw3.h"));
 const c = @cImport({
@@ -40,10 +46,27 @@ pub fn main() !void {
     var pool = NodePool.init(allocator);
     defer pool.deinit();
 
+    var texturePool = try TexturePool.init(allocator);
+    defer texturePool.deinit(allocator);
+
     const cubeGeo = try Geometry.makeCube(allocator);
-    var node1 = try pool.create(Node.init(cubeGeo));
+
+    var data = chessboard();
+    var disk = diskboard();
+
+    const texture1 = texturePool.create(
+        Texture.init(scene_pkg.DIMENSION, scene_pkg.DIMENSION, &data),
+    );
+
+    const texture2 = texturePool.create(
+        Texture.init(scene_pkg.DIMENSION, scene_pkg.DIMENSION, &disk),
+    );
+
+    var node1 = try pool.create(Node.init(cubeGeo, texture1));
 
     try scene.addRoot(node1);
+    scene.addTexture(texture1);
+    scene.addTexture(texture2);
 
     var camera = Camera.init(math.pi / 4.0, 640.0 / 420.0, 0.01, 100);
     node1.get().transform.translate(0, 0, 0.0);
@@ -52,7 +75,7 @@ pub fn main() !void {
 
     // const cubeGeo2 = try Geometry.makeTriangle(allocator, 1, 1, 1);
     const cubeGeo2 = try Geometry.makeCube(allocator);
-    var node2 = try pool.create(Node.init(cubeGeo2));
+    var node2 = try pool.create(Node.init(cubeGeo2, texture2));
     node2.get().transform.translate(2, 0, 0);
 
     try node1.get().addChild(allocator, node2);
@@ -139,7 +162,6 @@ pub fn main() !void {
     }
 }
 
-const chessboard = @import("scene.zig").makeChessboard;
 test "test checkboard" {
     const board = chessboard();
 

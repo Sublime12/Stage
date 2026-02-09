@@ -5,6 +5,9 @@ const Geometry = @import("scene.zig").Geometry;
 const Vertex = @import("scene.zig").Vertex;
 const transform = @import("transform.zig");
 const math = @import("math.zig");
+const texture_pkg = @import("texture.zig");
+
+const TextureHandle = texture_pkg.TextureHandle;
 const Vector3 = math.Vector3;
 const Transform = transform.Transform;
 
@@ -25,6 +28,7 @@ pub const NodePool = struct {
 
     allocator: Allocator,
     nodes: std.ArrayList(Node),
+    // textureId,
 
     pub fn init(allocator: Allocator) NodePool {
         return .{
@@ -54,6 +58,7 @@ pub const Node = struct {
 
     children: std.ArrayList(NodeHandle),
     geometry: ?Geometry,
+    texture: ?TextureHandle,
     // lumiere
     // camera
     // camera: ?Camera,
@@ -64,12 +69,16 @@ pub const Node = struct {
     // cameraWorld = camera.node.get().totalTransform * camera.transform
     // lumiereWorld = lumiere.node.get().totalTransform * lumiere.transform
 
-    pub fn init(geometry: Geometry) Node {
+    pub fn init(
+        geometry: Geometry,
+        texture: ?TextureHandle,
+    ) Node {
         return .{
             .children = std.ArrayList(NodeHandle).empty,
             .geometry = geometry,
             .transform = comptime Transform.init(),
             .worldTransform = comptime Transform.init(),
+            .texture = texture,
         };
     }
 
@@ -121,7 +130,12 @@ pub const Node = struct {
                 var newVertices = try std.ArrayList(Vertex).initCapacity(allocator, 3);
                 defer newVertices.deinit(allocator);
                 for (triangle.vertices) |vertex| {
-                    const newVertex = current_transform.transformVertex(&vertex);
+                    var newVertex = current_transform.transformVertex(&vertex);
+                    if (node.texture) |t| {
+                        newVertex.textureId = @intCast(t.id);
+                    } else {
+                        newVertex.textureId = -1;
+                    }
                     try newVertices.append(allocator, newVertex);
                     try vertices.append(allocator, newVertex);
                 }

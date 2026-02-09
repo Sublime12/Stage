@@ -8,6 +8,7 @@ const Light = @import("light.zig").Light;
 
 const chessboard = @import("scene.zig").makeChessboard;
 const DIMENSION = @import("scene.zig").DIMENSION;
+const TexturePool = @import("texture.zig").TexturePool;
 
 const glfw = @cImport(@cInclude("GLFW/glfw3.h"));
 const gl = @cImport(@cInclude("gl.h"));
@@ -148,6 +149,11 @@ pub const App = struct {
             "textCoord",
         ));
 
+        const textureIdLocation: c_uint = @intCast(gl.glGetAttribLocation(
+            self.program,
+            "textureId",
+        ));
+
         var vertex_array: gl.GLuint = 0;
         gl.glGenVertexArrays(1, &vertex_array);
         gl.glBindVertexArray(vertex_array);
@@ -192,6 +198,15 @@ pub const App = struct {
             @ptrFromInt(@offsetOf(Vertex, "textCoord")),
         );
 
+        gl.glEnableVertexAttribArray(textureIdLocation);
+        gl.glVertexAttribIPointer(
+            textureIdLocation,
+            1,
+            gl.GL_INT,
+            @sizeOf(Vertex),
+            @ptrFromInt(@offsetOf(Vertex, "textureId")),
+        );
+
         var width: i32 = 0;
         var height: i32 = 0;
         glfw.glfwGetFramebufferSize(self.window, &width, &height);
@@ -219,36 +234,50 @@ pub const App = struct {
         gl.glUniformMatrix4fv(@intCast(proj_location), 1, gl.GL_TRUE, @ptrCast(&camera.projection.mat));
         gl.glUniformMatrix4fv(@intCast(view_location), 1, gl.GL_TRUE, @ptrCast(&camera.view.mat));
 
-        var texture: gl.GLuint = 0;
-        gl.glGenTextures(1, &texture);
-        defer gl.glDeleteTextures(1, &texture);
+        // var texture: gl.GLuint = 0;
+        //
+        //gl.glUseProgram(self.program);
 
-        gl.glBindTexture(gl.GL_TEXTURE_2D, texture);
-        gl.glTextureParameteri(texture, gl.GL_TEXTURE_WRAP_S, gl.GL_REPEAT);
-        gl.glTextureParameteri(texture, gl.GL_TEXTURE_WRAP_T, gl.GL_REPEAT);
-        gl.glTextureParameteri(texture, gl.GL_TEXTURE_MIN_FILTER, gl.GL_LINEAR);
-        gl.glTextureParameteri(texture, gl.GL_TEXTURE_MAG_FILTER, gl.GL_LINEAR);
+        const tex1_loc = gl.glGetUniformLocation(self.program, "texture1");
+        const tex2_loc = gl.glGetUniformLocation(self.program, "texture2");
+        const tex3_loc = gl.glGetUniformLocation(self.program, "texture3");
 
-        const board = &chessboard();
-        // var widthTexture: c_int = -1;
-        // var heightTexture: c_int = -1;
-        // var nrChannels: c_int = 0;
-        // const board = stb.stbi_load("debian-logo.png", &widthTexture, &heightTexture, &nrChannels, 3);
-        // std.debug.assert(board != null);
-        // defer stb.stbi_image_free(board);
+        gl.glUniform1i(tex1_loc, 0);
+        gl.glUniform1i(tex2_loc, 1);
+        gl.glUniform1i(tex3_loc, 2);
+        const textures = scene.textures;
+        var texturesLocation: [TexturePool.MaxTextures]gl.GLuint = undefined;
+        gl.glGenTextures(@intCast(textures.items.len), &texturesLocation);
+        defer gl.glDeleteTextures(@intCast(textures.items.len), &texturesLocation);
 
-        // std.debug.print("height {}, width {}\n", .{ heightTexture, widthTexture });
-        gl.glTexImage2D(
-            gl.GL_TEXTURE_2D,
-            0,
-            gl.GL_RGB,
-            DIMENSION,
-            DIMENSION,
-            0,
-            gl.GL_RGB,
-            gl.GL_UNSIGNED_BYTE,
-            board,
-        );
+        // gl.glActiveTexture(gl.GL_TEXTURE0);
+        // gl.glActiveTexture(gl.GL_TEXTURE1);
+        // gl.glActiveTexture(gl.GL_TEXTURE2);
+        for (textures.items, 0..) |texture, i| {
+            std.debug.print("textures locations {any}\n", .{texturesLocation});
+            const textureLocation = texturesLocation[i];
+
+            gl.glActiveTexture(@intCast(gl.GL_TEXTURE0 + i));
+            gl.glBindTexture(gl.GL_TEXTURE_2D, textureLocation);
+            gl.glTextureParameteri(textureLocation, gl.GL_TEXTURE_WRAP_S, gl.GL_REPEAT);
+            gl.glTextureParameteri(textureLocation, gl.GL_TEXTURE_WRAP_T, gl.GL_REPEAT);
+            gl.glTextureParameteri(textureLocation, gl.GL_TEXTURE_MIN_FILTER, gl.GL_LINEAR);
+            gl.glTextureParameteri(textureLocation, gl.GL_TEXTURE_MAG_FILTER, gl.GL_LINEAR);
+
+            // std.debug.print("height {}, width {}\n", .{ heightTexture, widthTexture });
+            gl.glTexImage2D(
+                gl.GL_TEXTURE_2D,
+                0,
+                gl.GL_RGBA,
+                @intCast(texture.get().width),
+                @intCast(texture.get().height),
+                0,
+                gl.GL_RGBA,
+                gl.GL_UNSIGNED_BYTE,
+                texture.get().data.ptr,
+            );
+        }
+
         // gl.glGenerateMipmap(gl.GL_TEXTURE_2D);
 
         inline for (0..Scene.MaxLights) |i| {
@@ -363,7 +392,7 @@ pub const App = struct {
             );
         }
 
-        gl.glBindTexture(gl.GL_TEXTURE_2D, texture);
+        // gl.glBindTexture(gl.GL_TEXTURE_2D, texture);
         gl.glBindVertexArray(vertex_array);
         gl.glDrawArrays(gl.GL_TRIANGLES, 0, @as(c_int, @intCast(vertices.items.len)));
 
