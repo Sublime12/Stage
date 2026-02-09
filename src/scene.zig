@@ -109,15 +109,15 @@ pub const Geometry = struct {
         // Face 1
         const white = .{ 1.0, 1.0, 1.0 };
         const triangle1 = Triangle.init(
-            .{ .position = .{ 0.0, 0.5, 0.0 }, .color = white, .textCoord = .{ 0, 0 } },
-            .{ .position = .{ 0.5, 0.0, 0.0 }, .color = white, .textCoord = .{ 0, 1 } },
-            .{ .position = .{ 0.0, 0.0, 0.0 }, .color = white, .textCoord = .{ 1, 0 } },
+            .{ .position = .{ 0.0, 0.5, 0.0 }, .color = white, .textCoord = .{ 0, 1 } },
+            .{ .position = .{ 0.5, 0.0, 0.0 }, .color = white, .textCoord = .{ 1, 0 } },
+            .{ .position = .{ 0.0, 0.0, 0.0 }, .color = white, .textCoord = .{ 0, 0 } },
         );
 
         const triangle2 = Triangle.init(
-            .{ .position = .{ 0.5, 0.5, 0.0 }, .color = white, .textCoord = .{ 0, 0 } },
-            .{ .position = .{ 0.5, 0.0, 0.0 }, .color = white, .textCoord = .{ 0, 1 } },
-            .{ .position = .{ 0.0, 0.5, 0.0 }, .color = white, .textCoord = .{ 1, 0 } },
+            .{ .position = .{ 0.5, 0.5, 0.0 }, .color = white, .textCoord = .{ 1, 1 } },
+            .{ .position = .{ 0.5, 0.0, 0.0 }, .color = white, .textCoord = .{ 1, 0 } },
+            .{ .position = .{ 0.0, 0.5, 0.0 }, .color = white, .textCoord = .{ 0, 1 } },
         );
 
         // Face 2
@@ -130,21 +130,21 @@ pub const Geometry = struct {
         );
 
         const triangle4 = Triangle.init(
-            .{ .position = .{ 0.0, 0.5, 0.5 }, .color = white, .textCoord = .{ 0, 0 } },
-            .{ .position = .{ 0.0, 0.5, 0.0 }, .color = white, .textCoord = .{ 0, 1 } },
-            .{ .position = .{ 0.0, 0.0, 0.5 }, .color = white, .textCoord = .{ 1, 0 } },
+            .{ .position = .{ 0.0, 0.5, 0.5 }, .color = white, .textCoord = .{ 1, 1 } },
+            .{ .position = .{ 0.0, 0.5, 0.0 }, .color = white, .textCoord = .{ 1, 0 } },
+            .{ .position = .{ 0.0, 0.0, 0.5 }, .color = white, .textCoord = .{ 0, 1 } },
         );
 
         // Face 3
         // const gray = .{ 0.5, 0.5, 0.5 };
         const triangle5 = Triangle.init(
             .{ .position = .{ 0.0, 0.0, 0.5 }, .color = white, .textCoord = .{ 0, 0 } },
-            .{ .position = .{ 0.5, 0.0, 0.5 }, .color = white, .textCoord = .{ 0, 1 } },
-            .{ .position = .{ 0.0, 0.5, 0.5 }, .color = white, .textCoord = .{ 1, 0 } },
+            .{ .position = .{ 0.5, 0.0, 0.5 }, .color = white, .textCoord = .{ 1, 0 } },
+            .{ .position = .{ 0.0, 0.5, 0.5 }, .color = white, .textCoord = .{ 0, 1 } },
         );
 
         const triangle6 = Triangle.init(
-            .{ .position = .{ 0.5, 0.5, 0.5 }, .color = white, .textCoord = .{ 0, 0 } },
+            .{ .position = .{ 0.5, 0.5, 0.5 }, .color = white, .textCoord = .{ 1, 1 } },
             .{ .position = .{ 0.0, 0.5, 0.5 }, .color = white, .textCoord = .{ 0, 1 } },
             .{ .position = .{ 0.5, 0.0, 0.5 }, .color = white, .textCoord = .{ 1, 0 } },
         );
@@ -154,12 +154,12 @@ pub const Geometry = struct {
 
         const triangle7 = Triangle.init(
             .{ .position = .{ 0.5, 0.0, 0.0 }, .color = white, .textCoord = .{ 0, 0 } },
-            .{ .position = .{ 0.5, 0.5, 0.0 }, .color = white, .textCoord = .{ 0, 1 } },
-            .{ .position = .{ 0.5, 0.0, 0.5 }, .color = white, .textCoord = .{ 1, 0 } },
+            .{ .position = .{ 0.5, 0.5, 0.0 }, .color = white, .textCoord = .{ 1, 0 } },
+            .{ .position = .{ 0.5, 0.0, 0.5 }, .color = white, .textCoord = .{ 0, 1 } },
         );
 
         const triangle8 = Triangle.init(
-            .{ .position = .{ 0.5, 0.5, 0.5 }, .color = white, .textCoord = .{ 0, 0 } },
+            .{ .position = .{ 0.5, 0.5, 0.5 }, .color = white, .textCoord = .{ 1, 1 } },
             .{ .position = .{ 0.5, 0.0, 0.5 }, .color = white, .textCoord = .{ 0, 1 } },
             .{ .position = .{ 0.5, 0.5, 0.0 }, .color = white, .textCoord = .{ 1, 0 } },
         );
@@ -169,12 +169,12 @@ pub const Geometry = struct {
 
         const triangle9 = Triangle.init(
             .{ .position = .{ 0.0, 0.0, 0.0 }, .color = white, .textCoord = .{ 0, 0 } },
-            .{ .position = .{ 0.5, 0.0, 0.0 }, .color = white, .textCoord = .{ 0, 1 } },
-            .{ .position = .{ 0.0, 0.0, 0.5 }, .color = white, .textCoord = .{ 1, 0 } },
+            .{ .position = .{ 0.5, 0.0, 0.0 }, .color = white, .textCoord = .{ 1, 0 } },
+            .{ .position = .{ 0.0, 0.0, 0.5 }, .color = white, .textCoord = .{ 0, 1 } },
         );
 
         const triangle10 = Triangle.init(
-            .{ .position = .{ 0.5, 0.0, 0.5 }, .color = white, .textCoord = .{ 0, 0 } },
+            .{ .position = .{ 0.5, 0.0, 0.5 }, .color = white, .textCoord = .{ 1, 1 } },
             .{ .position = .{ 0.0, 0.0, 0.5 }, .color = white, .textCoord = .{ 0, 1 } },
             .{ .position = .{ 0.5, 0.0, 0.0 }, .color = white, .textCoord = .{ 1, 0 } },
         );
@@ -183,15 +183,15 @@ pub const Geometry = struct {
         // const white = .{ 1.0, 1.0, 1.0 };
 
         const triangle11 = Triangle.init(
-            .{ .position = .{ 0.0, 0.5, 0.5 }, .color = white, .textCoord = .{ 0, 0 } },
-            .{ .position = .{ 0.5, 0.5, 0.0 }, .color = white, .textCoord = .{ 0, 1 } },
-            .{ .position = .{ 0.0, 0.5, 0.0 }, .color = white, .textCoord = .{ 1, 0 } },
+            .{ .position = .{ 0.0, 0.5, 0.5 }, .color = white, .textCoord = .{ 0, 1 } },
+            .{ .position = .{ 0.5, 0.5, 0.0 }, .color = white, .textCoord = .{ 1, 0 } },
+            .{ .position = .{ 0.0, 0.5, 0.0 }, .color = white, .textCoord = .{ 0, 0 } },
         );
 
         const triangle12 = Triangle.init(
-            .{ .position = .{ 0.5, 0.5, 0.5 }, .color = white, .textCoord = .{ 0, 0 } },
-            .{ .position = .{ 0.5, 0.5, 0.0 }, .color = white, .textCoord = .{ 0, 1 } },
-            .{ .position = .{ 0.0, 0.5, 0.5 }, .color = white, .textCoord = .{ 1, 0 } },
+            .{ .position = .{ 0.5, 0.5, 0.5 }, .color = white, .textCoord = .{ 1, 1 } },
+            .{ .position = .{ 0.5, 0.5, 0.0 }, .color = white, .textCoord = .{ 1, 0 } },
+            .{ .position = .{ 0.0, 0.5, 0.5 }, .color = white, .textCoord = .{ 0, 1 } },
         );
 
         var geometry = Geometry.init();
