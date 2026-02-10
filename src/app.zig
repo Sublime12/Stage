@@ -242,7 +242,6 @@ pub const App = struct {
         defer gl.glDeleteTextures(@intCast(textures.items.len), &texturesLocation);
 
         for (textures.items, 0..) |texture, i| {
-            std.debug.print("textures locations {any}\n", .{texturesLocation});
             const textureLocation = texturesLocation[i];
 
             gl.glActiveTexture(@intCast(gl.GL_TEXTURE0 + i));
