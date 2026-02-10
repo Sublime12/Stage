@@ -6,8 +6,15 @@ const Vertex = @import("scene.zig").Vertex;
 const Camera = @import("camera.zig").Camera;
 const Light = @import("light.zig").Light;
 
+const chessboard = @import("scene.zig").makeChessboard;
+const DIMENSION = @import("scene.zig").DIMENSION;
+const TexturePool = @import("texture.zig").TexturePool;
+
 const glfw = @cImport(@cInclude("GLFW/glfw3.h"));
 const gl = @cImport(@cInclude("gl.h"));
+const stb = @cImport({
+    @cInclude("stb_image.h");
+});
 /// A callback function for handling C-style errors from GLFW.
 /// Follows the C calling convention to ensure compatibility with external libraries.
 fn error_callback(err_code: c_int, description: [*c]const u8) callconv(.c) void {
@@ -120,6 +127,7 @@ pub const App = struct {
             vertices.items.ptr,
             gl.GL_STATIC_DRAW,
         );
+        defer gl.glDeleteBuffers(1, &vertex_buffer);
 
         const vpos_location: c_uint = @intCast(gl.glGetAttribLocation(
             self.program,
@@ -136,10 +144,21 @@ pub const App = struct {
             "normal",
         ));
 
+        const text_location: c_uint = @intCast(gl.glGetAttribLocation(
+            self.program,
+            "textCoord",
+        ));
+
+        const textureIdLocation: c_uint = @intCast(gl.glGetAttribLocation(
+            self.program,
+            "textureId",
+        ));
+
         var vertex_array: gl.GLuint = 0;
         gl.glGenVertexArrays(1, &vertex_array);
         gl.glBindVertexArray(vertex_array);
         gl.glEnableVertexAttribArray(vpos_location);
+        defer gl.glDeleteVertexArrays(1, &vertex_array);
         gl.glVertexAttribPointer(
             vpos_location,
             3,
@@ -169,6 +188,25 @@ pub const App = struct {
             @ptrFromInt(@offsetOf(Vertex, "normal")),
         );
 
+        gl.glEnableVertexAttribArray(text_location);
+        gl.glVertexAttribPointer(
+            text_location,
+            2,
+            gl.GL_FLOAT,
+            gl.GL_FALSE,
+            @sizeOf(Vertex),
+            @ptrFromInt(@offsetOf(Vertex, "textCoord")),
+        );
+
+        gl.glEnableVertexAttribArray(textureIdLocation);
+        gl.glVertexAttribIPointer(
+            textureIdLocation,
+            1,
+            gl.GL_INT,
+            @sizeOf(Vertex),
+            @ptrFromInt(@offsetOf(Vertex, "textureId")),
+        );
+
         var width: i32 = 0;
         var height: i32 = 0;
         glfw.glfwGetFramebufferSize(self.window, &width, &height);
@@ -177,11 +215,6 @@ pub const App = struct {
         gl.glClearColor(0, 0, 0, 1);
         gl.glClear(gl.GL_COLOR_BUFFER_BIT | gl.GL_DEPTH_BUFFER_BIT);
         gl.glUseProgram(self.program);
-
-        // const lightPosLocation: c_uint = @intCast(gl.glGetUniformLocation(
-        //     self.program,
-        //     "lightPos",
-        // ));
 
         const proj_location: c_uint = @intCast(gl.glGetUniformLocation(
             self.program,
@@ -196,10 +229,47 @@ pub const App = struct {
         gl.glUniformMatrix4fv(@intCast(proj_location), 1, gl.GL_TRUE, @ptrCast(&camera.projection.mat));
         gl.glUniformMatrix4fv(@intCast(view_location), 1, gl.GL_TRUE, @ptrCast(&camera.view.mat));
 
+        const tex1_loc = gl.glGetUniformLocation(self.program, "texture1");
+        const tex2_loc = gl.glGetUniformLocation(self.program, "texture2");
+        const tex3_loc = gl.glGetUniformLocation(self.program, "texture3");
+
+        gl.glUniform1i(tex1_loc, 0);
+        gl.glUniform1i(tex2_loc, 1);
+        gl.glUniform1i(tex3_loc, 2);
+        const textures = scene.textures;
+        var texturesLocation: [TexturePool.MaxTextures]gl.GLuint = undefined;
+        gl.glGenTextures(@intCast(textures.items.len), &texturesLocation);
+        defer gl.glDeleteTextures(@intCast(textures.items.len), &texturesLocation);
+
+        for (textures.items, 0..) |texture, i| {
+            const textureLocation = texturesLocation[i];
+
+            gl.glActiveTexture(@intCast(gl.GL_TEXTURE0 + i));
+            gl.glBindTexture(gl.GL_TEXTURE_2D, textureLocation);
+            gl.glTextureParameteri(textureLocation, gl.GL_TEXTURE_WRAP_S, gl.GL_REPEAT);
+            gl.glTextureParameteri(textureLocation, gl.GL_TEXTURE_WRAP_T, gl.GL_REPEAT);
+            gl.glTextureParameteri(textureLocation, gl.GL_TEXTURE_MIN_FILTER, gl.GL_LINEAR);
+            gl.glTextureParameteri(textureLocation, gl.GL_TEXTURE_MAG_FILTER, gl.GL_LINEAR);
+
+            const textureData: ?*const anyopaque = 
+                if (texture.get().format == .rgb) texture.get().data.rgb.ptr 
+                else texture.get().data.rgba.ptr;
+            
+           gl.glTexImage2D(
+                gl.GL_TEXTURE_2D,
+                0,
+                gl.GL_RGBA,
+                @intCast(texture.get().width),
+                @intCast(texture.get().height),
+                0,
+                @intCast(@intFromEnum(texture.get().format)),
+                gl.GL_UNSIGNED_BYTE,
+                textureData
+            );
+        }
+
         inline for (0..Scene.MaxLights) |i| {
             const base = std.fmt.comptimePrint("lights[{d}].", .{i});
-
-            // std.debug.print("string: {s}\n", .{base});
 
             const lightActiveLocation: c_uint = @intCast(gl.glGetUniformLocation(
                 self.program,
@@ -251,8 +321,6 @@ pub const App = struct {
                 @intCast(lightActiveLocation),
                 if (isActive) 1 else 0,
             );
-
-            // std.debug.assert(scene.lights.items.len != 0);
 
             const light = if (isActive)
                 scene.lights.items[i].get()

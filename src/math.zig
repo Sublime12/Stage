@@ -2,6 +2,8 @@ const std = @import("std");
 
 pub const Mat4x4 = [4][4]f32;
 pub const Vector3 = [3]f32;
+pub const Vec4u = [4]u8;
+pub const Vec3u = [3]u8;
 
 pub inline fn identity() Mat4x4 {
     return .{

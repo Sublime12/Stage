@@ -53,10 +53,6 @@ pub const Light = struct {
     constant: f32,
     linear: f32,
     quadratic: f32,
-    // position: Vec3,
-    // totalTransform
-    // cameraWorld = camera.node.get().totalTransform * camera.transform
-    // lumiereWorld = lumiere.node.get().totalTransform * lumiere.transform
 
     pub fn init(vertex: *const Vec3, strengh: f32) Light {
         return .{
@@ -74,14 +70,6 @@ pub const Light = struct {
             },
         };
     }
-
-    // pub fn getTransformedVertex(self: *const Self) Vec3 {
-    //     if (self.node) |n| {
-    //         const newTransform = Transform.from(&n.get().worldTransform, &self.transform);
-    //         return newTransform.transformVertex(&self.position);
-    //     }
-    //     return self.transform.transformVertex(&self.position);
-    // }
 
     pub fn transformPosition(self: *const Self) Vec3 {
         var result: Vec3 = undefined;

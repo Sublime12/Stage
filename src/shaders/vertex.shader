@@ -1,21 +1,19 @@
 #version 330
-// uniform mat4 MVP;
 uniform mat4 proj;
 uniform mat4 view;
-
-// uniform vec3 lightColor;
-// uniform vec3 lightPos;
-// uniform float lightStrength;
 
 in vec3 vCol;
 in vec3 vPos;
 in vec3 normal;
+in vec2 textCoord;
+in int textureId;
 
 out vec3 fCol;
 out vec3 fPos;
 out vec3 fNormal;
 out vec3 fViewPos;
-// out vec3 color;
+out vec2 fTextCoord;
+flat out int fTextureId;
 
 void main()
 {
@@ -26,6 +24,8 @@ void main()
     fCol = vCol;
     fPos = vPos;
     fNormal = normal;
+    fTextCoord = textCoord;
+    fTextureId = textureId;
     gl_Position = proj * view * vec4(vPos, 1.0);
 }
 
