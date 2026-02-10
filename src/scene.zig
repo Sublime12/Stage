@@ -17,7 +17,6 @@ pub const Scene = struct {
     pub const MaxLights = 5;
 
     root: ?NodeHandle,
-    // light: ?Light,
     lights: std.ArrayList(LightHandle),
     textures: std.ArrayList(TextureHandle),
     allocator: Allocator,
@@ -29,7 +28,6 @@ pub const Scene = struct {
             .allocator = allocator,
             .lights = try std.ArrayList(LightHandle).initCapacity(allocator, MaxLights),
             .textures = try std.ArrayList(TextureHandle).initCapacity(allocator, TexturePool.MaxTextures),
-            // .light = null,
         };
     }
 
@@ -39,7 +37,6 @@ pub const Scene = struct {
     }
 
     pub fn addLight(self: *Self, light: LightHandle) void {
-        // self.light = light.*;
         self.lights.appendAssumeCapacity(light);
     }
 
@@ -122,8 +119,6 @@ pub const Geometry = struct {
         );
 
         // Face 2
-        // const red = .{ 1.0, 0.0, 0.0 };
-
         const triangle3 = Triangle.init(
             .{ .position = .{ 0.0, 0.0, 0.0 }, .color = white, .textCoord = .{ 0, 0 } },
             .{ .position = .{ 0.0, 0.0, 0.5 }, .color = white, .textCoord = .{ 0, 1 } },
@@ -137,7 +132,6 @@ pub const Geometry = struct {
         );
 
         // Face 3
-        // const gray = .{ 0.5, 0.5, 0.5 };
         const triangle5 = Triangle.init(
             .{ .position = .{ 0.0, 0.0, 0.5 }, .color = white, .textCoord = .{ 0, 0 } },
             .{ .position = .{ 0.5, 0.0, 0.5 }, .color = white, .textCoord = .{ 1, 0 } },
@@ -151,8 +145,6 @@ pub const Geometry = struct {
         );
 
         // Face 4
-        // const yellow = .{ 1.0, 1.0, 0.0 };
-
         const triangle7 = Triangle.init(
             .{ .position = .{ 0.5, 0.0, 0.0 }, .color = white, .textCoord = .{ 0, 0 } },
             .{ .position = .{ 0.5, 0.5, 0.0 }, .color = white, .textCoord = .{ 1, 0 } },
@@ -166,8 +158,6 @@ pub const Geometry = struct {
         );
 
         // Face 4
-        // const skyblue = .{ 0.0, 1.0, 1.0 };
-
         const triangle9 = Triangle.init(
             .{ .position = .{ 0.0, 0.0, 0.0 }, .color = white, .textCoord = .{ 0, 0 } },
             .{ .position = .{ 0.5, 0.0, 0.0 }, .color = white, .textCoord = .{ 1, 0 } },
@@ -181,8 +171,6 @@ pub const Geometry = struct {
         );
 
         // Face 6
-        // const white = .{ 1.0, 1.0, 1.0 };
-
         const triangle11 = Triangle.init(
             .{ .position = .{ 0.0, 0.5, 0.5 }, .color = white, .textCoord = .{ 0, 1 } },
             .{ .position = .{ 0.5, 0.5, 0.0 }, .color = white, .textCoord = .{ 1, 0 } },
@@ -224,8 +212,6 @@ pub fn makeChessboard() [DIMENSION * DIMENSION]Vec4u {
                 .{ 0, 0, 0, 0 }
             else
                 .{ 255, 255, 255, 255 });
-
-            // const medium = DIMENSION / 2;
         }
     }
 

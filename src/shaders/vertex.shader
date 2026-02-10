@@ -1,11 +1,6 @@
 #version 330
-// uniform mat4 MVP;
 uniform mat4 proj;
 uniform mat4 view;
-
-// uniform vec3 lightColor;
-// uniform vec3 lightPos;
-// uniform float lightStrength;
 
 in vec3 vCol;
 in vec3 vPos;
@@ -19,7 +14,6 @@ out vec3 fNormal;
 out vec3 fViewPos;
 out vec2 fTextCoord;
 flat out int fTextureId;
-// out vec3 color;
 
 void main()
 {

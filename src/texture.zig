@@ -53,11 +53,6 @@ pub const Texture = struct {
     height: usize,
     data: TextureData,
     format: TextureFormat,
-    // TODO: user must specify the data format used
-    // rgb, rgba, gray, gray-alpha, etc...
-    // format: FormatEnum
-    // data: union{[]Vec4u, []vecu, []vec2f []vec3u}
-    // format: enum { rgb, rgba, rgbf, rgbaf, }
 
     pub fn init(
         width: usize,
@@ -68,7 +63,6 @@ pub const Texture = struct {
             .rgb => |texture| std.debug.assert(texture.len == width * height),
             .rgba => |texture| std.debug.assert(texture.len == width * height),
         }
-        // std.debug.assert(data.len == width * height);
         const format = switch(data) {
             .rgb => TextureFormat.rgb,
             .rgba => TextureFormat.rgba,

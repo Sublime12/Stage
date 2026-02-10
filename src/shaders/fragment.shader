@@ -1,14 +1,6 @@
 #version 330
 
-// in vec3 color;
 out vec4 fragment;
-
-// uniform vec3 ambientColor;
-// uniform vec3 diffuseColor;
-// uniform vec3 specularColor;
-// uniform vec3 lightPos;
-// uniform float lightStrength;
-
 
 struct Light {
     vec3 position;
@@ -29,11 +21,7 @@ struct Light {
 uniform sampler2D texture1;
 uniform sampler2D texture2;
 uniform sampler2D texture3;
-// uniform sampler2D ourTexture2;
-// uniform sampler2D ourTexture3;
 uniform Light lights[MAX_LIGHT];
-// 3 textures,
-// correctTexture = textures[node.textureId]
 
 in vec3 fCol;
 in vec3 fPos;
@@ -41,7 +29,6 @@ in vec3 fNormal;
 in vec3 fViewPos;
 in vec2 fTextCoord;
 flat in int fTextureId;
-// in int textureId
 
 vec3 calculatePointLight(Light light, vec3 normal, vec3 fPos, vec3 fViewPos);
 
@@ -64,7 +51,6 @@ void main()
         }
     }
 
-    // use var so it does make an error in zig
     result = result * fCol * texColor.rgb;
     fragment = vec4(result, 1.0);
 }

@@ -28,7 +28,6 @@ pub const NodePool = struct {
 
     allocator: Allocator,
     nodes: std.ArrayList(Node),
-    // textureId,
 
     pub fn init(allocator: Allocator) NodePool {
         return .{
@@ -59,15 +58,8 @@ pub const Node = struct {
     children: std.ArrayList(NodeHandle),
     geometry: ?Geometry,
     texture: ?TextureHandle,
-    // lumiere
-    // camera
-    // camera: ?Camera,
-    // lumiere: ?Lumiere,
     transform: Transform,
     worldTransform: Transform,
-    // totalTransform
-    // cameraWorld = camera.node.get().totalTransform * camera.transform
-    // lumiereWorld = lumiere.node.get().totalTransform * lumiere.transform
 
     pub fn init(
         geometry: Geometry,
