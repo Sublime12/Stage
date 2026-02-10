@@ -53,10 +53,10 @@ pub fn main() !void {
     const cubeGeo = try Geometry.makeCube(allocator);
     var board = chessboard();
 
-    const data = TextureData { .rgba = &board };
+    const data = TextureData{ .rgba = &board };
 
     var diskb = diskboard();
-    const disk = TextureData { .rgb = &diskb };
+    const disk = TextureData{ .rgb = &diskb };
 
     const texture1 = texturePool.create(
         Texture.init(scene_pkg.DIMENSION, scene_pkg.DIMENSION, data),
@@ -163,20 +163,5 @@ pub fn main() !void {
         // camera.lookAt(.{camX, 0.0, camZ}, .{0.0, 0.0, 0.0}, .{0.0, 1.0, 0.0});
 
         // node5.get().transform.rotateY(math.pi / 300.0);
-    }
-}
-
-test "test checkboard" {
-    const board = chessboard();
-
-    for (board) |row| {
-        for (row) |v| {
-            if (v[0] == 0) {
-                std.debug.print("{} ", .{v[0]});
-            } else {
-                std.debug.print("{} ", .{v[0]});
-            }
-        }
-        std.debug.print("\n", .{});
     }
 }

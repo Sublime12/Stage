@@ -63,7 +63,7 @@ pub const Texture = struct {
             .rgb => |texture| std.debug.assert(texture.len == width * height),
             .rgba => |texture| std.debug.assert(texture.len == width * height),
         }
-        const format = switch(data) {
+        const format = switch (data) {
             .rgb => TextureFormat.rgb,
             .rgba => TextureFormat.rgba,
         };

@@ -251,11 +251,13 @@ pub const App = struct {
             gl.glTextureParameteri(textureLocation, gl.GL_TEXTURE_MIN_FILTER, gl.GL_LINEAR);
             gl.glTextureParameteri(textureLocation, gl.GL_TEXTURE_MAG_FILTER, gl.GL_LINEAR);
 
-            const textureData: ?*const anyopaque = 
-                if (texture.get().format == .rgb) texture.get().data.rgb.ptr 
-                else texture.get().data.rgba.ptr;
-            
-           gl.glTexImage2D(
+            const textureData: ?*const anyopaque =
+                if (texture.get().format == .rgb)
+                    texture.get().data.rgb.ptr
+                else
+                    texture.get().data.rgba.ptr;
+
+            gl.glTexImage2D(
                 gl.GL_TEXTURE_2D,
                 0,
                 gl.GL_RGBA,
@@ -264,7 +266,7 @@ pub const App = struct {
                 0,
                 @intCast(@intFromEnum(texture.get().format)),
                 gl.GL_UNSIGNED_BYTE,
-                textureData
+                textureData,
             );
         }
 
