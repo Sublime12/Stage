@@ -27,6 +27,10 @@ jobs:
         run: |
           sudo apt install xz-utils
           sudo sh -c 'wget -c https://pkg.machengine.org/zig/zig-x86_64-linux-0.15.2.tar.xz -O - | tar -xJ --strip-components=1 -C /usr/local/bin'
+      - name: install dependencies
+        run:
+          sudo apt update
+          sudo apt install libglfw3-dev
       - name: build execs and tests
         run:
           zig build
