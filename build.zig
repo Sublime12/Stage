@@ -91,10 +91,6 @@ pub fn build(b: *std.Build) void {
         .file = b.path("src/c/gl.c"),
         .flags = &.{},
     });
-    exe.addCSourceFile(.{
-        .file = b.path("src/c/stb_image.c"),
-        .flags = &.{},
-    });
     exe.linkLibC();
     exe.linkSystemLibrary("glfw");
 
