@@ -19,6 +19,7 @@ const LightPool = light_pkg.LightPool;
 const Vertex = scene_pkg.Vertex;
 const TexturePool = texture_pkg.TexturePool;
 const Texture = texture_pkg.Texture;
+const TextureData = texture_pkg.TextureData;
 
 const chessboard = @import("scene.zig").makeChessboard;
 const diskboard = @import("scene.zig").makeDisk;
@@ -50,16 +51,19 @@ pub fn main() !void {
     defer texturePool.deinit(allocator);
 
     const cubeGeo = try Geometry.makeCube(allocator);
+    var board = chessboard();
 
-    var data = chessboard();
-    var disk = diskboard();
+    const data = TextureData { .rgba = &board };
+
+    var diskb = diskboard();
+    const disk = TextureData { .rgb = &diskb };
 
     const texture1 = texturePool.create(
-        Texture.init(scene_pkg.DIMENSION, scene_pkg.DIMENSION, &data),
+        Texture.init(scene_pkg.DIMENSION, scene_pkg.DIMENSION, data),
     );
 
     const texture2 = texturePool.create(
-        Texture.init(scene_pkg.DIMENSION, scene_pkg.DIMENSION, &disk),
+        Texture.init(scene_pkg.DIMENSION, scene_pkg.DIMENSION, disk),
     );
 
     var node1 = try pool.create(Node.init(cubeGeo, texture1));

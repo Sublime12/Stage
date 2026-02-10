@@ -1,6 +1,8 @@
 const std = @import("std");
+const gl = @cImport(@cInclude("gl.h"));
 const Allocator = std.mem.Allocator;
 const Vec4u = @import("math.zig").Vec4u;
+const Vec3u = @import("math.zig").Vec3u;
 
 pub const TexturePool = struct {
     pub const MaxTextures = 3;
@@ -36,20 +38,46 @@ pub const TextureHandle = struct {
     }
 };
 
+const TextureFormat = enum(c_int) {
+    rgb = gl.GL_RGB,
+    rgba = gl.GL_RGBA,
+};
+
+pub const TextureData = union(TextureFormat) {
+    rgb: []Vec3u,
+    rgba: []Vec4u,
+};
+
 pub const Texture = struct {
     width: usize,
     height: usize,
-    data: []Vec4u,
+    data: TextureData,
+    format: TextureFormat,
     // TODO: user must specify the data format used
     // rgb, rgba, gray, gray-alpha, etc...
     // format: FormatEnum
+    // data: union{[]Vec4u, []vecu, []vec2f []vec3u}
+    // format: enum { rgb, rgba, rgbf, rgbaf, }
 
-    pub fn init(width: usize, height: usize, data: []Vec4u) Texture {
-        std.debug.assert(data.len == width * height);
+    pub fn init(
+        width: usize,
+        height: usize,
+        data: TextureData,
+    ) Texture {
+        switch (data) {
+            .rgb => |texture| std.debug.assert(texture.len == width * height),
+            .rgba => |texture| std.debug.assert(texture.len == width * height),
+        }
+        // std.debug.assert(data.len == width * height);
+        const format = switch(data) {
+            .rgb => TextureFormat.rgb,
+            .rgba => TextureFormat.rgba,
+        };
         return .{
             .width = width,
             .height = height,
             .data = data,
+            .format = format,
         };
     }
 };

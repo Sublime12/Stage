@@ -9,7 +9,8 @@ const TextureHandle = texture_pkg.TextureHandle;
 const TexturePool = texture_pkg.TexturePool;
 const Light = light_pkg.Light;
 const LightHandle = light_pkg.LightHandle;
-const Vec4i = @import("math.zig").Vec4u;
+const Vec4u = @import("math.zig").Vec4u;
+const Vec3u = @import("math.zig").Vec3u;
 
 pub const Scene = struct {
     const Self = @This();
@@ -213,8 +214,8 @@ pub const Geometry = struct {
 };
 
 pub const DIMENSION = 100;
-pub fn makeChessboard() [DIMENSION * DIMENSION]Vec4i {
-    var board: [DIMENSION * DIMENSION]Vec4i = undefined;
+pub fn makeChessboard() [DIMENSION * DIMENSION]Vec4u {
+    var board: [DIMENSION * DIMENSION]Vec4u = undefined;
     for (0..DIMENSION) |i| {
         for (0..DIMENSION) |j| {
             const i_scaled = i / 5;
@@ -231,8 +232,8 @@ pub fn makeChessboard() [DIMENSION * DIMENSION]Vec4i {
     return board;
 }
 
-pub fn makeDisk() [DIMENSION * DIMENSION]Vec4i {
-    var board: [DIMENSION * DIMENSION]Vec4i = undefined;
+pub fn makeDisk() [DIMENSION * DIMENSION]Vec3u {
+    var board: [DIMENSION * DIMENSION]Vec3u = undefined;
 
     for (0..DIMENSION) |i| {
         for (0..DIMENSION) |j| {
@@ -246,9 +247,9 @@ pub fn makeDisk() [DIMENSION * DIMENSION]Vec4i {
                 (i_f - x_center) * (i_f - x_center) + (j_f - y_center) * (j_f - y_center),
             );
             if (value < DIMENSION / 2) {
-                board[i + j * DIMENSION] = .{ 10, 75, 150, 1 };
+                board[i + j * DIMENSION] = .{ 10, 75, 150 };
             } else {
-                board[i + j * DIMENSION] = .{ 255, 255, 255, 255 };
+                board[i + j * DIMENSION] = .{ 255, 255, 255 };
             }
         }
     }

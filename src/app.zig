@@ -216,11 +216,6 @@ pub const App = struct {
         gl.glClear(gl.GL_COLOR_BUFFER_BIT | gl.GL_DEPTH_BUFFER_BIT);
         gl.glUseProgram(self.program);
 
-        // const lightPosLocation: c_uint = @intCast(gl.glGetUniformLocation(
-        //     self.program,
-        //     "lightPos",
-        // ));
-
         const proj_location: c_uint = @intCast(gl.glGetUniformLocation(
             self.program,
             "proj",
@@ -234,10 +229,6 @@ pub const App = struct {
         gl.glUniformMatrix4fv(@intCast(proj_location), 1, gl.GL_TRUE, @ptrCast(&camera.projection.mat));
         gl.glUniformMatrix4fv(@intCast(view_location), 1, gl.GL_TRUE, @ptrCast(&camera.view.mat));
 
-        // var texture: gl.GLuint = 0;
-        //
-        //gl.glUseProgram(self.program);
-
         const tex1_loc = gl.glGetUniformLocation(self.program, "texture1");
         const tex2_loc = gl.glGetUniformLocation(self.program, "texture2");
         const tex3_loc = gl.glGetUniformLocation(self.program, "texture3");
@@ -250,9 +241,6 @@ pub const App = struct {
         gl.glGenTextures(@intCast(textures.items.len), &texturesLocation);
         defer gl.glDeleteTextures(@intCast(textures.items.len), &texturesLocation);
 
-        // gl.glActiveTexture(gl.GL_TEXTURE0);
-        // gl.glActiveTexture(gl.GL_TEXTURE1);
-        // gl.glActiveTexture(gl.GL_TEXTURE2);
         for (textures.items, 0..) |texture, i| {
             std.debug.print("textures locations {any}\n", .{texturesLocation});
             const textureLocation = texturesLocation[i];
@@ -264,26 +252,25 @@ pub const App = struct {
             gl.glTextureParameteri(textureLocation, gl.GL_TEXTURE_MIN_FILTER, gl.GL_LINEAR);
             gl.glTextureParameteri(textureLocation, gl.GL_TEXTURE_MAG_FILTER, gl.GL_LINEAR);
 
-            // std.debug.print("height {}, width {}\n", .{ heightTexture, widthTexture });
-            gl.glTexImage2D(
+            const textureData: ?*const anyopaque = 
+                if (texture.get().format == .rgb) texture.get().data.rgb.ptr 
+                else texture.get().data.rgba.ptr;
+            
+           gl.glTexImage2D(
                 gl.GL_TEXTURE_2D,
                 0,
                 gl.GL_RGBA,
                 @intCast(texture.get().width),
                 @intCast(texture.get().height),
                 0,
-                gl.GL_RGBA,
+                @intCast(@intFromEnum(texture.get().format)),
                 gl.GL_UNSIGNED_BYTE,
-                texture.get().data.ptr,
+                textureData
             );
         }
 
-        // gl.glGenerateMipmap(gl.GL_TEXTURE_2D);
-
         inline for (0..Scene.MaxLights) |i| {
             const base = std.fmt.comptimePrint("lights[{d}].", .{i});
-
-            // std.debug.print("string: {s}\n", .{base});
 
             const lightActiveLocation: c_uint = @intCast(gl.glGetUniformLocation(
                 self.program,
@@ -335,8 +322,6 @@ pub const App = struct {
                 @intCast(lightActiveLocation),
                 if (isActive) 1 else 0,
             );
-
-            // std.debug.assert(scene.lights.items.len != 0);
 
             const light = if (isActive)
                 scene.lights.items[i].get()
@@ -392,7 +377,6 @@ pub const App = struct {
             );
         }
 
-        // gl.glBindTexture(gl.GL_TEXTURE_2D, texture);
         gl.glBindVertexArray(vertex_array);
         gl.glDrawArrays(gl.GL_TRIANGLES, 0, @as(c_int, @intCast(vertices.items.len)));
 
