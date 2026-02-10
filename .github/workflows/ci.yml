@@ -24,6 +24,9 @@ jobs:
         run: |
           sudo apt install --yes xz-utils libglfw3-dev
           sudo sh -c 'wget -c https://pkg.machengine.org/zig/zig-x86_64-linux-0.15.2.tar.xz -O - | tar -xJ --strip-components=1 -C /usr/local/bin'
+      - name: check linting
+        run:
+          zig fmt --check .
       - name: build execs and tests
         run:
           zig build
