@@ -30,5 +30,7 @@ jobs:
       - name: build execs and tests
         run:
           zig build
-
+      - name: Run tests
+        run:  
+          ./zig-out/bin/test
 
