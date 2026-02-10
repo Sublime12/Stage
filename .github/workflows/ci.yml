@@ -1,9 +1,30 @@
-on: [push]
+name: CI
+on:
+  push:
+    paths-ignore:
+      - "doc/**"
+      - "README.md"
+      - "**.md"
+      - "LICENSE**"
+  pull_request:
+    paths-ignore:
+      - "doc/**"
+      - "README.md"
+      - "**.md"
+      - "LICENSE**"
 jobs:
-  test:
+  x86_64-linux:
     runs-on: ubuntu-latest
-    name: Build and Test
+    # We want to run on external PRs, but not on our own internal PRs as they'll be run by the push
+    # to the branch.
+    # if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository
+    env:
+      DISPLAY: ':99.0'
     steps:
-      - uses: actions/checkout@v3
-      - uses: mlugg/setup-zig@v1
-      - run: zig build test
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup Zig
+        run: |
+          sudo apt install xz-utils
+          sudo sh -c 'wget -c https://pkg.machengine.org/zig/zig-linux-x86_64-0.14.0-dev.2577+271452d22.tar.xz -O - | tar -xJ --strip-components=1 -C /usr/local/bin'
+
