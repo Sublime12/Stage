@@ -166,17 +166,3 @@ pub fn main() !void {
     }
 }
 
-test "test checkboard" {
-    const board = chessboard();
-
-    for (board) |row| {
-        for (row) |v| {
-            if (v[0] == 0) {
-                std.debug.print("{} ", .{v[0]});
-            } else {
-                std.debug.print("{} ", .{v[0]});
-            }
-        }
-        std.debug.print("\n", .{});
-    }
-}
