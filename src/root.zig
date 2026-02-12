@@ -10,6 +10,7 @@ pub const node = @import("node.zig");
 pub const root = @import("root.zig");
 pub const scene = @import("scene.zig");
 pub const transform = @import("transform.zig");
+pub const uv_unwrapping = @import("uv_unwrapping.zig");
 
 test {
     std.testing.refAllDecls(@This());

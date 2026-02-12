@@ -11,6 +11,7 @@ const Light = light_pkg.Light;
 const LightHandle = light_pkg.LightHandle;
 const Vec4u = @import("math.zig").Vec4u;
 const Vec3u = @import("math.zig").Vec3u;
+const Vec2f = @import("math.zig").Vec2f;
 
 pub const Scene = struct {
     const Self = @This();
@@ -243,10 +244,20 @@ pub fn makeDisk() [DIMENSION * DIMENSION]Vec3u {
     return board;
 }
 
-const Triangle = struct {
+pub const Triangle = struct {
     vertices: [3]Vertex,
 
     pub fn init(v1: Vertex, v2: Vertex, v3: Vertex) Triangle {
+        return .{
+            .vertices = .{ v1, v2, v3 },
+        };
+    }
+};
+
+pub const Triangle2d = struct {
+    vertices: [3]Vec2f,
+
+    pub fn init(v1: Vec2f, v2: Vec2f, v3: Vec2f) Triangle2d {
         return .{
             .vertices = .{ v1, v2, v3 },
         };
