@@ -52,11 +52,36 @@ pub fn multiplyMat4x4Vec3(
     };
 }
 
-pub fn substractVec3(result: *Vector3, vec1: *const Vector3, vec2: *const Vector3) void {
+pub fn substractVec3(
+    result: *Vector3,
+    vec1: *const Vector3,
+    vec2: *const Vector3,
+) void {
     result.* = .{
         vec1[0] - vec2[0],
         vec1[1] - vec2[1],
         vec1[2] - vec2[2],
+    };
+}
+
+pub fn addVec2(
+    result: *Vec2f,
+    vec1: *const Vec2f,
+    vec2: *const Vec2f,
+) void {
+    result.* = .{
+        vec1[0] + vec2[0],
+        vec1[1] + vec2[1],
+    };
+}
+pub fn substractVec2(
+    result: *Vec2f,
+    vec1: *const Vec2f,
+    vec2: *const Vec2f,
+) void {
+    result.* = .{
+        vec1[0] - vec2[0],
+        vec1[1] - vec2[1],
     };
 }
 
@@ -66,6 +91,14 @@ pub fn normalizeVec3(result: *Vector3, vec: *const Vector3) void {
         vec[0] / length,
         vec[1] / length,
         vec[2] / length,
+    };
+}
+
+pub fn normalizeVec2(result: *Vec2f, vec: *const Vec2f) void {
+    const length = @sqrt(vec[0] * vec[0] + vec[1] * vec[1]);
+    result.* = .{
+        vec[0] / length,
+        vec[1] / length,
     };
 }
 
@@ -82,6 +115,13 @@ pub fn dotVec3(
     vec2: *const Vector3,
 ) f32 {
     return (vec1[0] * vec2[0]) + (vec1[1] * vec2[1]) + (vec1[2] * vec2[2]);
+}
+
+pub fn dotVec2(
+    vec1: *const Vec2f,
+    vec2: *const Vec2f,
+) f32 {
+    return (vec1[0] * vec2[0]) + (vec1[1] * vec2[1]);
 }
 
 fn generateRandomMat4x4(rand: std.Random) Mat4x4 {
@@ -101,8 +141,12 @@ fn generateRandomMat4x4(rand: std.Random) Mat4x4 {
     return result;
 }
 
-fn lengthVec3(vec: *const Vector3) f32 {
+pub fn lengthVec3(vec: *const Vector3) f32 {
     return @sqrt(vec[0] * vec[0] + vec[1] * vec[1] + vec[2] * vec[2]);
+}
+
+pub fn lengthVec2(vec: *const Vec2f) f32 {
+    return @sqrt(vec[0] * vec[0] + vec[1] * vec[1]);
 }
 
 test "expect identity return an identity 4x4 matrix" {
