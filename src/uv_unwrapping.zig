@@ -3,16 +3,121 @@ const std = @import("std");
 const scene = @import("scene.zig");
 const math = @import("math.zig");
 
+const Allocator = std.mem.Allocator;
+
 const Triangle = scene.Triangle;
 const Triangle2d = scene.Triangle2d;
 const Vertex = scene.Vertex;
+const Geometry = scene.Geometry;
 const Vec3f = math.Vec3f;
 const Vec2f = math.Vec2f;
 
+// have a function taking a list of geometry and return a graph of
+// triangles connected to adjencent triangles
+
+// list(Node)
+// Node(el, neighbors)
+// neighbors(Node)
+// Node(triangle3d -> ptr ?Node2d),
+// list(node3d) :
+// first = nodes3d[0]
+// second = nodes3d[1]
+// files = []
+// while (not emppty(node3d)) {
+//      tpop = files.pop();
+//      for t.pop.neighbors: stack_nodes.append(neighbor)
+//
+//      t2d = flatten(tcourant, tpop)
+//
+//      graph2d.append(t2d)
+const Node3d = struct {
+    triangle: scene.Triangle,
+    neighbors: std.ArrayList(Node3d),
+};
+const GeometryGraph3d = struct {
+    const Self = @This();
+
+    nodes: std.ArrayList(Node3d),
+    geometry: *const Geometry,
+
+    pub fn init(geometry: *const Geometry) Self {
+        return .{
+            .nodes = .empty,
+            .geometry = geometry,
+        };
+    }
+
+    pub fn deinit(self: *Self, allocator: Allocator) void {
+        for (self.nodes.items) |*node| {
+            node.neighbors.deinit(allocator);
+        }
+        self.nodes.deinit(allocator);
+    }
+
+    pub fn generateGraph(self: *Self, allocator: Allocator) !void {
+        const triangles = self.geometry.shape;
+
+        for (triangles.items) |t1| {
+            const node: Node3d = .{ .triangle = t1, .neighbors = .empty };
+            try self.nodes.append(allocator, node);
+        }
+
+        for (self.nodes.items, 0..) |*n1, i| {
+            for (self.nodes.items, 0..) |n2, j| {
+                if (i == j) continue;
+
+                if (findAdjacentSide(n1.triangle, n2.triangle)) |_| {
+                    try n1.neighbors.append(allocator, n2);
+                }
+            }
+        }
+    }
+    pub fn format(
+        self: Self,
+        writer: anytype,
+    ) !void {
+        try writer.writeAll("graph GeometryGraph {\n");
+        try writer.writeAll("  node [shape=box];\n");
+
+        for (self.nodes.items, 0..) |node, i| {
+            const v = node.triangle.vertices;
+            try writer.print(
+                \\  n{d} [label=\"ID: {d}\\nV0: ({d:.2}, {d:.2}, {d:.2})\\nV1: 
+                \\ ({d:.2}, {d:.2}, {d:.2})\\nV2: ({d:.2}, {d:.2}, {d:.2})\"];\n"
+            ,
+                .{
+                    i,                i,
+                    v[0].position[0], v[0].position[1],
+                    v[0].position[2], v[1].position[0],
+                    v[1].position[1], v[1].position[2],
+                    v[2].position[0], v[2].position[1],
+                    v[2].position[2],
+                },
+            );
+
+            for (node.neighbors.items) |neighbor| {
+                for (self.nodes.items, 0..) |target, j| {
+                    if (i < j and std.meta.eql(neighbor.triangle, target.triangle)) {
+                        try writer.print("  n{d} -- n{d};\n", .{ i, j });
+                        break;
+                    }
+                }
+            }
+        }
+
+        try writer.writeAll("}\n");
+    }
+};
+
+const GeometryGraph2d = struct {
+    // Node(triangle2d, ptr -> ?Node3d)
+    //
+};
+
 pub fn flatten(t1: Triangle, t2: Triangle) Triangle2d {
     const adjancentSide = findAdjacentSide(t1, t2);
-    const B = adjancentSide[0];
-    const C = adjancentSide[1];
+    const B = adjancentSide.?[0];
+    const C = adjancentSide.?[1];
     const D = extractDifferentPoint(t2, C, B);
     const A = extractDifferentPoint(t1, C, B);
     var vbc3d: Vec3f = undefined;
@@ -25,8 +130,8 @@ pub fn flatten(t1: Triangle, t2: Triangle) Triangle2d {
     const cos = dot / (lengthBc * lengthBd);
     const sin = @sqrt(1 - cos * cos);
 
-    var b: Vec2f = .{ B.position[0], B.position[2] };
-    var c: Vec2f = .{ C.position[0], C.position[2] };
+    const b: Vec2f = .{ B.position[0], B.position[2] };
+    const c: Vec2f = .{ C.position[0], C.position[2] };
 
     var vbc2d: Vec2f = undefined;
     math.substractVec2(&vbc2d, &c, &b);
@@ -75,7 +180,7 @@ fn extractDifferentPoint(t: Triangle, c: Vertex, b: Vertex) Vertex {
         unreachable;
 }
 
-fn findAdjacentSide(t1: Triangle, t2: Triangle) [2]Vertex {
+fn findAdjacentSide(t1: Triangle, t2: Triangle) ?[2]Vertex {
     var result: [2]Vertex = undefined;
     const emptyVertex = Vertex.init(
         .{ 0, 0, 0 },
@@ -86,15 +191,16 @@ fn findAdjacentSide(t1: Triangle, t2: Triangle) [2]Vertex {
     var i: usize = 0;
     for (t1.vertices) |v1| {
         for (t2.vertices) |v2| {
-            if (areVerticesEqlApprox(v1.position, v2.position) and i < 2) {
-                result[i] = v1;
+            if (areVerticesEqlApprox(v1.position, v2.position)) {
+                if (i < 2) {
+                    result[i] = v1;
+                }
                 i += 1;
                 break;
             }
         }
     }
-    std.debug.assert(i == 2);
-    return result;
+    return if (i != 2) null else result;
 }
 
 fn areVerticesEqlApprox(v1: Vec3f, v2: Vec3f) bool {
@@ -154,8 +260,8 @@ test "find adjacents for t2 triangles" {
     const t2 = triangles[1];
 
     const adjacents = findAdjacentSide(t1, t2);
-    try std.testing.expectEqual(adjacents[0], t2.vertices[0]);
-    try std.testing.expectEqual(adjacents[1], t2.vertices[1]);
+    try std.testing.expectEqual(adjacents.?[0], t2.vertices[0]);
+    try std.testing.expectEqual(adjacents.?[1], t2.vertices[1]);
 }
 
 test "find different point in triangle" {
@@ -186,4 +292,21 @@ test "find different point in triangle" {
 
     try std.testing.expectEqual(expected_d, d);
     try std.testing.expectEqual(expected_a, a);
+}
+
+test "generate 3d graph of adjacents triangles for cube" {
+    const allocator = std.testing.allocator;
+    var geometry = try Geometry.makeCube(allocator);
+    defer geometry.deinit(allocator);
+
+    var graph = GeometryGraph3d.init(&geometry);
+    defer graph.deinit(allocator);
+
+    try graph.generateGraph(allocator);
+
+    // std.debug.print("{f}\n", .{graph});
+    try std.testing.expect(graph.nodes.items.len != 0);
+    for (graph.nodes.items) |node| {
+        try std.testing.expect(node.neighbors.items.len == 3);
+    }
 }
