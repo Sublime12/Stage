@@ -62,8 +62,7 @@ fn areVerticesEqlApprox(v1: Vec3f, v2: Vec3f) bool {
     return true;
 }
 
-test "flattening smol triangle" {
-    std.debug.print("Bonjour le monde\n", .{});
+fn makeTwoTriangle() [2]Triangle {
     const a = Vertex.init(
         .{ 0, 0, 0 },
         .{ 0, 0, 0 },
@@ -86,11 +85,26 @@ test "flattening smol triangle" {
     );
     const t1 = Triangle.init(a, b, c);
     const t2 = Triangle.init(b, c, d);
+
+    return .{ t1, t2 };
+}
+
+test "flattening smol triangle" {
+    // std.debug.print("Bonjour le monde\n", .{});
     // _ = t1;
     // _ = t2;
 
-    const res = flatten(t1, t2);
-    _ = res;
+    const triangles = makeTwoTriangle();
+    const t1 = triangles[0];
+    const t2 = triangles[1];
+
+    const adjacents = findAdjacentSide(t1, t2);
+    try std.testing.expectEqual(adjacents[0], t2.vertices[0]);
+    try std.testing.expectEqual(adjacents[1], t2.vertices[1]);
+
+
+    // const res = flatten(t1, t2);
+    // _ = res;
 
     // std.debug.print("flatten triangle: {any}\n", .{res});
 }
@@ -121,5 +135,6 @@ test "find adjecent sides" {
     const t2 = Triangle.init(b, c, a);
 
     const adjecents = findAdjacentSide(t1, t2);
-    std.debug.print("{any}\n", .{adjecents});
+    _ = adjecents;
+    // std.debug.print("{any}\n", .{adjecents});
 }
