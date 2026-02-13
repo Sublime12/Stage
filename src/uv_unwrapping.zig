@@ -44,7 +44,7 @@ pub fn flatten(t1: Triangle, t2: Triangle) Triangle2d {
     const a: Vec2f = .{ A.position[0], A.position[2] };
     var w: Vec2f = undefined;
     math.substractVec2(&w, &a, &b);
-    const sideA = math.dotVec2(&a, &b);
+    const sideA = math.dotVec2(&u, &w);
     if (sideA > 0) {
         math.substractVec2(&local_uv, &xlocal_u, &zlocal_v);
     } else {
@@ -144,7 +144,8 @@ test "flatten two triangles" {
 
     const triangle = flatten(t1, t2);
     const d = triangle.vertices[2];
-    try std.testing.expect(areVerticesEqlApproxVec2(d, .{ -0.22474, -1.22474 }));
+
+    try std.testing.expect(areVerticesEqlApproxVec2(d, .{ 2.22474, 1.22474 }));
 }
 
 test "find adjacents for t2 triangles" {
