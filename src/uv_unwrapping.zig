@@ -14,8 +14,10 @@ pub fn flatten(t1: Triangle, t2: Triangle) Triangle2d {
     const c = adjancentSide[1];
     const d = extractDifferentPoint(t2, c, b);
     const a = extractDifferentPoint(t1, c, b);
-    std.debug.print("d: {any}\n", .{d});
-    std.debug.print("a: {any}\n", .{a});
+    _ = d;
+    _ = a;
+    // std.debug.print("d: {any}\n", .{d});
+    // std.debug.print("a: {any}\n", .{a});
     unreachable;
 }
 
@@ -90,10 +92,6 @@ fn makeTwoTriangle() [2]Triangle {
 }
 
 test "find adjacents for t2 triangles" {
-    // std.debug.print("Bonjour le monde\n", .{});
-    // _ = t1;
-    // _ = t2;
-
     const triangles = makeTwoTriangle();
     const t1 = triangles[0];
     const t2 = triangles[1];
@@ -101,15 +99,9 @@ test "find adjacents for t2 triangles" {
     const adjacents = findAdjacentSide(t1, t2);
     try std.testing.expectEqual(adjacents[0], t2.vertices[0]);
     try std.testing.expectEqual(adjacents[1], t2.vertices[1]);
-
-
-    // const res = flatten(t1, t2);
-    // _ = res;
-
-    // std.debug.print("flatten triangle: {any}\n", .{res});
 }
 
-test "find adjecent sides" {
+test "find different point in triangle" {
     const a = Vertex.init(
         .{ 0, 0, 0 },
         .{ 0, 0, 0 },
@@ -130,11 +122,11 @@ test "find adjecent sides" {
         .{ 0, 0, 0 },
         .{ 0, 0 },
     );
-    _ = d;
     const t1 = Triangle.init(a, b, c);
-    const t2 = Triangle.init(b, c, a);
+    const t2 = Triangle.init(b, c, d);
+    const expected_d = extractDifferentPoint(t2, c, b);
+    const expected_a = extractDifferentPoint(t1, c, b);
 
-    const adjecents = findAdjacentSide(t1, t2);
-    _ = adjecents;
-    // std.debug.print("{any}\n", .{adjecents});
+    try std.testing.expectEqual(expected_d, d);
+    try std.testing.expectEqual(expected_a, a);
 }
