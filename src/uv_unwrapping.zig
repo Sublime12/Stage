@@ -54,7 +54,7 @@ const GeometryGraph3d = struct {
         self.nodes.deinit(allocator);
     }
 
-    pub fn generateGraph(self: *Self, allocator: Allocator) !void {
+    pub fn generate(self: *Self, allocator: Allocator) !void {
         const triangles = self.geometry.shape;
 
         for (triangles.items) |t1| {
@@ -302,7 +302,7 @@ test "generate 3d graph of adjacents triangles for cube" {
     var graph = GeometryGraph3d.init(&geometry);
     defer graph.deinit(allocator);
 
-    try graph.generateGraph(allocator);
+    try graph.generate(allocator);
 
     // std.debug.print("{f}\n", .{graph});
     try std.testing.expect(graph.nodes.items.len != 0);
