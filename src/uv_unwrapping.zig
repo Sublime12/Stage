@@ -10,8 +10,27 @@ const Vec3f = math.Vec3f;
 
 pub fn flatten(t1: Triangle, t2: Triangle) Triangle2d {
     const adjancentSide = findAdjacentSide(t1, t2);
-    _ = adjancentSide;
+    const b = adjancentSide[0];
+    const c = adjancentSide[1];
+    const d = extractDifferentPoint(t2, c, b);
+    const a = extractDifferentPoint(t1, c, b);
+    std.debug.print("d: {any}\n", .{d});
+    std.debug.print("a: {any}\n", .{a});
     unreachable;
+}
+
+fn extractDifferentPoint(t: Triangle, c: Vertex, b: Vertex) Vertex {
+    return if (!areVerticesEqlApprox(t.vertices[0].position, b.position) and
+        !areVerticesEqlApprox(t.vertices[0].position, c.position))
+        t.vertices[0]
+    else if (!areVerticesEqlApprox(t.vertices[1].position, b.position) and
+        !areVerticesEqlApprox(t.vertices[1].position, c.position))
+        t.vertices[1]
+    else if (!areVerticesEqlApprox(t.vertices[2].position, b.position) and
+        !areVerticesEqlApprox(t.vertices[2].position, c.position))
+        t.vertices[2]
+    else
+        unreachable;
 }
 
 fn findAdjacentSide(t1: Triangle, t2: Triangle) [2]Vertex {
@@ -33,7 +52,6 @@ fn findAdjacentSide(t1: Triangle, t2: Triangle) [2]Vertex {
         }
     }
     std.debug.assert(i == 2);
-    // std.debug.assert(found);
     return result;
 }
 
@@ -68,10 +86,11 @@ test "flattening smol triangle" {
     );
     const t1 = Triangle.init(a, b, c);
     const t2 = Triangle.init(b, c, d);
-    _ = t1;
-    _ = t2;
+    // _ = t1;
+    // _ = t2;
 
-    // const res = flatten(t1, t2);
+    const res = flatten(t1, t2);
+    _ = res;
 
     // std.debug.print("flatten triangle: {any}\n", .{res});
 }
