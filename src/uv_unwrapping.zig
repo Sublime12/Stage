@@ -89,7 +89,7 @@ fn makeTwoTriangle() [2]Triangle {
     return .{ t1, t2 };
 }
 
-test "flattening smol triangle" {
+test "find adjacents for t2 triangles" {
     // std.debug.print("Bonjour le monde\n", .{});
     // _ = t1;
     // _ = t2;
