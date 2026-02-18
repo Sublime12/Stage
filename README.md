@@ -9,6 +9,10 @@ Pour compiler et utiliser **Stage**, vous devez avoir installé les éléments s
 * **Zig 0.15.2**
 * **glfw3** (utilisé pour la gestion des fenêtres et des entrées)
 
+## Demo video
+
+[![Watch the video]](./docs/demo.mkv)
+
 ## Quick Start
 
 Voici un exemple minimal pour créer une scène et afficher un cube :
