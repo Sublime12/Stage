@@ -11,7 +11,7 @@ Pour compiler et utiliser **Stage**, vous devez avoir installé les éléments s
 
 ## Demo video
 
-[![Watch the video]](./docs/demo.mkv)
+[![Watch the video](https://img.youtube.com)](https://youtu.be/4i6WxO7_G6o)
 
 ## Quick Start
 
