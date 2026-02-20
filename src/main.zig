@@ -7,7 +7,7 @@ const stage = @import("app.zig");
 const camera_pkg = @import("camera.zig");
 const light_pkg = @import("light.zig");
 const texture_pkg = @import("texture.zig");
-
+const obj_parser = @import("obj_parser.zig").ObjParser;
 const Geometry = scene_pkg.Geometry;
 const Scene = scene_pkg.Scene;
 const Node = node.Node;
@@ -50,9 +50,11 @@ pub fn main() !void {
     var texturePool = try TexturePool.init(allocator);
     defer texturePool.deinit(allocator);
 
-    const cubeGeo = try Geometry.makeCube(allocator);
+    // const cubeGeo = try Geometry.makeCube(allocator);
     var board = chessboard();
 
+    const sphereGeo = try obj_parser.parse("./assets/sphere.obj", allocator);
+    
     const data = TextureData{ .rgba = &board };
 
     var diskb = diskboard();
@@ -66,7 +68,7 @@ pub fn main() !void {
         Texture.init(scene_pkg.DIMENSION, scene_pkg.DIMENSION, disk),
     );
 
-    var node1 = try pool.create(Node.init(cubeGeo, texture1));
+    var node1 = try pool.create(Node.init(sphereGeo, texture1));
 
     try scene.addRoot(node1);
     scene.addTexture(texture1);
