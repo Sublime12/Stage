@@ -11,6 +11,7 @@ const Light = light_pkg.Light;
 const LightHandle = light_pkg.LightHandle;
 const Vec4u = @import("math.zig").Vec4u;
 const Vec3u = @import("math.zig").Vec3u;
+const Vec2f = @import("math.zig").Vec2f;
 
 pub const Scene = struct {
     const Self = @This();
@@ -184,6 +185,8 @@ pub const Geometry = struct {
         );
 
         var geometry = Geometry.init();
+
+        try geometry.shape.append(allocator, triangle9);
         try geometry.shape.append(allocator, triangle1);
         try geometry.shape.append(allocator, triangle2);
         try geometry.shape.append(allocator, triangle3);
@@ -192,7 +195,6 @@ pub const Geometry = struct {
         try geometry.shape.append(allocator, triangle6);
         try geometry.shape.append(allocator, triangle7);
         try geometry.shape.append(allocator, triangle8);
-        try geometry.shape.append(allocator, triangle9);
         try geometry.shape.append(allocator, triangle10);
         try geometry.shape.append(allocator, triangle11);
         try geometry.shape.append(allocator, triangle12);
@@ -243,12 +245,24 @@ pub fn makeDisk() [DIMENSION * DIMENSION]Vec3u {
     return board;
 }
 
-const Triangle = struct {
+pub const Triangle = struct {
     vertices: [3]Vertex,
 
     pub fn init(v1: Vertex, v2: Vertex, v3: Vertex) Triangle {
         return .{
             .vertices = .{ v1, v2, v3 },
+        };
+    }
+};
+
+pub const Triangle2d = struct {
+    vertices: [3]Vec2f,
+    from_3d: Triangle,
+
+    pub fn init(v1: Vec2f, v2: Vec2f, v3: Vec2f, from3d: Triangle) Triangle2d {
+        return .{
+            .vertices = .{ v1, v2, v3 },
+            .from_3d = from3d,
         };
     }
 };
