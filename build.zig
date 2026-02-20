@@ -4,7 +4,7 @@ pub fn build(b: *std.Build) void {
     const target = b.standardTargetOptions(.{});
     const optimize = b.standardOptimizeOption(.{});
 
-    const mod = b.addModule("Stage", .{
+    const mod = b.addModule("stage", .{
         .root_source_file = b.path("src/root.zig"),
         .target = target,
     });
@@ -14,12 +14,12 @@ pub fn build(b: *std.Build) void {
         .target = target,
         .optimize = optimize,
         .imports = &.{
-            .{ .name = "Stage", .module = mod },
+            .{ .name = "stage", .module = mod },
         },
     });
 
     const exe = b.addExecutable(.{
-        .name = "Stage",
+        .name = "stage",
         .root_module = exe_mod,
     });
 
