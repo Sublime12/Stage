@@ -97,13 +97,11 @@ const GeometryGraph3d = struct {
         var visited = std.AutoHashMap(NodeHandle, void).init(allocator);
         defer visited.deinit();
 
-        // var flattened = std.AutoHashMap(NodeHandle, Triangle2d).init(allocator);
         var flattened = std.AutoArrayHashMap(NodeHandle, Triangle2d).init(allocator);
         defer flattened.deinit();
 
         assert(self.nodes.items.len >= 2);
 
-        // const second = &self.nodes[1];
         const firstHandle: NodeHandle = .{
             .nodes = &self.nodes,
             .index = 0,
@@ -124,54 +122,19 @@ const GeometryGraph3d = struct {
             .index = 0,
         }, first_2d);
 
-        // var i: usize = 0;
-        // _ = i;
-
         while (!nextNodes.empty()) {
             const tpop = nextNodes.popFirst() orelse unreachable;
-            // if (visited.contains(tpop)) continue;
-            // std.debug.print("current node: {any} {any} {any}: nei {}\n", .{
-            //     tpop.triangle.vertices[0].position,
-            //     tpop.triangle.vertices[1].position,
-            //     tpop.triangle.vertices[2].position,
-            //     tpop.neighbors.items.len,
-            // });
             for (tpop.get().neighbors.items) |neighbor| {
                 // flatten here?
                 // if not visited neighbor
                 if (visited.contains(neighbor)) continue;
-                // defer i += 1;
-                // if (i >= 4) break;
 
                 const t1_2d = flattened.get(tpop).?;
-                // std.debug.print("tpop{any} {any} {any} neighbord{any} {any} {any}\n", .{
-                //     tpop.get().triangle.vertices[0].position,
-                //     tpop.get().triangle.vertices[1].position,
-                //     tpop.get().triangle.vertices[2].position,
-                //     neighbor.get().triangle.vertices[0].position,
-                //     neighbor.get().triangle.vertices[1].position,
-                //     neighbor.get().triangle.vertices[2].position,
-                // });
                 const flattenedNeighbor = flatten(
                     tpop.get().triangle,
                     neighbor.get().triangle,
                     t1_2d,
                 );
-
-                // std.debug.print("3d: parent{any} {any} {any} -> child{any} {any} {any}\n", .{
-                //     tpop.get().triangle.vertices[0].position,
-                //     tpop.get().triangle.vertices[1].position,
-                //     tpop.get().triangle.vertices[2].position,
-                //     neighbor.get().triangle.vertices[0].position,
-                //     neighbor.get().triangle.vertices[1].position,
-                //     neighbor.get().triangle.vertices[2].position,
-                // });
-                //
-                //
-                // std.debug.print("2d: parent{any} -> child{any}\n", .{
-                //     t1_2d.vertices,
-                //     flattenedNeighbor.vertices,
-                // });
 
                 std.debug.print("2d: child{any}\n", .{
                     flattenedNeighbor.vertices,
