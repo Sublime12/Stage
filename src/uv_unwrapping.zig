@@ -16,25 +16,6 @@ const DoublyLinkedList = link_list.DoublyLinkedList;
 
 const assert = std.debug.assert;
 
-// have a function taking a list of geometry and return a graph of
-// triangles connected to adjencent triangles
-
-// list(Node)
-// Node(el, neighbors)
-// neighbors(Node)
-// Node(triangle3d -> ptr ?Node2d),
-// list(node3d) :
-// first = nodes3d[0]
-// second = nodes3d[1]
-// files = []
-// while (not emppty(node3d)) {
-//      tpop = files.pop();
-//      for t.pop.neighbors: stack_nodes.append(neighbor)
-//
-//      t2d = flatten(tcourant, tpop)
-//
-//      graph2d.append(t2d)
-
 const Node3d = struct {
     triangle: scene.Triangle,
     neighbors: std.ArrayList(GeometryGraph3d.NodeHandle),
@@ -137,26 +118,15 @@ const GeometryGraph3d = struct {
                     t1_2d,
                 );
 
-                std.debug.print("2d: child{any}\n", .{
-                    flattenedNeighbor.vertices,
-                });
-
                 try flattened.putNoClobber(neighbor, flattenedNeighbor);
                 try visited.putNoClobber(neighbor, {});
                 try nextNodes.append(neighbor);
             }
-            // try visited.putNoClobber(tpop, {});
-        }
-
-        var it = flattened.iterator();
-        while (it.next()) |entry| {
-            const triangle2d = entry.value_ptr;
-            std.debug.print("t = {any}\n", .{triangle2d.vertices});
         }
 
         var graph = GeometryGraph2d.initEmpty(self.geometry);
 
-        it = flattened.iterator();
+        var it = flattened.iterator();
         while (it.next()) |entry| {
             const node3d = entry.key_ptr;
             const flatten2d = entry.value_ptr;
@@ -240,31 +210,20 @@ const GeometryGraph2d = struct {
     }
 };
 
-// t12d
 pub fn flatten(t1: Triangle, t2: Triangle, t1_2d: Triangle2d) Triangle2d {
     const adjancentSide = findAdjacentSide(t1, t2);
     const B = adjancentSide.?[0];
     const C = adjancentSide.?[1];
     const D = extractDifferentPoint(t2, C, B);
-    // const A = extractDifferentPoint(t1, C, B);
     var vbc3d: Vec3f = undefined;
     var vbd3d: Vec3f = undefined;
     math.substractVec3(&vbc3d, &C.position, &B.position);
     math.substractVec3(&vbd3d, &D.position, &B.position);
-    // const dot = math.dotVec3(&vbc3d, &vbd3d);
-    // const lengthBc = math.lengthVec3(&vbc3d);
-    // const lengthBd = math.lengthVec3(&vbd3d);
-    // const cos = dot / (lengthBc * lengthBd);
-    // const sin = @sqrt(1 - cos * cos);
     var vcd3d: Vec3f = undefined;
     math.substractVec3(&vcd3d, &D.position, &C.position);
     const d2 = math.lengthVec3(&vcd3d); // Distance C to D
     const d1 = math.lengthVec3(&vbd3d); // Distance B to D
 
-    // const b: Vec2f = .{ B.position[0], B.position[2] };
-    // const c: Vec2f = .{ C.position[0], C.position[2] };
-    // B == t1_2d.3d.v1 if true
-    // b = t1_2d.v1
     var b_opt: ?Vec2f = null;
     if (areVerticesEqlApprox(B.position, t1_2d.from_3d.vertices[0].position)) {
         b_opt = t1_2d.vertices[0];
@@ -286,7 +245,6 @@ pub fn flatten(t1: Triangle, t2: Triangle, t1_2d: Triangle2d) Triangle2d {
     }
     assert(c_opt != null);
     const c = c_opt.?;
-    // const a: Vec2f = .{ A.position[0], A.position[2] };
     var a_opt: ?Vec2f = null;
     if (!areVerticesEqlApprox(C.position, t1_2d.from_3d.vertices[0].position) and
         !areVerticesEqlApprox(B.position, t1_2d.from_3d.vertices[0].position))
@@ -304,10 +262,6 @@ pub fn flatten(t1: Triangle, t2: Triangle, t1_2d: Triangle2d) Triangle2d {
     assert(a_opt != null);
     const a = a_opt.?;
 
-    // var vbc2d: Vec2f = undefined;
-    // math.substractVec2(&vbc2d, &c, &b);
-    // const d1 = math.lengthVec3(&vbd3d);
-
     var vbc2d: Vec2f = undefined;
     math.substractVec2(&vbc2d, &c, &b);
     const L = math.lengthVec2(&vbc2d);
@@ -320,22 +274,10 @@ pub fn flatten(t1: Triangle, t2: Triangle, t1_2d: Triangle2d) Triangle2d {
 
     const x_part: Vec2f = .{ x * u[0], x * u[1] };
     const h_part: Vec2f = .{ h * v[0], h * v[1] };
-    // const xlocal = d1 * cos;
-    // const zlocal = d1 * sin;
-    //
-    // const xlocal_u: Vec2f = .{ xlocal * u[0], xlocal * u[1] };
-    // const zlocal_v: Vec2f = .{ zlocal * v[0], zlocal * v[1] };
-    // var local_uv: Vec2f = undefined;
 
     var w: Vec2f = undefined;
     math.substractVec2(&w, &a, &b);
     const sideA = math.dotVec2(&v, &w);
-    // const sideA = math.dotVec2(&w, &v);
-    // if (sideA > 0) {
-    //     math.substractVec2(&local_uv, &xlocal_u, &zlocal_v);
-    // } else {
-    //     math.addVec2(&local_uv, &xlocal_u, &zlocal_v);
-    // }
 
     var d: Vec2f = undefined;
     if (sideA > 0) {
@@ -344,7 +286,6 @@ pub fn flatten(t1: Triangle, t2: Triangle, t1_2d: Triangle2d) Triangle2d {
         d = .{ b[0] + x_part[0] + h_part[0], b[1] + x_part[1] + h_part[1] };
     }
 
-    // const d: Vec2f = .{ b[0] + local_uv[0], b[1] + local_uv[1] };
     var final_vertices: [3]Vec2f = undefined;
     for (t2.vertices, 0..) |v_3d, i| {
         if (areVerticesEqlApprox(v_3d.position, B.position)) {
@@ -359,13 +300,6 @@ pub fn flatten(t1: Triangle, t2: Triangle, t1_2d: Triangle2d) Triangle2d {
         .vertices = final_vertices,
         .from_3d = t2,
     };
-    // const flattenT2 = Triangle2d.init(
-    //     b,
-    //     c,
-    //     d,
-    //     t2,
-    // );
-    // return flattenT2;
 }
 
 fn extractDifferentPoint(t: Triangle, c: Vertex, b: Vertex) Vertex {
