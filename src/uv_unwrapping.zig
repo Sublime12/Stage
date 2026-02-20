@@ -156,6 +156,7 @@ const GeometryGraph3d = struct {
 
         var graph = GeometryGraph2d.initEmpty(self.geometry);
 
+        it = flattened.iterator();
         while (it.next()) |entry| {
             const node3d = entry.key_ptr;
             const flatten2d = entry.value_ptr;
@@ -166,7 +167,7 @@ const GeometryGraph3d = struct {
             );
             try graph.nodes.append(allocator, node2d);
         }
-
+        
         return graph;
     }
 
@@ -232,6 +233,10 @@ const GeometryGraph2d = struct {
             .nodes = .empty,
             .geometry = geometry,
         };
+    }
+
+    pub fn deinit(self: *Self, allocator: Allocator) void {
+        self.nodes.deinit(allocator);
     }
 };
 
@@ -508,7 +513,6 @@ test "generate 3d graph of adjacents triangles for cube" {
 
     try graph.generate(allocator);
 
-    // std.debug.print("{f}\n", .{graph});
     try std.testing.expect(graph.nodes.items.len != 0);
     for (graph.nodes.items) |node| {
         try std.testing.expect(node.neighbors.items.len == 3);
@@ -525,11 +529,24 @@ test "unwrap 3d geometry to 2d" {
 
     try graph.generate(allocator);
     try std.testing.expect(graph.nodes.items.len != 0);
-    for (graph.nodes.items, 0..) |node, i| {
-        _ = i;
-        // std.debug.print("node {} len: {}\n", .{ i, node.neighbors.items.len });
+    for (graph.nodes.items) |node| {
         try std.testing.expect(node.neighbors.items.len == 3);
     }
 
-    _ = try graph.uvUnwrap(allocator);
+    var graph2d = try graph.uvUnwrap(allocator);
+    defer graph2d.deinit(allocator);
+    try std.testing.expectEqual(
+        geometry.shape.items.len,
+        graph2d.nodes.items.len,
+    );
+
+    for (graph2d.nodes.items) |node2d| {
+        for (node2d.triangle2d.vertices) |vertex| {
+            for (vertex) |coordinate| {
+                const roundedCoord: i32 = @intFromFloat(@round(coordinate * 10));
+                // for cube, all coordinate will be a multiple of 0.5
+                try std.testing.expect(@mod(roundedCoord, 5) == 0);
+            }
+        }
+    }
 }
