@@ -117,6 +117,7 @@ const GeometryGraph3d = struct {
             .{ first.vertices[2].position[0], first.vertices[2].position[2] },
             first,
         );
+
         try flattened.putNoClobber(.{
             .nodes = &self.nodes,
             .index = 0,
@@ -152,7 +153,21 @@ const GeometryGraph3d = struct {
             const triangle2d = entry.value_ptr;
             std.debug.print("t = {any}\n", .{triangle2d.vertices});
         }
-        unreachable;
+
+        var graph = GeometryGraph2d.initEmpty(self.geometry);
+
+        while (it.next()) |entry| {
+            const node3d = entry.key_ptr;
+            const flatten2d = entry.value_ptr;
+
+            const node2d = Node2d.init(
+                flatten2d.*,
+                node3d.get().triangle,
+            );
+            try graph.nodes.append(allocator, node2d);
+        }
+
+        return graph;
     }
 
     pub fn format(
@@ -194,7 +209,16 @@ const GeometryGraph3d = struct {
 
 const Node2d = struct {
     triangle: scene.Triangle,
+    triangle2d: Triangle2d,
     neighbors: std.ArrayList(Node2d),
+
+    pub fn init(triangle2d: Triangle2d, triangle: Triangle) Node2d {
+        return .{
+            .triangle = triangle,
+            .triangle2d = triangle2d,
+            .neighbors = .empty,
+        };
+    }
 };
 
 const GeometryGraph2d = struct {
@@ -202,6 +226,13 @@ const GeometryGraph2d = struct {
 
     nodes: std.ArrayList(Node2d),
     geometry: *const Geometry,
+
+    pub fn initEmpty(geometry: *const Geometry) Self {
+        return .{
+            .nodes = .empty,
+            .geometry = geometry,
+        };
+    }
 };
 
 // t12d
