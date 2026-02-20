@@ -107,8 +107,6 @@ const GeometryGraph3d = struct {
         while (!nextNodes.empty()) {
             const tpop = nextNodes.popFirst() orelse unreachable;
             for (tpop.get().neighbors.items) |neighbor| {
-                // flatten here?
-                // if not visited neighbor
                 if (visited.contains(neighbor)) continue;
 
                 const t1_2d = flattened.get(tpop).?;

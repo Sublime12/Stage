@@ -1,3 +1,5 @@
+# TODO: (obselete) Update the documentation
+
 ## **Algorithm: Isometric Triangle Flattening (UV Unwrapping)**
 
 This algorithm takes a 3D triangle ($T_2$ defined by points $B, C, D$) and 
