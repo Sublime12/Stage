@@ -137,7 +137,7 @@ const GeometryGraph3d = struct {
             );
             try graph.nodes.append(allocator, node2d);
         }
-        
+
         return graph;
     }
 
