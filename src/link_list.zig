@@ -33,28 +33,33 @@ pub fn DoublyLinkedList(T: type) type {
             }
         }
 
-        pub fn append(list: *Self, value: T) !void {
-            const new_node = try list.allocator.create(Node);
+        pub fn empty(self: Self) bool {
+            return self.first == null and self.last == null;
+        }
+
+        pub fn append(self: *Self, value: T) !void {
+            const new_node = try self.allocator.create(Node);
             new_node.* = .{
                 .value = value,
                 .prev = null,
                 .next = null,
             };
 
-            if (list.last) |last| {
+            if (self.last) |last| {
                 // Insert after last.
-                list.insertAfter(last, new_node);
+                self.insertAfter(last, new_node);
             } else {
                 // Empty list.
-                list.prepend(new_node);
+                self.prepend(new_node);
             }
         }
 
-        pub fn popFirst(list: *Self) ?T {
-            const first = list.first orelse return null;
-            list.remove(first);
-            list.allocator.destroy(first);
-            return first.value;
+        pub fn popFirst(self: *Self) ?T {
+            const first = self.first orelse return null;
+            self.remove(first);
+            const tmp_value = first.value;
+            self.allocator.destroy(first);
+            return tmp_value;
         }
 
         pub fn remove(list: *Self, node: *Node) void {
