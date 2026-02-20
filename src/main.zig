@@ -7,7 +7,7 @@ const stage = @import("app.zig");
 const camera_pkg = @import("camera.zig");
 const light_pkg = @import("light.zig");
 const texture_pkg = @import("texture.zig");
-const obj_parser = @import("obj_parser.zig").ObjParser;
+const obj_parse = @import("obj_parser.zig").obj_parse;
 const Geometry = scene_pkg.Geometry;
 const Scene = scene_pkg.Scene;
 const Node = node.Node;
@@ -53,8 +53,15 @@ pub fn main() !void {
     // const cubeGeo = try Geometry.makeCube(allocator);
     var board = chessboard();
 
-    const sphereGeo = try obj_parser.parse("./assets/sphere.obj", allocator);
-    
+    const file = try std.fs.cwd().openFile("./assets/sphere.obj", .{ .mode = .read_only });
+    defer file.close();
+
+    var file_buffer: [256]u8 = undefined;
+    var reader = file.reader(&file_buffer);
+    const reader_interface = &reader.interface;
+
+    const sphereGeo = try obj_parse(reader_interface, allocator);
+
     const data = TextureData{ .rgba = &board };
 
     var diskb = diskboard();
