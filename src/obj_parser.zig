@@ -84,9 +84,9 @@ test "expect obj_parse return a geometry with the correct coordinate" {
     var reader = std.Io.Reader.fixed(obj_text);
     var triangleGeo = try obj_parse(&reader, std.testing.allocator);
     defer triangleGeo.deinit(std.testing.allocator);
-    
+
     try std.testing.expectEqual(1, triangleGeo.shape.items.len);
-    try std.testing.expectEqual(.{0.000000, -1.000000, 0.000000}, triangleGeo.shape.items[0].vertices[0].position);
-    try std.testing.expectEqual(.{0.723607, -0.447220, 0.525725}, triangleGeo.shape.items[0].vertices[1].position);
-    try std.testing.expectEqual(.{-0.276388, -0.447220, 0.850649}, triangleGeo.shape.items[0].vertices[2].position);
+    try std.testing.expectEqual(.{ 0.000000, -1.000000, 0.000000 }, triangleGeo.shape.items[0].vertices[0].position);
+    try std.testing.expectEqual(.{ 0.723607, -0.447220, 0.525725 }, triangleGeo.shape.items[0].vertices[1].position);
+    try std.testing.expectEqual(.{ -0.276388, -0.447220, 0.850649 }, triangleGeo.shape.items[0].vertices[2].position);
 }
