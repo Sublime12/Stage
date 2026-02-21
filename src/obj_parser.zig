@@ -67,23 +67,25 @@ pub fn obj_parse(reader_interface: *Reader, allocator: Allocator) !Geometry {
     return geometry;
 }
 
-test "_" {
+test "expect obj_parse return a geometry with the correct coordinate" {
     const obj_text =
-        \\ # Blender 5.0.1
-        \\ # www.blender.org
-        \\ mtllib sphere.mtl
-        \\ o Icosphere
-        \\ v 0.000000 -1.000000 0.000000
-        \\ v 0.723607 -0.447220 0.525725
-        \\ v -0.276388 -0.447220 0.850649
-        \\ s 0
-        \\ f 1/1/1 2/2/1 3/3/1
+        \\# Blender 5.0.1
+        \\# www.blender.org
+        \\mtllib sphere.mtl
+        \\o Icosphere
+        \\v 0.000000 -1.000000 0.000000
+        \\v 0.723607 -0.447220 0.525725
+        \\v -0.276388 -0.447220 0.850649
+        \\s 0
+        \\f 1/1/1 2/2/1 3/3/1
     ;
 
-    var buf = obj_text.*;
-
-    var reader = std.testing.Reader.init(&buf, &.{});
-    const reader_interface = &reader.interface;
-
-    _ = try obj_parse(reader_interface, std.testing.allocator);
+    var reader = std.Io.Reader.fixed(obj_text);
+    var triangleGeo = try obj_parse(&reader, std.testing.allocator);
+    defer triangleGeo.deinit(std.testing.allocator);
+    
+    try std.testing.expectEqual(1, triangleGeo.shape.items.len);
+    try std.testing.expectEqual(.{0.000000, -1.000000, 0.000000}, triangleGeo.shape.items[0].vertices[0].position);
+    try std.testing.expectEqual(.{0.723607, -0.447220, 0.525725}, triangleGeo.shape.items[0].vertices[1].position);
+    try std.testing.expectEqual(.{-0.276388, -0.447220, 0.850649}, triangleGeo.shape.items[0].vertices[2].position);
 }
