@@ -254,34 +254,12 @@ pub const GeometryGraph2d = struct {
         }
 
         for (self.nodes.items) |*node| {
-            // for (node.triangle.vertices) |*vertex| {
             for (0..node.triangle2d.vertices.len) |i| {
                 const vertex = node.triangle2d.vertices[i];
                 node.triangle2d.vertices[i][X] = (vertex[X] - minX) / (maxX - minX);
                 node.triangle2d.vertices[i][Y] = (vertex[Y] - minY) / (maxY - minY);
             }
         }
-
-        // maxX = -std.math.inf(f32);
-        // minX = std.math.inf(f32);
-        // maxY = -std.math.inf(f32);
-        // minY = std.math.inf(f32);
-        //
-        // for (self.nodes.items) |node| {
-        //     const triangle = node.triangle2d;
-        //     for (triangle.vertices) |vertex| {
-        //         if (vertex[X] > maxX) maxX = vertex[X];
-        //         if (vertex[X] < minX) minX = vertex[X];
-        //         if (vertex[Y] > maxY) maxY = vertex[Y];
-        //         if (vertex[Y] < minY) minY = vertex[Y];
-        //     }
-        // }
-        //
-        //
-        // std.debug.print(
-        //     "bounds X({}, {}), Y({}, {})\n",
-        //     .{ minX, maxX, minY, maxY },
-        // );
     }
 
     pub fn print(self: *const Self) void {
@@ -307,9 +285,8 @@ pub fn flatten(t1: Triangle, t2: Triangle, t1_2d: Triangle2d) Triangle2d {
     math.substractVec3(&vbd3d, &D.position, &B.position);
     var vcd3d: Vec3f = undefined;
     math.substractVec3(&vcd3d, &D.position, &C.position);
-    const d2 = math.lengthVec3(&vcd3d); // Distance C to D
-    const d1 = math.lengthVec3(&vbd3d); // Distance B to D
-
+    const d2 = math.lengthVec3(&vcd3d);
+    const d1 = math.lengthVec3(&vbd3d);
     var b_opt: ?Vec2f = null;
     if (areVerticesEqlApprox(B.position, t1_2d.from_3d.vertices[0].position)) {
         b_opt = t1_2d.vertices[0];
@@ -589,29 +566,10 @@ test "unwrap sphrere" {
     defer graph.deinit(allocator);
 
     try graph.generate(allocator);
-    // try std.testing.expect(graph.nodes.items.len != 0);
-    // for (graph.nodes.items) |node| {
-    //     try std.testing.expect(node.neighbors.items.len == 3);
-    // }
 
     var graph2d = try graph.uvUnwrap(allocator);
     defer graph2d.deinit(allocator);
 
     graph2d.normalize();
-    graph2d.print();
-    // try std.testing.expectEqual(
-    //     geometry.shape.items.len,
-    //     graph2d.nodes.items.len,
-    // );
-
-    // for (graph2d.nodes.items) |node2d| {
-    //     for (node2d.triangle2d.vertices) |vertex| {
-    //         for (vertex) |coordinate| {
-    //             const roundedCoord: i32 = @intFromFloat(@round(coordinate * 10));
-    //             // for cube, all coordinate will be a multiple of 0.5
-    //             try std.testing.expect(@mod(roundedCoord, 5) == 0);
-    //         }
-    //     }
-    // }
-
+    // graph2d.print();
 }
