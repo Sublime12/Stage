@@ -36,6 +36,7 @@ pub fn obj_parse(reader_interface: *Reader, allocator: Allocator) !Geometry {
             var i: usize = 0;
 
             while (it.next()) |face_input| {
+                if (i >= 3) break;
                 var face = std.mem.splitScalar(u8, face_input, '/');
                 const v = try std.fmt.parseInt(usize, face.next().?, 10);
                 const vt = try std.fmt.parseInt(usize, face.next().?, 10);
@@ -85,5 +86,8 @@ test "_" {
     var reader = std.testing.Reader.init(&buf, &.{});
     const reader_interface = &reader.interface;
 
-    _ = try obj_parse(reader_interface, std.testing.allocator);
+    var geometry = try obj_parse(reader_interface, std.testing.allocator);
+    defer geometry.deinit(std.testing.allocator);
+
+    try std.testing.expectEqual(1, geometry.shape.items.len);
 }
