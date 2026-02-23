@@ -3,6 +3,7 @@ const std = @import("std");
 const scene = @import("scene.zig");
 const math = @import("math.zig");
 const link_list = @import("link_list.zig");
+const obj_parser_pkg = @import("obj_parser.zig");
 
 const Allocator = std.mem.Allocator;
 
@@ -13,6 +14,11 @@ const Geometry = scene.Geometry;
 const Vec3f = math.Vec3f;
 const Vec2f = math.Vec2f;
 const DoublyLinkedList = link_list.DoublyLinkedList;
+const obj_parse = obj_parser_pkg.obj_parse;
+
+const X = 0;
+const Y = 1;
+const Z = 2;
 
 const assert = std.debug.assert;
 
@@ -205,6 +211,64 @@ const GeometryGraph2d = struct {
 
     pub fn deinit(self: *Self, allocator: Allocator) void {
         self.nodes.deinit(allocator);
+    }
+
+    pub fn normalize(self: *Self) void {
+        var maxX: f32 = -std.math.inf(f32);
+        var minX: f32 = std.math.inf(f32);
+        var maxY: f32 = -std.math.inf(f32);
+        var minY: f32 = std.math.inf(f32);
+
+        for (self.nodes.items) |node| {
+            const triangle = node.triangle2d;
+            for (triangle.vertices) |vertex| {
+                if (vertex[X] > maxX) maxX = vertex[X];
+                if (vertex[X] < minX) minX = vertex[X];
+                if (vertex[Y] > maxY) maxY = vertex[Y];
+                if (vertex[Y] < minY) minY = vertex[Y];
+            }
+        }
+
+        for (self.nodes.items) |*node| {
+            // for (node.triangle.vertices) |*vertex| {
+            for (0..node.triangle2d.vertices.len) |i| {
+                const vertex = node.triangle2d.vertices[i];
+                node.triangle2d.vertices[i][X] = (vertex[X] - minX) / (maxX - minX);
+                node.triangle2d.vertices[i][Y] = (vertex[Y] - minY) / (maxY - minY);
+            }
+        }
+
+        // maxX = -std.math.inf(f32);
+        // minX = std.math.inf(f32);
+        // maxY = -std.math.inf(f32);
+        // minY = std.math.inf(f32);
+        //
+        // for (self.nodes.items) |node| {
+        //     const triangle = node.triangle2d;
+        //     for (triangle.vertices) |vertex| {
+        //         if (vertex[X] > maxX) maxX = vertex[X];
+        //         if (vertex[X] < minX) minX = vertex[X];
+        //         if (vertex[Y] > maxY) maxY = vertex[Y];
+        //         if (vertex[Y] < minY) minY = vertex[Y];
+        //     }
+        // }
+        //
+        //
+        // std.debug.print(
+        //     "bounds X({}, {}), Y({}, {})\n",
+        //     .{ minX, maxX, minY, maxY },
+        // );
+    }
+
+    pub fn print(self: *const Self) void {
+        for (self.nodes.items) |node| {
+            const vertices = node.triangle2d.vertices;
+            std.debug.print("(({}, {}), ({}, {}), ({}, {})),\n", .{
+                vertices[0][0], vertices[0][1],
+                vertices[1][0], vertices[1][1],
+                vertices[2][0], vertices[2][1],
+            });
+        }
     }
 };
 
@@ -467,6 +531,7 @@ test "unwrap 3d geometry to 2d" {
 
     var graph2d = try graph.uvUnwrap(allocator);
     defer graph2d.deinit(allocator);
+
     try std.testing.expectEqual(
         geometry.shape.items.len,
         graph2d.nodes.items.len,
@@ -481,4 +546,48 @@ test "unwrap 3d geometry to 2d" {
             }
         }
     }
+}
+
+test "unwrap sphrere" {
+    const allocator = std.testing.allocator;
+    // var geometry = try Geometry.makeCube(allocator);
+    const file = try std.fs.cwd().openFile("./assets/sphere.obj", .{ .mode = .read_only });
+    defer file.close();
+
+    var file_buffer: [1024]u8 = undefined;
+    var reader = file.reader(&file_buffer);
+    const reader_interface = &reader.interface;
+
+    var geometry = try obj_parse(reader_interface, allocator);
+    defer geometry.deinit(allocator);
+
+    var graph = GeometryGraph3d.init(&geometry);
+    defer graph.deinit(allocator);
+
+    try graph.generate(allocator);
+    // try std.testing.expect(graph.nodes.items.len != 0);
+    // for (graph.nodes.items) |node| {
+    //     try std.testing.expect(node.neighbors.items.len == 3);
+    // }
+
+    var graph2d = try graph.uvUnwrap(allocator);
+    defer graph2d.deinit(allocator);
+
+    graph2d.normalize();
+    graph2d.print();
+    // try std.testing.expectEqual(
+    //     geometry.shape.items.len,
+    //     graph2d.nodes.items.len,
+    // );
+
+    // for (graph2d.nodes.items) |node2d| {
+    //     for (node2d.triangle2d.vertices) |vertex| {
+    //         for (vertex) |coordinate| {
+    //             const roundedCoord: i32 = @intFromFloat(@round(coordinate * 10));
+    //             // for cube, all coordinate will be a multiple of 0.5
+    //             try std.testing.expect(@mod(roundedCoord, 5) == 0);
+    //         }
+    //     }
+    // }
+
 }
