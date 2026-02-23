@@ -24,6 +24,8 @@ const TextureData = texture_pkg.TextureData;
 const chessboard = @import("scene.zig").makeChessboard;
 const diskboard = @import("scene.zig").makeDisk;
 
+const BUFFER_LENGTH = 1024 * 10;
+
 const glfw = @cImport(@cInclude("GLFW/glfw3.h"));
 const c = @cImport({
     @cInclude("stdio.h");
@@ -53,10 +55,10 @@ pub fn main() !void {
     // const cubeGeo = try Geometry.makeCube(allocator);
     var board = chessboard();
 
-    const file = try std.fs.cwd().openFile("./assets/sphere.obj", .{ .mode = .read_only });
+    const file = try std.fs.cwd().openFile("./assets/wheels.obj", .{ .mode = .read_only });
     defer file.close();
 
-    var file_buffer: [256]u8 = undefined;
+    var file_buffer: [BUFFER_LENGTH]u8 = undefined;
     var reader = file.reader(&file_buffer);
     const reader_interface = &reader.interface;
 

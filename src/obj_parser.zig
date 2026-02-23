@@ -36,6 +36,7 @@ pub fn obj_parse(reader_interface: *Reader, allocator: Allocator) !Geometry {
             var i: usize = 0;
 
             while (it.next()) |face_input| {
+                if (i >= 3) break;
                 var face = std.mem.splitScalar(u8, face_input, '/');
                 const v = try std.fmt.parseInt(usize, face.next().?, 10);
                 const vt = try std.fmt.parseInt(usize, face.next().?, 10);
