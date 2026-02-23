@@ -538,13 +538,17 @@ test "unwrap 3d geometry to 2d" {
         graph2d.nodes.items.len,
     );
 
+    // graph2d.print();
+
     for (graph2d.nodes.items) |node2d| {
         for (node2d.triangle2d.vertices) |vertex| {
-            for (vertex) |coordinate| {
-                const roundedCoord: i32 = @intFromFloat(@round(coordinate * 10));
-                // for cube, all coordinate will be a multiple of 0.5
-                try std.testing.expect(@mod(roundedCoord, 5) == 0);
-            }
+            const scaledX = vertex[X] * 3;
+            const roundedX: i32 = @intFromFloat(@round(scaledX));
+            try std.testing.expect(@abs(scaledX - @as(f32, @floatFromInt(roundedX))) < 1e-6);
+
+            const scaledY = vertex[Y] * 4;
+            const roundedY: i32 = @intFromFloat(@round(scaledY));
+            try std.testing.expect(@abs(scaledY - @as(f32, @floatFromInt(roundedY))) < 1e-6);
         }
     }
 }
