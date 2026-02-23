@@ -23,11 +23,11 @@ const Z = 2;
 const assert = std.debug.assert;
 
 const Node3d = struct {
-    triangle: scene.Triangle,
+    triangle: TriangleNode,
     neighbors: std.ArrayList(GeometryGraph3d.NodeHandle),
 };
 
-const GeometryGraph3d = struct {
+pub const GeometryGraph3d = struct {
     const NodeHandle = struct {
         nodes: *std.ArrayList(Node3d),
         index: usize,
@@ -57,10 +57,10 @@ const GeometryGraph3d = struct {
     }
 
     pub fn generate(self: *Self, allocator: Allocator) !void {
-        const triangles = self.geometry.shape;
+        // const triangles = self.geometry.shape;
 
-        for (triangles.items) |t1| {
-            const node: Node3d = .{ .triangle = t1, .neighbors = .empty };
+        for (0..self.geometry.shape.items.len) |i| {
+            const node: Node3d = .{ .triangle = .{ .index = i, .pool = &self.geometry.shape }, .neighbors = .empty };
             try self.nodes.append(allocator, node);
         }
 
@@ -68,7 +68,7 @@ const GeometryGraph3d = struct {
             for (self.nodes.items, 0..) |n2, j| {
                 if (i == j) continue;
 
-                if (findAdjacentSide(n1.triangle, n2.triangle)) |_| {
+                if (findAdjacentSide(n1.triangle.get().*, n2.triangle.get().*)) |_| {
                     try n1.neighbors.append(allocator, .{
                         .nodes = &self.nodes,
                         .index = j,
@@ -99,10 +99,10 @@ const GeometryGraph3d = struct {
 
         const first = self.nodes.items[0].triangle;
         const first_2d = Triangle2d.init(
-            .{ first.vertices[0].position[0], first.vertices[0].position[2] },
-            .{ first.vertices[1].position[0], first.vertices[1].position[2] },
-            .{ first.vertices[2].position[0], first.vertices[2].position[2] },
-            first,
+            .{ first.get().vertices[0].position[0], first.get().vertices[0].position[2] },
+            .{ first.get().vertices[1].position[0], first.get().vertices[1].position[2] },
+            .{ first.get().vertices[2].position[0], first.get().vertices[2].position[2] },
+            first.get().*,
         );
 
         try flattened.putNoClobber(.{
@@ -117,8 +117,8 @@ const GeometryGraph3d = struct {
 
                 const t1_2d = flattened.get(tpop).?;
                 const flattenedNeighbor = flatten(
-                    tpop.get().triangle,
-                    neighbor.get().triangle,
+                    tpop.get().triangle.get().*,
+                    neighbor.get().triangle.get().*,
                     t1_2d,
                 );
 
@@ -141,6 +141,9 @@ const GeometryGraph3d = struct {
             );
             try graph.nodes.append(allocator, node2d);
         }
+
+        graph.normalize();
+        graph.update3dUvs();
 
         return graph;
     }
@@ -182,21 +185,32 @@ const GeometryGraph3d = struct {
     }
 };
 
+const TriangleNode = struct {
+    const Self = @This();
+    index: usize,
+    pool: *const std.ArrayList(Triangle),
+
+    pub fn get(self: *const Self) *Triangle {
+        return &self.pool.items[self.index];
+    }
+};
+
 const Node2d = struct {
-    triangle: scene.Triangle,
+    // triangle: scene.Triangle,
+    triangle: TriangleNode,
     triangle2d: Triangle2d,
     neighbors: std.ArrayList(Node2d),
 
-    pub fn init(triangle2d: Triangle2d, triangle: Triangle) Node2d {
+    pub fn init(triangle2d: Triangle2d, triangleNode: TriangleNode) Node2d {
         return .{
-            .triangle = triangle,
+            .triangle = triangleNode,
             .triangle2d = triangle2d,
             .neighbors = .empty,
         };
     }
 };
 
-const GeometryGraph2d = struct {
+pub const GeometryGraph2d = struct {
     const Self = @This();
 
     nodes: std.ArrayList(Node2d),
@@ -211,6 +225,16 @@ const GeometryGraph2d = struct {
 
     pub fn deinit(self: *Self, allocator: Allocator) void {
         self.nodes.deinit(allocator);
+    }
+
+    pub fn update3dUvs(self: *Self) void {
+        for (self.nodes.items) |node2d| {
+            for (0..node2d.triangle2d.vertices.len) |i| {
+                const vertex = node2d.triangle2d.vertices[i];
+                node2d.triangle.get().vertices[i].textCoord[0] = vertex[0];
+                node2d.triangle.get().vertices[i].textCoord[1] = vertex[1];
+            }
+        }
     }
 
     pub fn normalize(self: *Self) void {
