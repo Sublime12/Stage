@@ -7,7 +7,10 @@ const stage = @import("app.zig");
 const camera_pkg = @import("camera.zig");
 const light_pkg = @import("light.zig");
 const texture_pkg = @import("texture.zig");
+const uv_unwrapping_pkg = @import("uv_unwrapping.zig");
+
 const obj_parse = @import("obj_parser.zig").obj_parse;
+
 const Geometry = scene_pkg.Geometry;
 const Scene = scene_pkg.Scene;
 const Node = node.Node;
@@ -20,6 +23,8 @@ const Vertex = scene_pkg.Vertex;
 const TexturePool = texture_pkg.TexturePool;
 const Texture = texture_pkg.Texture;
 const TextureData = texture_pkg.TextureData;
+const GeometryGraph3d = uv_unwrapping_pkg.GeometryGraph3d;
+const GeometryGraph2d = uv_unwrapping_pkg.GeometryGraph2d;
 
 const chessboard = @import("scene.zig").makeChessboard;
 const diskboard = @import("scene.zig").makeDisk;
@@ -55,7 +60,7 @@ pub fn main() !void {
     // const cubeGeo = try Geometry.makeCube(allocator);
     var board = chessboard();
 
-    const file = try std.fs.cwd().openFile("./assets/wheels.obj", .{ .mode = .read_only });
+    const file = try std.fs.cwd().openFile("./assets/sphere.obj", .{ .mode = .read_only });
     defer file.close();
 
     var file_buffer: [BUFFER_LENGTH]u8 = undefined;
@@ -63,6 +68,11 @@ pub fn main() !void {
     const reader_interface = &reader.interface;
 
     const sphereGeo = try obj_parse(reader_interface, allocator);
+
+    var graph3d = GeometryGraph3d.init(&sphereGeo);
+    defer graph3d.deinit(allocator);
+    try graph3d.generate(allocator);
+    _ = try graph3d.uvUnwrap(allocator);
 
     const data = TextureData{ .rgba = &board };
 
@@ -90,7 +100,7 @@ pub fn main() !void {
 
     // const cubeGeo2 = try Geometry.makeTriangle(allocator, 1, 1, 1);
     const cubeGeo2 = try Geometry.makeCube(allocator);
-    var node2 = try pool.create(Node.init(cubeGeo2, texture2));
+    var node2 = try pool.create(Node.init(cubeGeo2, texture1));
     node2.get().transform.translate(2, 0, 0);
 
     try node1.get().addChild(allocator, node2);
