@@ -62,7 +62,7 @@ pub const Node = struct {
     worldTransform: Transform,
 
     pub fn init(
-        geometry: Geometry,
+        geometry: ?Geometry,
         texture: ?TextureHandle,
     ) Node {
         return .{
