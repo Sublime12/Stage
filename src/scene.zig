@@ -11,6 +11,7 @@ const Light = light_pkg.Light;
 const LightHandle = light_pkg.LightHandle;
 const Vec4u = @import("math.zig").Vec4u;
 const Vec3u = @import("math.zig").Vec3u;
+const Vec3f = @import("math.zig").Vec3f;
 const Vec2f = @import("math.zig").Vec2f;
 
 pub const Scene = struct {
@@ -84,6 +85,20 @@ pub const Geometry = struct {
     pub fn init() Geometry {
         return .{
             .shape = std.ArrayList(Triangle).empty,
+        };
+    }
+
+    pub fn setBaseColor(self: *Self, baseColor: Vec3f) void {
+        for (self.shape.items) |*triangle| {
+            for (0..triangle.vertices.len) |i| {
+                triangle.vertices[i].color = baseColor;
+            }
+        }
+    }
+
+    pub fn clone(self: *const Self, allocator: Allocator) !Geometry {
+        return .{
+            .shape = try self.shape.clone(allocator),
         };
     }
 
@@ -212,6 +227,17 @@ pub fn makeYellowboard() [DIMENSION * DIMENSION]Vec4u {
             // const j_scaled = j / 5;
             // (255, 223, 34)
             board[j * DIMENSION + i] = .{ 255, 223, 43, 255 };
+        }
+    }
+
+    return board;
+}
+
+pub fn makeColorboard(color: Vec4u) [DIMENSION * DIMENSION]Vec4u {
+    var board: [DIMENSION * DIMENSION]Vec4u = undefined;
+    for (0..DIMENSION) |i| {
+        for (0..DIMENSION) |j| {
+            board[j * DIMENSION + i] = color;
         }
     }
 

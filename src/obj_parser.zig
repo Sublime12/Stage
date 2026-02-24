@@ -14,7 +14,11 @@ const X = 0;
 const Y = 1;
 const Z = 2;
 
-pub fn obj_parse(reader_interface: *Reader, allocator: Allocator) !Geometry {
+pub fn obj_parse(
+    reader_interface: *Reader,
+    allocator: Allocator,
+    baseColor: Vec3f,
+) !Geometry {
     var vertices: ArrayList(Vec3f) = ArrayList(Vec3f).empty;
     defer vertices.deinit(allocator);
 
@@ -56,9 +60,9 @@ pub fn obj_parse(reader_interface: *Reader, allocator: Allocator) !Geometry {
         const p2 = vertices.items[face[Y][0] - 1];
         const p3 = vertices.items[face[Z][0] - 1];
 
-        const v1 = Vertex.init(p1, .{ 1, 1, 1 }, .{ -1, -1 });
-        const v2 = Vertex.init(p2, .{ 1, 1, 1 }, .{ -1, -1 });
-        const v3 = Vertex.init(p3, .{ 1, 1, 1 }, .{ -1, -1 });
+        const v1 = Vertex.init(p1, baseColor, .{ -1, -1 });
+        const v2 = Vertex.init(p2, baseColor, .{ -1, -1 });
+        const v3 = Vertex.init(p3, baseColor, .{ -1, -1 });
 
         const triangle = Triangle.init(v1, v2, v3);
 
@@ -82,7 +86,11 @@ test "expect obj_parse return a geometry with the correct coordinate" {
     ;
 
     var reader = std.Io.Reader.fixed(obj_text);
-    var triangleGeo = try obj_parse(&reader, std.testing.allocator);
+    var triangleGeo = try obj_parse(
+        &reader,
+        std.testing.allocator,
+        .{ 1, 0.874, 0.169 },
+    );
     defer triangleGeo.deinit(std.testing.allocator);
 
     try std.testing.expectEqual(1, triangleGeo.shape.items.len);

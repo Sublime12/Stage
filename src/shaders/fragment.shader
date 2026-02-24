@@ -51,7 +51,7 @@ void main()
         }
     }
 
-    result = result * fCol * texColor.rgb;
+    result = result * texColor.rgb + fCol;
     fragment = vec4(result, 1.0);
 }
 
