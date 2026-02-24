@@ -563,7 +563,8 @@ test "unwrap sphrere" {
     var reader = file.reader(&file_buffer);
     const reader_interface = &reader.interface;
 
-    var geometry = try obj_parse(reader_interface, allocator);
+    const baseColor = .{ 1.0, 0.874, 0.169 };
+    var geometry = try obj_parse(reader_interface, allocator, baseColor);
     defer geometry.deinit(allocator);
 
     var graph = GeometryGraph3d.init(&geometry);
