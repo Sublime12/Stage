@@ -106,82 +106,82 @@ pub const Geometry = struct {
 
     pub fn makeCube(allocator: Allocator) !Geometry {
         // Face 1
-        const white = .{ 1.0, 1.0, 1.0 };
+        const black = .{ 0.0, 0.0, 0.0 };
         const triangle1 = Triangle.init(
-            .{ .position = .{ 0.0, 0.5, 0.0 }, .color = white, .textCoord = .{ 0, 1 } },
-            .{ .position = .{ 0.5, 0.0, 0.0 }, .color = white, .textCoord = .{ 1, 0 } },
-            .{ .position = .{ 0.0, 0.0, 0.0 }, .color = white, .textCoord = .{ 0, 0 } },
+            .{ .position = .{ 0.0, 0.5, 0.0 }, .color = black, .textCoord = .{ 0, 1 } },
+            .{ .position = .{ 0.5, 0.0, 0.0 }, .color = black, .textCoord = .{ 1, 0 } },
+            .{ .position = .{ 0.0, 0.0, 0.0 }, .color = black, .textCoord = .{ 0, 0 } },
         );
 
         const triangle2 = Triangle.init(
-            .{ .position = .{ 0.5, 0.5, 0.0 }, .color = white, .textCoord = .{ 1, 1 } },
-            .{ .position = .{ 0.5, 0.0, 0.0 }, .color = white, .textCoord = .{ 1, 0 } },
-            .{ .position = .{ 0.0, 0.5, 0.0 }, .color = white, .textCoord = .{ 0, 1 } },
+            .{ .position = .{ 0.5, 0.5, 0.0 }, .color = black, .textCoord = .{ 1, 1 } },
+            .{ .position = .{ 0.5, 0.0, 0.0 }, .color = black, .textCoord = .{ 1, 0 } },
+            .{ .position = .{ 0.0, 0.5, 0.0 }, .color = black, .textCoord = .{ 0, 1 } },
         );
 
         // Face 2
         const triangle3 = Triangle.init(
-            .{ .position = .{ 0.0, 0.0, 0.0 }, .color = white, .textCoord = .{ 0, 0 } },
-            .{ .position = .{ 0.0, 0.0, 0.5 }, .color = white, .textCoord = .{ 0, 1 } },
-            .{ .position = .{ 0.0, 0.5, 0.0 }, .color = white, .textCoord = .{ 1, 0 } },
+            .{ .position = .{ 0.0, 0.0, 0.0 }, .color = black, .textCoord = .{ 0, 0 } },
+            .{ .position = .{ 0.0, 0.0, 0.5 }, .color = black, .textCoord = .{ 0, 1 } },
+            .{ .position = .{ 0.0, 0.5, 0.0 }, .color = black, .textCoord = .{ 1, 0 } },
         );
 
         const triangle4 = Triangle.init(
-            .{ .position = .{ 0.0, 0.5, 0.5 }, .color = white, .textCoord = .{ 1, 1 } },
-            .{ .position = .{ 0.0, 0.5, 0.0 }, .color = white, .textCoord = .{ 1, 0 } },
-            .{ .position = .{ 0.0, 0.0, 0.5 }, .color = white, .textCoord = .{ 0, 1 } },
+            .{ .position = .{ 0.0, 0.5, 0.5 }, .color = black, .textCoord = .{ 1, 1 } },
+            .{ .position = .{ 0.0, 0.5, 0.0 }, .color = black, .textCoord = .{ 1, 0 } },
+            .{ .position = .{ 0.0, 0.0, 0.5 }, .color = black, .textCoord = .{ 0, 1 } },
         );
 
         // Face 3
         const triangle5 = Triangle.init(
-            .{ .position = .{ 0.0, 0.0, 0.5 }, .color = white, .textCoord = .{ 0, 0 } },
-            .{ .position = .{ 0.5, 0.0, 0.5 }, .color = white, .textCoord = .{ 1, 0 } },
-            .{ .position = .{ 0.0, 0.5, 0.5 }, .color = white, .textCoord = .{ 0, 1 } },
+            .{ .position = .{ 0.0, 0.0, 0.5 }, .color = black, .textCoord = .{ 0, 0 } },
+            .{ .position = .{ 0.5, 0.0, 0.5 }, .color = black, .textCoord = .{ 1, 0 } },
+            .{ .position = .{ 0.0, 0.5, 0.5 }, .color = black, .textCoord = .{ 0, 1 } },
         );
 
         const triangle6 = Triangle.init(
-            .{ .position = .{ 0.5, 0.5, 0.5 }, .color = white, .textCoord = .{ 1, 1 } },
-            .{ .position = .{ 0.0, 0.5, 0.5 }, .color = white, .textCoord = .{ 0, 1 } },
-            .{ .position = .{ 0.5, 0.0, 0.5 }, .color = white, .textCoord = .{ 1, 0 } },
+            .{ .position = .{ 0.5, 0.5, 0.5 }, .color = black, .textCoord = .{ 1, 1 } },
+            .{ .position = .{ 0.0, 0.5, 0.5 }, .color = black, .textCoord = .{ 0, 1 } },
+            .{ .position = .{ 0.5, 0.0, 0.5 }, .color = black, .textCoord = .{ 1, 0 } },
         );
 
         // Face 4
         const triangle7 = Triangle.init(
-            .{ .position = .{ 0.5, 0.0, 0.0 }, .color = white, .textCoord = .{ 0, 0 } },
-            .{ .position = .{ 0.5, 0.5, 0.0 }, .color = white, .textCoord = .{ 1, 0 } },
-            .{ .position = .{ 0.5, 0.0, 0.5 }, .color = white, .textCoord = .{ 0, 1 } },
+            .{ .position = .{ 0.5, 0.0, 0.0 }, .color = black, .textCoord = .{ 0, 0 } },
+            .{ .position = .{ 0.5, 0.5, 0.0 }, .color = black, .textCoord = .{ 1, 0 } },
+            .{ .position = .{ 0.5, 0.0, 0.5 }, .color = black, .textCoord = .{ 0, 1 } },
         );
 
         const triangle8 = Triangle.init(
-            .{ .position = .{ 0.5, 0.5, 0.5 }, .color = white, .textCoord = .{ 1, 1 } },
-            .{ .position = .{ 0.5, 0.0, 0.5 }, .color = white, .textCoord = .{ 0, 1 } },
-            .{ .position = .{ 0.5, 0.5, 0.0 }, .color = white, .textCoord = .{ 1, 0 } },
+            .{ .position = .{ 0.5, 0.5, 0.5 }, .color = black, .textCoord = .{ 1, 1 } },
+            .{ .position = .{ 0.5, 0.0, 0.5 }, .color = black, .textCoord = .{ 0, 1 } },
+            .{ .position = .{ 0.5, 0.5, 0.0 }, .color = black, .textCoord = .{ 1, 0 } },
         );
 
         // Face 4
         const triangle9 = Triangle.init(
-            .{ .position = .{ 0.0, 0.0, 0.0 }, .color = white, .textCoord = .{ 0, 0 } },
-            .{ .position = .{ 0.5, 0.0, 0.0 }, .color = white, .textCoord = .{ 1, 0 } },
-            .{ .position = .{ 0.0, 0.0, 0.5 }, .color = white, .textCoord = .{ 0, 1 } },
+            .{ .position = .{ 0.0, 0.0, 0.0 }, .color = black, .textCoord = .{ 0, 0 } },
+            .{ .position = .{ 0.5, 0.0, 0.0 }, .color = black, .textCoord = .{ 1, 0 } },
+            .{ .position = .{ 0.0, 0.0, 0.5 }, .color = black, .textCoord = .{ 0, 1 } },
         );
 
         const triangle10 = Triangle.init(
-            .{ .position = .{ 0.5, 0.0, 0.5 }, .color = white, .textCoord = .{ 1, 1 } },
-            .{ .position = .{ 0.0, 0.0, 0.5 }, .color = white, .textCoord = .{ 0, 1 } },
-            .{ .position = .{ 0.5, 0.0, 0.0 }, .color = white, .textCoord = .{ 1, 0 } },
+            .{ .position = .{ 0.5, 0.0, 0.5 }, .color = black, .textCoord = .{ 1, 1 } },
+            .{ .position = .{ 0.0, 0.0, 0.5 }, .color = black, .textCoord = .{ 0, 1 } },
+            .{ .position = .{ 0.5, 0.0, 0.0 }, .color = black, .textCoord = .{ 1, 0 } },
         );
 
         // Face 6
         const triangle11 = Triangle.init(
-            .{ .position = .{ 0.0, 0.5, 0.5 }, .color = white, .textCoord = .{ 0, 1 } },
-            .{ .position = .{ 0.5, 0.5, 0.0 }, .color = white, .textCoord = .{ 1, 0 } },
-            .{ .position = .{ 0.0, 0.5, 0.0 }, .color = white, .textCoord = .{ 0, 0 } },
+            .{ .position = .{ 0.0, 0.5, 0.5 }, .color = black, .textCoord = .{ 0, 1 } },
+            .{ .position = .{ 0.5, 0.5, 0.0 }, .color = black, .textCoord = .{ 1, 0 } },
+            .{ .position = .{ 0.0, 0.5, 0.0 }, .color = black, .textCoord = .{ 0, 0 } },
         );
 
         const triangle12 = Triangle.init(
-            .{ .position = .{ 0.5, 0.5, 0.5 }, .color = white, .textCoord = .{ 1, 1 } },
-            .{ .position = .{ 0.5, 0.5, 0.0 }, .color = white, .textCoord = .{ 1, 0 } },
-            .{ .position = .{ 0.0, 0.5, 0.5 }, .color = white, .textCoord = .{ 0, 1 } },
+            .{ .position = .{ 0.5, 0.5, 0.5 }, .color = black, .textCoord = .{ 1, 1 } },
+            .{ .position = .{ 0.5, 0.5, 0.0 }, .color = black, .textCoord = .{ 1, 0 } },
+            .{ .position = .{ 0.0, 0.5, 0.5 }, .color = black, .textCoord = .{ 0, 1 } },
         );
 
         var geometry = Geometry.init();
@@ -204,6 +204,20 @@ pub const Geometry = struct {
 };
 
 pub const DIMENSION = 100;
+pub fn makeYellowboard() [DIMENSION * DIMENSION]Vec4u {
+    var board: [DIMENSION * DIMENSION]Vec4u = undefined;
+    for (0..DIMENSION) |i| {
+        for (0..DIMENSION) |j| {
+            // const i_scaled = i / 5;
+            // const j_scaled = j / 5;
+            // (255, 223, 34)
+            board[j * DIMENSION + i] = .{ 255, 223, 43, 255 };
+        }
+    }
+
+    return board;
+}
+
 pub fn makeChessboard() [DIMENSION * DIMENSION]Vec4u {
     var board: [DIMENSION * DIMENSION]Vec4u = undefined;
     for (0..DIMENSION) |i| {
