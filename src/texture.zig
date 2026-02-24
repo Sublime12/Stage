@@ -44,8 +44,8 @@ const TextureFormat = enum(c_int) {
 };
 
 pub const TextureData = union(TextureFormat) {
-    rgb: []Vec3u,
-    rgba: []Vec4u,
+    rgb: []const Vec3u,
+    rgba: []const Vec4u,
 };
 
 pub const Texture = struct {

@@ -185,8 +185,8 @@ pub fn main() !void {
         // scene.addLight(light);
 
         // node2.get().transform.rotateX(0.01);
-        // sunNode.get().transform.rotateY(0.01);
-        // earthNode.get().transform.rotateY(0.07);
+        sunNode.get().transform.rotateY(0.01);
+        earthNode.get().transform.rotateY(0.03);
 
         if (glfw.glfwGetKey(window, glfw.GLFW_KEY_UP) == glfw.GLFW_PRESS) {
             std.debug.print("UP\n", .{});
