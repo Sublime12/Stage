@@ -121,12 +121,12 @@ pub fn main() !void {
         const y = rand.float(f32) * perimeter - perimeter / 2;
         const z = rand.float(f32) * perimeter - perimeter / 2;
 
-        const starGeo = try Geometry.makeCube(allocator);
+        const starGeo = try Geometry.makeTriangle(allocator, 0, 0, 0);
         const starNode = try pool.create(Node.init(starGeo, texture1));
         starNode.get().transform.translate(x, y, z);
         starNode.get().transform.scale(0.2);
 
-        try rootNode.get().addChild(allocator,starNode);
+        try rootNode.get().addChild(allocator, starNode);
     }
 
     // var earthMap = colorboard(.{0, 84, 119, 255});
