@@ -28,6 +28,7 @@ const GeometryGraph2d = uv_unwrapping_pkg.GeometryGraph2d;
 
 const chessboard = @import("scene.zig").makeChessboard;
 const diskboard = @import("scene.zig").makeDisk;
+const yellowboard = @import("scene.zig").makeYellowboard;
 
 const BUFFER_LENGTH = 1024 * 10;
 
@@ -58,7 +59,7 @@ pub fn main() !void {
     defer texturePool.deinit(allocator);
 
     // const cubeGeo = try Geometry.makeCube(allocator);
-    var board = chessboard();
+    var board = yellowboard();
 
     const file = try std.fs.cwd().openFile("./assets/sphere.obj", .{ .mode = .read_only });
     defer file.close();
@@ -67,12 +68,18 @@ pub fn main() !void {
     var reader = file.reader(&file_buffer);
     const reader_interface = &reader.interface;
 
-    const sphereGeo = try obj_parse(reader_interface, allocator);
+    const scale = 0.7;
+    const baseColor = .{ 1.0 * scale, 0.874 * scale, 0.169 * scale };
+
+    const sphereGeo = try obj_parse(reader_interface, allocator, baseColor);
+    // const earthGeo = try sphereGeo.clone(allocator);
 
     var graph3d = GeometryGraph3d.init(&sphereGeo);
     defer graph3d.deinit(allocator);
     try graph3d.generate(allocator);
-    _ = try graph3d.uvUnwrap(allocator);
+
+    var graph2d = try graph3d.uvUnwrap(allocator);
+    defer graph2d.deinit(allocator);
 
     const data = TextureData{ .rgba = &board };
 
@@ -87,14 +94,17 @@ pub fn main() !void {
         Texture.init(scene_pkg.DIMENSION, scene_pkg.DIMENSION, disk),
     );
 
-    var node1 = try pool.create(Node.init(sphereGeo, texture1));
+    var sunNode = try pool.create(Node.init(sphereGeo, texture1));
+    sunNode.get().transform.scaleX(0.2);
+    sunNode.get().transform.scaleY(0.2);
+    sunNode.get().transform.scaleZ(0.2);
 
-    try scene.addRoot(node1);
+    try scene.addRoot(sunNode);
     scene.addTexture(texture1);
     scene.addTexture(texture2);
 
     var camera = Camera.init(math.pi / 4.0, 640.0 / 420.0, 0.01, 100);
-    node1.get().transform.translate(0, 0, 0.0);
+    sunNode.get().transform.translate(0, 0, 0.0);
     // TODO: Adjust the specular ligth when camara eye move
     camera.lookAt(.{ -1.5, -1.0, -1.5 }, .{ 0.1, 0.1, 0.1 }, .{ 0.0, 1.0, 0.0 });
 
@@ -102,13 +112,14 @@ pub fn main() !void {
     const cubeGeo2 = try Geometry.makeCube(allocator);
     var node2 = try pool.create(Node.init(cubeGeo2, texture1));
     node2.get().transform.translate(2, 0, 0);
+    node2.get().transform.scale(2);
 
-    try node1.get().addChild(allocator, node2);
+    try sunNode.get().addChild(allocator, node2);
 
     var lightPool = LightPool.init(allocator);
     defer lightPool.deinit();
 
-    var light = try lightPool.create(Light.init(&.{ 1.5, 1.5, 1.5 }, 2.0));
+    var light = try lightPool.create(Light.init(&.{ 0, 0, 0 }, 2.0));
     light.get().color.ambient = .{ 1, 1, 1 };
     light.get().color.diffuse = .{ 0.3, 0.3, 0.3 };
     light.get().color.specular = .{ 1, 0, 0 };
@@ -118,11 +129,11 @@ pub fn main() !void {
     light.get().node = node2;
     scene.addLight(light);
 
-    var light2 = try lightPool.create(Light.init(&.{ -1.5, -1.5, -1.5 }, 2.0));
-    light2.get().color.ambient = .{ 0.2, 0.1, 0.1 };
-    light2.get().color.specular = .{ 0, 1, 0 };
+    // var light2 = try lightPool.create(Light.init(&.{ -1.5, -1.5, -1.5 }, 2.0));
+    // light2.get().color.ambient = .{ 0.2, 0.1, 0.1 };
+    // light2.get().color.specular = .{ 0, 1, 0 };
 
-    scene.addLight(light2);
+    // scene.addLight(light2);
 
     const window = glfw.glfwGetCurrentContext();
 
@@ -133,6 +144,7 @@ pub fn main() !void {
         // scene.addLight(light);
 
         // node2.get().transform.rotateX(0.01);
+        sunNode.get().transform.rotateY(0.01);
 
         if (glfw.glfwGetKey(window, glfw.GLFW_KEY_UP) == glfw.GLFW_PRESS) {
             std.debug.print("UP\n", .{});
