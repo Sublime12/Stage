@@ -121,8 +121,15 @@ pub fn main() !void {
         const y = rand.float(f32) * perimeter - perimeter / 2;
         const z = rand.float(f32) * perimeter - perimeter / 2;
 
+        const rx = rand.float(f32) * std.math.pi;
+        const ry = rand.float(f32) * std.math.pi;
+        const rz = rand.float(f32) * std.math.pi;
+
         const starGeo = try Geometry.makeTriangle(allocator, 0, 0, 0);
         const starNode = try pool.create(Node.init(starGeo, texture1));
+        starNode.get().transform.rotateX(rx);
+        starNode.get().transform.rotateX(ry);
+        starNode.get().transform.rotateX(rz);
         starNode.get().transform.translate(x, y, z);
         starNode.get().transform.scale(0.2);
 
