@@ -26,6 +26,8 @@ const Texture = texture_pkg.Texture;
 const TextureData = texture_pkg.TextureData;
 const GeometryGraph3d = uv_unwrapping_pkg.GeometryGraph3d;
 const GeometryGraph2d = uv_unwrapping_pkg.GeometryGraph2d;
+const NodeHandle = node.NodeHandle;
+const Random = std.Random;
 
 const chessboard = @import("scene.zig").makeChessboard;
 const diskboard = @import("scene.zig").makeDisk;
@@ -48,7 +50,7 @@ pub fn main() !void {
     defer _ = gpa.deinit();
     const allocator = gpa.allocator();
 
-    var app = try App.init("Stage window", 640, 480);
+    var app = try App.init("Stage window", 1200, 900);
     defer app.deinit();
 
     var scene = try Scene.init(allocator);
@@ -98,10 +100,10 @@ pub fn main() !void {
     const image = stb.stbi_load("assets/texture_earth.png", &width, &height, &nrChannels, 3);
     defer stb.stbi_image_free(image);
 
-    const width_u: usize = @intCast(width);
-    const height_u: usize = @intCast(height);
+    var width_u: usize = @intCast(width);
+    var height_u: usize = @intCast(height);
 
-    const raw_slice = image[0 .. width_u * height_u * 3];
+    var raw_slice = image[0 .. width_u * height_u * 3];
     const rgba_slice: []const [3]u8 = @ptrCast(@alignCast(raw_slice));
 
     var rootNode = try pool.create(Node.init(null, null));
@@ -110,11 +112,29 @@ pub fn main() !void {
     const texture2 = texturePool.create(
         Texture.init(width_u, height_u, earthT),
     );
+
+    const sun_image = stb.stbi_load("assets/sun_texture.jpg", &width, &height, &nrChannels, 3);
+    defer stb.stbi_image_free(image);
+    std.debug.assert(sun_image != null);
+
+    width_u = @intCast(width);
+    height_u = @intCast(height);
+
+    raw_slice = sun_image[0 .. width_u * height_u * 3];
+    const sun_rgba_slice: []const [3]u8 = @ptrCast(@alignCast(raw_slice));
+
+    const sunT = TextureData{ .rgb = sun_rgba_slice };
+    const sunTexture = texturePool.create(
+        Texture.init(width_u, height_u, sunT),
+    );
     // const texture2 = TextureData{ .rgba = image };
 
     std.debug.print("w: {}, h: {}, :nrChannels: {}\n", .{ width, height, nrChannels });
     var random = std.Random.DefaultPrng.init(0);
     const rand = random.random();
+
+    var stars = std.ArrayList(NodeHandle).empty;
+    defer stars.deinit(allocator);
     for (0..500) |_| {
         const perimeter = 20;
         const x = rand.float(f32) * perimeter - perimeter / 2;
@@ -131,8 +151,10 @@ pub fn main() !void {
         starNode.get().transform.rotateX(ry);
         starNode.get().transform.rotateX(rz);
         starNode.get().transform.translate(x, y, z);
-        starNode.get().transform.scale(0.2);
+        starNode.get().transform.scale(0.04);
+        starNode.get().geometry.?.setBaseColor(.{ 0, 0, 0 });
 
+        try stars.append(allocator, starNode);
         try rootNode.get().addChild(allocator, starNode);
     }
 
@@ -142,7 +164,7 @@ pub fn main() !void {
     //     Texture.init(scene_pkg.DIMENSION, scene_pkg.DIMENSION, earthT),
     // );
 
-    var sunNode = try pool.create(Node.init(sphereGeo, texture1));
+    var sunNode = try pool.create(Node.init(sphereGeo, sunTexture));
     // sunNode.get().transform.scale(0.2);
     sunNode.get().transform.translate(0, 0, 0.0);
     // sunNode.get().geometry.?.setBaseColor(.{ 0 , 0 , 0});
@@ -151,6 +173,7 @@ pub fn main() !void {
     try scene.addRoot(rootNode);
     scene.addTexture(texture1);
     scene.addTexture(texture2);
+    scene.addTexture(sunTexture);
 
     var camera = Camera.init(math.pi / 4.0, 640.0 / 420.0, 0.01, 100);
     // TODO: Adjust the specular ligth when camara eye move
@@ -161,7 +184,7 @@ pub fn main() !void {
     // _ = cubeGeo2;
     var earthNode = try pool.create(Node.init(earthGeo, texture2));
     // earthNode.get().geometry.?.setColor();
-    earthNode.get().transform.translate(10, 0, 0);
+    earthNode.get().transform.translate(6, 0, 0);
     earthNode.get().transform.scale(2);
     earthNode.get().geometry.?.setBaseColor(.{ 0, 0, 0 });
     earthNode.get().transform.scale(0.3);
@@ -175,7 +198,8 @@ pub fn main() !void {
     var moonGeo = try sphereGeo.clone(allocator);
     moonGeo.setBaseColor(.{ 0.0, 0.0, 0.0 });
     const moonNode = try pool.create(Node.init(moonGeo, texture3));
-    moonNode.get().transform.translate(3, 0, 0);
+    moonNode.get().transform.scale(0.3);
+    moonNode.get().transform.translate(1.5, 0, 0);
     try earthNode.get().addChild(allocator, moonNode);
 
     try sunNode.get().addChild(allocator, earthNode);
@@ -186,7 +210,7 @@ pub fn main() !void {
     var light = try lightPool.create(Light.init(&.{ 0, 0, 0 }, 2.0));
     light.get().color.ambient = .{ 1, 1, 1 };
     light.get().color.diffuse = .{ 0.3, 0.3, 0.3 };
-    light.get().color.specular = .{ 1, 0, 0 };
+    light.get().color.specular = .{ 0.874, 0.192, 0.34 };
     light.get().constant = 0.4;
 
     // light.get().quadratic = 1;
@@ -201,13 +225,17 @@ pub fn main() !void {
     // scene.addLight(light2);
     scene.addTexture(texture3);
 
+    // var prng = std.Random.DefaultPrng.init(0);
+    // const rand = prng.random();
     const window = glfw.glfwGetCurrentContext();
 
     while (glfw.glfwWindowShouldClose(window) == 0) {
         try app.render(allocator, &scene, &camera);
 
-        sunNode.get().transform.rotateY(0.01);
-        earthNode.get().transform.rotateY(0.03);
+        sunNode.get().transform.rotateY(0.04);
+        earthNode.get().transform.rotateY(0.06);
+        // earthNode.get().transform.rotateX(0.15);
+        // updateStars(stars, rand);
 
         if (glfw.glfwGetKey(window, glfw.GLFW_KEY_UP) == glfw.GLFW_PRESS) {
             std.debug.print("UP\n", .{});
@@ -251,6 +279,25 @@ pub fn main() !void {
         if (glfw.glfwGetKey(window, glfw.GLFW_KEY_B) == glfw.GLFW_PRESS) {
             std.debug.print("rotate right\n", .{});
             camera.view.rotateX(-0.01);
+        }
+    }
+}
+
+fn updateStars(stars: std.ArrayList(NodeHandle), rand: Random) void {
+    for (stars.items) |star| {
+        if (rand.float(f32) < 0.65) {
+            const range = 0.05;
+            const tx = rand.float(f32) * range - range / 2.0;
+            const ty = rand.float(f32) * range - range / 2.0;
+            const tz = rand.float(f32) * range - range / 2.0;
+            star.get().transform.translate(tx, ty, tz);
+
+            const rx = rand.float(f32) * 2 - 1;
+            const ry = rand.float(f32) * 2 - 1;
+            const rz = rand.float(f32) * 2 - 1;
+            star.get().transform.rotateX(rx);
+            star.get().transform.rotateX(ry);
+            star.get().transform.rotateX(rz);
         }
     }
 }

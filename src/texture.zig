@@ -5,7 +5,7 @@ const Vec4u = @import("math.zig").Vec4u;
 const Vec3u = @import("math.zig").Vec3u;
 
 pub const TexturePool = struct {
-    pub const MaxTextures = 3;
+    pub const MaxTextures = 8;
     const Self = @This();
     textures: std.ArrayList(Texture),
 
