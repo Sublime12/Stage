@@ -1,10 +1,12 @@
 const std = @import("std");
+
+const light_pkg = @import("light.zig");
+const texture_pkg = @import("texture.zig");
+
 const Allocator = std.mem.Allocator;
 const Node = @import("node.zig").Node;
 const NodeHandle = @import("node.zig").NodeHandle;
 const Transform = @import("transform.zig").Transform;
-const light_pkg = @import("light.zig");
-const texture_pkg = @import("texture.zig");
 const TextureHandle = texture_pkg.TextureHandle;
 const TexturePool = texture_pkg.TexturePool;
 const Light = light_pkg.Light;

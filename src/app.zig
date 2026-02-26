@@ -229,13 +229,11 @@ pub const App = struct {
         gl.glUniformMatrix4fv(@intCast(proj_location), 1, gl.GL_TRUE, @ptrCast(&camera.projection.mat));
         gl.glUniformMatrix4fv(@intCast(view_location), 1, gl.GL_TRUE, @ptrCast(&camera.view.mat));
 
-        const tex1_loc = gl.glGetUniformLocation(self.program, "texture1");
-        const tex2_loc = gl.glGetUniformLocation(self.program, "texture2");
-        const tex3_loc = gl.glGetUniformLocation(self.program, "texture3");
-
-        gl.glUniform1i(tex1_loc, 0);
-        gl.glUniform1i(tex2_loc, 1);
-        gl.glUniform1i(tex3_loc, 2);
+        inline for (0..TexturePool.MaxTextures) |i| {
+            const textureId = std.fmt.comptimePrint("texture{}", .{i + 1});
+            const textureLocation = gl.glGetUniformLocation(self.program, textureId);
+            gl.glUniform1i(textureLocation, i);
+        }
         const textures = scene.textures;
         var texturesLocation: [TexturePool.MaxTextures]gl.GLuint = undefined;
         gl.glGenTextures(@intCast(textures.items.len), &texturesLocation);

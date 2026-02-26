@@ -62,8 +62,6 @@ pub fn main() !void {
     var texturePool = try TexturePool.init(allocator);
     defer texturePool.deinit(allocator);
 
-    // const cubeGeo = try Geometry.makeCube(allocator);
-
     const file = try std.fs.cwd().openFile("./assets/sphere.obj", .{ .mode = .read_only });
     defer file.close();
 
@@ -87,10 +85,7 @@ pub fn main() !void {
     var board = yellowboard();
     const data = TextureData{ .rgba = &board };
 
-    // var diskb = diskboard();
-    // const disk = TextureData{ .rgb = &diskb };
-
-    const texture1 = texturePool.create(
+    const starTexture = texturePool.create(
         Texture.init(scene_pkg.DIMENSION, scene_pkg.DIMENSION, data),
     );
 
@@ -109,12 +104,12 @@ pub fn main() !void {
     var rootNode = try pool.create(Node.init(null, null));
 
     const earthT = TextureData{ .rgb = rgba_slice };
-    const texture2 = texturePool.create(
+    const earthTexture = texturePool.create(
         Texture.init(width_u, height_u, earthT),
     );
 
     const sun_image = stb.stbi_load("assets/sun_texture.jpg", &width, &height, &nrChannels, 3);
-    defer stb.stbi_image_free(image);
+    defer stb.stbi_image_free(sun_image);
     std.debug.assert(sun_image != null);
 
     width_u = @intCast(width);
@@ -127,7 +122,27 @@ pub fn main() !void {
     const sunTexture = texturePool.create(
         Texture.init(width_u, height_u, sunT),
     );
-    // const texture2 = TextureData{ .rgba = image };
+
+    const moon_image = stb.stbi_load("assets/moon_texture.jpg", &width, &height, &nrChannels, 3);
+    defer stb.stbi_image_free(moon_image);
+    std.debug.assert(moon_image != null);
+    std.debug.assert(nrChannels == 3);
+
+    width_u = @intCast(width);
+    height_u = @intCast(height);
+
+    raw_slice = moon_image[0 .. width_u * height_u * 3];
+    const moon_rgba_slice: []const [3]u8 = @ptrCast(@alignCast(raw_slice));
+
+    const moonT = TextureData{ .rgb = moon_rgba_slice };
+    const moonTexture = texturePool.create(
+        Texture.init(width_u, height_u, moonT),
+    );
+
+    scene.addTexture(starTexture);
+    scene.addTexture(earthTexture);
+    scene.addTexture(sunTexture);
+    scene.addTexture(moonTexture);
 
     std.debug.print("w: {}, h: {}, :nrChannels: {}\n", .{ width, height, nrChannels });
     var random = std.Random.DefaultPrng.init(0);
@@ -146,7 +161,7 @@ pub fn main() !void {
         const rz = rand.float(f32) * std.math.pi;
 
         const starGeo = try Geometry.makeTriangle(allocator, 0, 0, 0);
-        const starNode = try pool.create(Node.init(starGeo, texture1));
+        const starNode = try pool.create(Node.init(starGeo, starTexture));
         starNode.get().transform.rotateX(rx);
         starNode.get().transform.rotateX(ry);
         starNode.get().transform.rotateX(rz);
@@ -158,46 +173,24 @@ pub fn main() !void {
         try rootNode.get().addChild(allocator, starNode);
     }
 
-    // var earthMap = colorboard(.{0, 84, 119, 255});
-    // const earthT = TextureData{ .rgba = &earthMap };
-    // const texture2 = texturePool.create(
-    //     Texture.init(scene_pkg.DIMENSION, scene_pkg.DIMENSION, earthT),
-    // );
-
     var sunNode = try pool.create(Node.init(sphereGeo, sunTexture));
-    // sunNode.get().transform.scale(0.2);
     sunNode.get().transform.translate(0, 0, 0.0);
-    // sunNode.get().geometry.?.setBaseColor(.{ 0 , 0 , 0});
 
     try rootNode.get().addChild(allocator, sunNode);
     try scene.addRoot(rootNode);
-    scene.addTexture(texture1);
-    scene.addTexture(texture2);
-    scene.addTexture(sunTexture);
 
     var camera = Camera.init(math.pi / 4.0, 640.0 / 420.0, 0.01, 100);
-    // TODO: Adjust the specular ligth when camara eye move
     camera.lookAt(.{ 0, 25, 0 }, .{ 0.1, 0.1, 0.1 }, .{ 0.0, 1.0, 0.0 });
 
-    // const cubeGeo2 = try Geometry.makeTriangle(allocator, 1, 1, 1);
-    // const cubeGeo2 = try Geometry.makeCube(allocator);
-    // _ = cubeGeo2;
-    var earthNode = try pool.create(Node.init(earthGeo, texture2));
-    // earthNode.get().geometry.?.setColor();
+    var earthNode = try pool.create(Node.init(earthGeo, earthTexture));
     earthNode.get().transform.translate(6, 0, 0);
     earthNode.get().transform.scale(2);
     earthNode.get().geometry.?.setBaseColor(.{ 0, 0, 0 });
     earthNode.get().transform.scale(0.3);
 
-    var moonMap = colorboard(.{ 174, 46, 74, 0 });
-    const moonT = TextureData{ .rgba = &moonMap };
-    const texture3 = texturePool.create(
-        Texture.init(scene_pkg.DIMENSION, scene_pkg.DIMENSION, moonT),
-    );
-
     var moonGeo = try sphereGeo.clone(allocator);
     moonGeo.setBaseColor(.{ 0.0, 0.0, 0.0 });
-    const moonNode = try pool.create(Node.init(moonGeo, texture3));
+    const moonNode = try pool.create(Node.init(moonGeo, moonTexture));
     moonNode.get().transform.scale(0.3);
     moonNode.get().transform.translate(1.5, 0, 0);
     try earthNode.get().addChild(allocator, moonNode);
@@ -213,20 +206,9 @@ pub fn main() !void {
     light.get().color.specular = .{ 0.874, 0.192, 0.34 };
     light.get().constant = 0.4;
 
-    // light.get().quadratic = 1;
-    // light.color.specular = .{0.3, 0.3, 0.3};
     light.get().node = earthNode;
     scene.addLight(light);
 
-    // var light2 = try lightPool.create(Light.init(&.{ -1.5, -1.5, -1.5 }, 2.0));
-    // light2.get().color.ambient = .{ 0.2, 0.1, 0.1 };
-    // light2.get().color.specular = .{ 0, 1, 0 };
-
-    // scene.addLight(light2);
-    scene.addTexture(texture3);
-
-    // var prng = std.Random.DefaultPrng.init(0);
-    // const rand = prng.random();
     const window = glfw.glfwGetCurrentContext();
 
     while (glfw.glfwWindowShouldClose(window) == 0) {
@@ -234,8 +216,7 @@ pub fn main() !void {
 
         sunNode.get().transform.rotateY(0.04);
         earthNode.get().transform.rotateY(0.06);
-        // earthNode.get().transform.rotateX(0.15);
-        // updateStars(stars, rand);
+        updateStars(stars, rand);
 
         if (glfw.glfwGetKey(window, glfw.GLFW_KEY_UP) == glfw.GLFW_PRESS) {
             std.debug.print("UP\n", .{});
