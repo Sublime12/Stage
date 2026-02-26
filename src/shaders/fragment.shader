@@ -21,6 +21,11 @@ struct Light {
 uniform sampler2D texture1;
 uniform sampler2D texture2;
 uniform sampler2D texture3;
+uniform sampler2D texture4;
+uniform sampler2D texture5;
+uniform sampler2D texture6;
+uniform sampler2D texture7;
+uniform sampler2D texture8;
 uniform Light lights[MAX_LIGHT];
 
 in vec3 fCol;
@@ -40,8 +45,18 @@ void main()
         texColor = texture(texture1, fTextCoord);
     } else if (fTextureId == 1) {
         texColor = texture(texture2, fTextCoord);
-    } else if (fTextureId == 2) {
+     } else if (fTextureId == 2) {
         texColor = texture(texture3, fTextCoord);
+    } else if (fTextureId == 3) {
+        texColor = texture(texture4, fTextCoord);
+    } else if (fTextureId == 4) {
+        texColor = texture(texture5, fTextCoord);
+    } else if (fTextureId == 5) {
+        texColor = texture(texture6, fTextCoord);
+    } else if (fTextureId == 6) {
+        texColor = texture(texture7, fTextCoord);
+    } else if (fTextureId == 7) {
+        texColor = texture(texture8, fTextCoord);
     }
 
     vec3 result = vec3(0.0);
@@ -51,7 +66,7 @@ void main()
         }
     }
 
-    result = result * fCol * texColor.rgb;
+    result = result * texColor.rgb + fCol;
     fragment = vec4(result, 1.0);
 }
 

@@ -65,6 +65,33 @@ pub const Transform = struct {
         math.multiplyMat4x4(&self.mat, &self.mat, &rotateZMatrice);
     }
 
+    pub fn scale(self: *Self, s: f32) void {
+        self.scaleX(s);
+        self.scaleY(s);
+        self.scaleZ(s);
+    }
+
+    pub fn scaleX(self: *Self, sx: f32) void {
+        var scaleMatrix = math.identity();
+        scaleMatrix[0][0] = sx;
+
+        math.multiplyMat4x4(&self.mat, &self.mat, &scaleMatrix);
+    }
+
+    pub fn scaleY(self: *Self, sy: f32) void {
+        var scaleMatrix = math.identity();
+        scaleMatrix[1][1] = sy;
+
+        math.multiplyMat4x4(&self.mat, &self.mat, &scaleMatrix);
+    }
+
+    pub fn scaleZ(self: *Self, sz: f32) void {
+        var scaleMatrix = math.identity();
+        scaleMatrix[2][2] = sz;
+
+        math.multiplyMat4x4(&self.mat, &self.mat, &scaleMatrix);
+    }
+
     pub fn transformVertex(self: *const Self, v: *const Vertex) Vertex {
         var newVertex: Vertex = v.*;
         math.multiplyMat4x4Vec3(&newVertex.position, &self.mat, &v.position);
