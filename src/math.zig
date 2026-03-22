@@ -97,9 +97,9 @@ pub fn normalizeVec3(
     };
 }
 
-pub fn normalizeVec2(result: *Vec2f, vec: *const Vec2f) void {
+pub fn normalizeVec2(vec: *const Vec2f) Vec2f {
     const length = @sqrt(vec[0] * vec[0] + vec[1] * vec[1]);
-    result.* = .{
+    return .{
         vec[0] / length,
         vec[1] / length,
     };

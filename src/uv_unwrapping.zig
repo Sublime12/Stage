@@ -324,8 +324,7 @@ pub fn flatten(t1: Triangle, t2: Triangle, t1_2d: Triangle2d) Triangle2d {
     const x = (d1 * d1 - d2 * d2 + L * L) / (2 * L);
     const h = @sqrt(@max(0, d1 * d1 - x * x));
 
-    var u: Vec2f = undefined;
-    math.normalizeVec2(&u, &vbc2d);
+    const u = math.normalizeVec2(&vbc2d);
     const v: Vec2f = .{ -u[1], u[0] };
 
     const x_part: Vec2f = .{ x * u[0], x * u[1] };
