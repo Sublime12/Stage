@@ -58,8 +58,6 @@ pub const GeometryGraph3d = struct {
     }
 
     pub fn generate(self: *Self, allocator: Allocator) !void {
-        // const triangles = self.geometry.shape;
-
         for (0..self.geometry.shape.items.len) |i| {
             const node: Node3d = .{ .triangle = .{ .index = i, .pool = &self.geometry.shape }, .neighbors = .empty };
             try self.nodes.append(allocator, node);
@@ -197,7 +195,6 @@ const TriangleNode = struct {
 };
 
 const Node2d = struct {
-    // triangle: scene.Triangle,
     triangle: TriangleNode,
     triangle2d: Triangle2d,
     neighbors: std.ArrayList(Node2d),
@@ -280,12 +277,8 @@ pub fn flatten(t1: Triangle, t2: Triangle, t1_2d: Triangle2d) Triangle2d {
     const B = adjancentSide.?[0];
     const C = adjancentSide.?[1];
     const D = extractDifferentPoint(t2, C, B);
-    var vbc3d: Vec3f = undefined;
-    var vbd3d: Vec3f = undefined;
-    math.substractVec3(&vbc3d, &C.position, &B.position);
-    math.substractVec3(&vbd3d, &D.position, &B.position);
-    var vcd3d: Vec3f = undefined;
-    math.substractVec3(&vcd3d, &D.position, &C.position);
+    const vbd3d = math.substractVec3(&D.position, &B.position);
+    const vcd3d = math.substractVec3(&D.position, &C.position);
     const d2 = math.lengthVec3(&vcd3d);
     const d1 = math.lengthVec3(&vbd3d);
     var b_opt: ?Vec2f = null;
@@ -539,8 +532,6 @@ test "unwrap 3d geometry to 2d" {
         graph2d.nodes.items.len,
     );
 
-    // graph2d.print();
-
     for (graph2d.nodes.items) |node2d| {
         for (node2d.triangle2d.vertices) |vertex| {
             const scaledX = vertex[X] * 3;
@@ -556,7 +547,6 @@ test "unwrap 3d geometry to 2d" {
 
 test "unwrap sphrere" {
     const allocator = std.testing.allocator;
-    // var geometry = try Geometry.makeCube(allocator);
     const file = try std.fs.cwd().openFile("./assets/sphere.obj", .{ .mode = .read_only });
     defer file.close();
 
@@ -577,5 +567,4 @@ test "unwrap sphrere" {
     defer graph2d.deinit(allocator);
 
     graph2d.normalize();
-    // graph2d.print();
 }

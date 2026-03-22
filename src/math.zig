@@ -53,11 +53,10 @@ pub fn multiplyMat4x4Vec3(
 }
 
 pub fn substractVec3(
-    result: *Vector3,
     vec1: *const Vector3,
     vec2: *const Vector3,
-) void {
-    result.* = .{
+) Vector3 {
+    return .{
         vec1[0] - vec2[0],
         vec1[1] - vec2[1],
         vec1[2] - vec2[2],
@@ -243,9 +242,7 @@ test "expect substractVec3 return the difference between vec1 and vec2" {
     const vec2: Vector3 = .{ 4, 0, 8 };
 
     const expected: Vector3 = .{ 3, 3, -2 };
-    var actual: Vector3 = undefined;
-
-    substractVec3(&actual, &vec1, &vec2);
+    const actual = substractVec3(&vec1, &vec2);
 
     try std.testing.expectEqual(expected, actual);
 }
