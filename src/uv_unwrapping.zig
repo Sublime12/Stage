@@ -319,8 +319,7 @@ pub fn flatten(t1: Triangle, t2: Triangle, t1_2d: Triangle2d) Triangle2d {
     assert(a_opt != null);
     const a = a_opt.?;
 
-    var vbc2d: Vec2f = undefined;
-    math.substractVec2(&vbc2d, &c, &b);
+    const vbc2d = math.substractVec2(&c, &b);
     const L = math.lengthVec2(&vbc2d);
     const x = (d1 * d1 - d2 * d2 + L * L) / (2 * L);
     const h = @sqrt(@max(0, d1 * d1 - x * x));
@@ -332,8 +331,7 @@ pub fn flatten(t1: Triangle, t2: Triangle, t1_2d: Triangle2d) Triangle2d {
     const x_part: Vec2f = .{ x * u[0], x * u[1] };
     const h_part: Vec2f = .{ h * v[0], h * v[1] };
 
-    var w: Vec2f = undefined;
-    math.substractVec2(&w, &a, &b);
+    const w = math.substractVec2(&a, &b);
     const sideA = math.dotVec2(&v, &w);
 
     var d: Vec2f = undefined;

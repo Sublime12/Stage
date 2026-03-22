@@ -64,21 +64,21 @@ pub fn substractVec3(
 }
 
 pub fn addVec2(
-    result: *Vec2f,
     vec1: *const Vec2f,
     vec2: *const Vec2f,
-) void {
-    result.* = .{
+) Vec2f {
+    return .{
         vec1[0] + vec2[0],
         vec1[1] + vec2[1],
     };
 }
+
 pub fn substractVec2(
-    result: *Vec2f,
+    // result: *Vec2f,
     vec1: *const Vec2f,
     vec2: *const Vec2f,
-) void {
-    result.* = .{
+) Vec2f {
+    return .{
         vec1[0] - vec2[0],
         vec1[1] - vec2[1],
     };
