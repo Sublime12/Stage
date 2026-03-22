@@ -105,8 +105,8 @@ pub fn normalizeVec2(vec: *const Vec2f) Vec2f {
     };
 }
 
-pub fn crossVec3(result: *Vector3, vec1: *const Vector3, vec2: *const Vector3) void {
-    result.* = .{
+pub fn crossVec3(vec1: *const Vector3, vec2: *const Vector3,) Vector3 {
+    return .{
         vec1[1] * vec2[2] - vec1[2] * vec2[1],
         vec1[2] * vec2[0] - vec1[0] * vec2[2],
         vec1[0] * vec2[1] - vec1[1] * vec2[0],
@@ -267,10 +267,7 @@ test "expect crossVec3 return 0 vector with parallel vector" {
     const vec2: Vector3 = .{ 3, 6, 9 };
 
     const expected: Vector3 = .{ 0, 0, 0 };
-    var actual: Vector3 = undefined;
-
-    crossVec3(&actual, &vec1, &vec2);
-
+    const actual = crossVec3(&vec1, &vec2);
     try std.testing.expectEqual(expected, actual);
 }
 
@@ -279,9 +276,7 @@ test "expect crossVec3 return the cross product of two vector" {
     const vec2: Vector3 = .{ 6, 2, 0 };
 
     const expected: Vector3 = .{ -8, 24, -16 };
-    var actual: Vector3 = undefined;
-
-    crossVec3(&actual, &vec1, &vec2);
+    const actual = crossVec3(&vec1, &vec2);
 
     try std.testing.expectEqual(expected, actual);
 }

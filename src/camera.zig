@@ -67,12 +67,9 @@ pub const Camera = struct {
         var f = math.substractVec3(&center, &eye);
         f = math.normalizeVec3(&f);
 
-        var s: Vector3 = undefined;
-        math.crossVec3(&s, &f, &up);
+        var s = math.crossVec3(&f, &up);
         s = math.normalizeVec3(&s);
-
-        var u: Vector3 = undefined;
-        math.crossVec3(&u, &s, &f);
+        const u = math.crossVec3(&s, &f);
 
         self.view.mat[0][0] = s[0];
         self.view.mat[0][1] = s[1];

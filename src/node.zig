@@ -151,8 +151,7 @@ pub const Node = struct {
         const u = math.substractVec3(&p2, &p1);
         const v = math.substractVec3(&p3, &p1);
 
-        var n: Vector3 = undefined;
-        math.crossVec3(&n, &u, &v);
+        var n = math.crossVec3(&u, &v);
         n = math.normalizeVec3(&n);
 
         return n;
