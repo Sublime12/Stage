@@ -1,8 +1,8 @@
 const std = @import("std");
 const Allocator = std.mem.Allocator;
 
-const Geometry = @import("scene.zig").Geometry;
-const Vertex = @import("scene.zig").Vertex;
+const Geometry = @import("geometry.zig").Geometry;
+const Vertex = @import("geometry.zig").Vertex;
 const transform = @import("transform.zig");
 const math = @import("math.zig");
 const texture_pkg = @import("texture.zig");
@@ -148,14 +148,11 @@ pub const Node = struct {
         const p1 = vertices.items[0].position;
         const p2 = vertices.items[1].position;
         const p3 = vertices.items[2].position;
-        var u: Vector3 = undefined;
-        math.substractVec3(&u, &p2, &p1);
-        var v: Vector3 = undefined;
-        math.substractVec3(&v, &p3, &p1);
+        const u = math.substractVec3(&p2, &p1);
+        const v = math.substractVec3(&p3, &p1);
 
-        var n: Vector3 = undefined;
-        math.crossVec3(&n, &u, &v);
-        math.normalizeVec3(&n, &n);
+        var n = math.crossVec3(&u, &v);
+        n = math.normalizeVec3(&n);
 
         return n;
     }

@@ -2,7 +2,7 @@ const std = @import("std");
 const Allocator = std.mem.Allocator;
 
 const Scene = @import("scene.zig").Scene;
-const Vertex = @import("scene.zig").Vertex;
+const Vertex = @import("geometry.zig").Vertex;
 const Camera = @import("camera.zig").Camera;
 const Light = @import("light.zig").Light;
 
@@ -36,6 +36,7 @@ pub const App = struct {
 
     window: *glfw.struct_GLFWwindow,
     program: gl.GLuint,
+    vertex_buffer: gl.GLuint,
 
     /// Initializes GLFW, creates a window, and loads OpenGL function pointers.
     /// Caller must call 'deinit' on success to free resources.
@@ -60,15 +61,20 @@ pub const App = struct {
         if (gl.gladLoadGL(glfw.glfwGetProcAddress) == 0) {
             return error.LoadGLFailed;
         }
-        glfw.glfwSwapInterval(1);
+        // glfw.glfwSwapInterval(1);
+        glfw.glfwSwapInterval(0);
 
         gl.glEnable(gl.GL_DEPTH_TEST);
 
         const program = try compile();
 
+        var vertex_buffer: gl.GLuint = 0;
+        gl.glGenBuffers(1, &vertex_buffer);
+        // self.vertex_buffer = vertex_buffer;
         return .{
             .window = window,
             .program = program,
+            .vertex_buffer = vertex_buffer,
         };
     }
 
@@ -118,8 +124,8 @@ pub const App = struct {
         defer vertices.deinit(allocator);
         try scene.generateVertices(allocator, &vertices);
 
-        var vertex_buffer: gl.GLuint = 0;
-        gl.glGenBuffers(1, &vertex_buffer);
+        const vertex_buffer = self.vertex_buffer;
+
         gl.glBindBuffer(gl.GL_ARRAY_BUFFER, vertex_buffer);
         gl.glBufferData(
             gl.GL_ARRAY_BUFFER,

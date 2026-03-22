@@ -2,6 +2,7 @@ const std = @import("std");
 const math = std.math;
 
 const scene_pkg = @import("scene.zig");
+const geometry_pkg = @import("geometry.zig");
 const node = @import("node.zig");
 const stage = @import("app.zig");
 const camera_pkg = @import("camera.zig");
@@ -12,7 +13,7 @@ const stb = @cImport(@cInclude("stb_image.h"));
 
 const obj_parse = @import("obj_parser.zig").obj_parse;
 
-const Geometry = scene_pkg.Geometry;
+const Geometry = geometry_pkg.Geometry;
 const Scene = scene_pkg.Scene;
 const Node = node.Node;
 const NodePool = node.NodePool;
@@ -29,10 +30,10 @@ const GeometryGraph2d = uv_unwrapping_pkg.GeometryGraph2d;
 const NodeHandle = node.NodeHandle;
 const Random = std.Random;
 
-const chessboard = @import("scene.zig").makeChessboard;
-const diskboard = @import("scene.zig").makeDisk;
-const yellowboard = @import("scene.zig").makeYellowboard;
-const colorboard = @import("scene.zig").makeColorboard;
+const chessboard = scene_pkg.makeChessboard;
+const diskboard = scene_pkg.makeDisk;
+const yellowboard = texture_pkg.makeYellowboard;
+const colorboard = scene_pkg.makeColorboard;
 
 const BUFFER_LENGTH = 1024 * 10;
 
@@ -86,7 +87,7 @@ pub fn main() !void {
     const data = TextureData{ .rgba = &board };
 
     const starTexture = texturePool.create(
-        Texture.init(scene_pkg.DIMENSION, scene_pkg.DIMENSION, data),
+        Texture.init(texture_pkg.DIMENSION, texture_pkg.DIMENSION, data),
     );
 
     var width: c_int = 0;
@@ -211,8 +212,13 @@ pub fn main() !void {
 
     const window = glfw.glfwGetCurrentContext();
 
+    var arena: std.heap.ArenaAllocator = .init(std.heap.page_allocator);
+    defer arena.deinit();
+    const arena_allocator = arena.allocator();
+
     while (glfw.glfwWindowShouldClose(window) == 0) {
-        try app.render(allocator, &scene, &camera);
+        try app.render(arena_allocator, &scene, &camera);
+        _ = arena.reset(.retain_capacity);
 
         sunNode.get().transform.rotateY(0.04);
         earthNode.get().transform.rotateY(0.06);

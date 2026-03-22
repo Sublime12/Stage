@@ -1,19 +1,20 @@
 const std = @import("std");
 
-const scene = @import("scene.zig");
 const math = @import("math.zig");
 const link_list = @import("link_list.zig");
 const obj_parser_pkg = @import("obj_parser.zig");
+const geometry_pkg = @import("geometry.zig");
 
 const Allocator = std.mem.Allocator;
 
-const Triangle = scene.Triangle;
-const Triangle2d = scene.Triangle2d;
-const Vertex = scene.Vertex;
-const Geometry = scene.Geometry;
+const Triangle = geometry_pkg.Triangle;
+const Triangle2d = geometry_pkg.Triangle2d;
+const Vertex = geometry_pkg.Vertex;
+const Geometry = geometry_pkg.Geometry;
 const Vec3f = math.Vec3f;
 const Vec2f = math.Vec2f;
 const DoublyLinkedList = link_list.DoublyLinkedList;
+
 const obj_parse = obj_parser_pkg.obj_parse;
 
 const X = 0;
@@ -57,8 +58,6 @@ pub const GeometryGraph3d = struct {
     }
 
     pub fn generate(self: *Self, allocator: Allocator) !void {
-        // const triangles = self.geometry.shape;
-
         for (0..self.geometry.shape.items.len) |i| {
             const node: Node3d = .{ .triangle = .{ .index = i, .pool = &self.geometry.shape }, .neighbors = .empty };
             try self.nodes.append(allocator, node);
@@ -196,7 +195,6 @@ const TriangleNode = struct {
 };
 
 const Node2d = struct {
-    // triangle: scene.Triangle,
     triangle: TriangleNode,
     triangle2d: Triangle2d,
     neighbors: std.ArrayList(Node2d),
@@ -279,12 +277,8 @@ pub fn flatten(t1: Triangle, t2: Triangle, t1_2d: Triangle2d) Triangle2d {
     const B = adjancentSide.?[0];
     const C = adjancentSide.?[1];
     const D = extractDifferentPoint(t2, C, B);
-    var vbc3d: Vec3f = undefined;
-    var vbd3d: Vec3f = undefined;
-    math.substractVec3(&vbc3d, &C.position, &B.position);
-    math.substractVec3(&vbd3d, &D.position, &B.position);
-    var vcd3d: Vec3f = undefined;
-    math.substractVec3(&vcd3d, &D.position, &C.position);
+    const vbd3d = math.substractVec3(&D.position, &B.position);
+    const vcd3d = math.substractVec3(&D.position, &C.position);
     const d2 = math.lengthVec3(&vcd3d);
     const d1 = math.lengthVec3(&vbd3d);
     var b_opt: ?Vec2f = null;
@@ -325,21 +319,18 @@ pub fn flatten(t1: Triangle, t2: Triangle, t1_2d: Triangle2d) Triangle2d {
     assert(a_opt != null);
     const a = a_opt.?;
 
-    var vbc2d: Vec2f = undefined;
-    math.substractVec2(&vbc2d, &c, &b);
+    const vbc2d = math.substractVec2(&c, &b);
     const L = math.lengthVec2(&vbc2d);
     const x = (d1 * d1 - d2 * d2 + L * L) / (2 * L);
     const h = @sqrt(@max(0, d1 * d1 - x * x));
 
-    var u: Vec2f = undefined;
-    math.normalizeVec2(&u, &vbc2d);
+    const u = math.normalizeVec2(&vbc2d);
     const v: Vec2f = .{ -u[1], u[0] };
 
     const x_part: Vec2f = .{ x * u[0], x * u[1] };
     const h_part: Vec2f = .{ h * v[0], h * v[1] };
 
-    var w: Vec2f = undefined;
-    math.substractVec2(&w, &a, &b);
+    const w = math.substractVec2(&a, &b);
     const sideA = math.dotVec2(&v, &w);
 
     var d: Vec2f = undefined;
@@ -538,8 +529,6 @@ test "unwrap 3d geometry to 2d" {
         graph2d.nodes.items.len,
     );
 
-    // graph2d.print();
-
     for (graph2d.nodes.items) |node2d| {
         for (node2d.triangle2d.vertices) |vertex| {
             const scaledX = vertex[X] * 3;
@@ -555,7 +544,6 @@ test "unwrap 3d geometry to 2d" {
 
 test "unwrap sphrere" {
     const allocator = std.testing.allocator;
-    // var geometry = try Geometry.makeCube(allocator);
     const file = try std.fs.cwd().openFile("./assets/sphere.obj", .{ .mode = .read_only });
     defer file.close();
 
@@ -576,5 +564,4 @@ test "unwrap sphrere" {
     defer graph2d.deinit(allocator);
 
     graph2d.normalize();
-    // graph2d.print();
 }

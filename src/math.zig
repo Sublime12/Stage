@@ -37,15 +37,14 @@ pub fn multiplyMat4x4(
 }
 
 pub fn multiplyMat4x4Vec3(
-    result: *Vector3,
     m: *const Mat4x4,
     v: *const Vector3,
-) void {
+) Vector3 {
     const x = v[0];
     const y = v[1];
     const z = v[2];
 
-    result.* = .{
+    return .{
         m[0][0] * x + m[0][1] * y + m[0][2] * z + m[0][3],
         m[1][0] * x + m[1][1] * y + m[1][2] * z + m[1][3],
         m[2][0] * x + m[2][1] * y + m[2][2] * z + m[2][3],
@@ -53,11 +52,10 @@ pub fn multiplyMat4x4Vec3(
 }
 
 pub fn substractVec3(
-    result: *Vector3,
     vec1: *const Vector3,
     vec2: *const Vector3,
-) void {
-    result.* = .{
+) Vector3 {
+    return .{
         vec1[0] - vec2[0],
         vec1[1] - vec2[1],
         vec1[2] - vec2[2],
@@ -65,45 +63,51 @@ pub fn substractVec3(
 }
 
 pub fn addVec2(
-    result: *Vec2f,
     vec1: *const Vec2f,
     vec2: *const Vec2f,
-) void {
-    result.* = .{
+) Vec2f {
+    return .{
         vec1[0] + vec2[0],
         vec1[1] + vec2[1],
     };
 }
+
 pub fn substractVec2(
-    result: *Vec2f,
     vec1: *const Vec2f,
     vec2: *const Vec2f,
-) void {
-    result.* = .{
+) Vec2f {
+    return .{
         vec1[0] - vec2[0],
         vec1[1] - vec2[1],
     };
 }
 
-pub fn normalizeVec3(result: *Vector3, vec: *const Vector3) void {
-    const length = @sqrt(vec[0] * vec[0] + vec[1] * vec[1] + vec[2] * vec[2]);
-    result.* = .{
+pub fn normalizeVec3(
+    vec: *const Vector3,
+) Vector3 {
+    const length = @sqrt(
+        vec[0] * vec[0] + vec[1] * vec[1] + vec[2] * vec[2],
+    );
+    return .{
         vec[0] / length,
         vec[1] / length,
         vec[2] / length,
     };
 }
 
-pub fn normalizeVec2(result: *Vec2f, vec: *const Vec2f) void {
+pub fn normalizeVec2(vec: *const Vec2f) Vec2f {
     const length = @sqrt(vec[0] * vec[0] + vec[1] * vec[1]);
-    result.* = .{
+    return .{
         vec[0] / length,
         vec[1] / length,
     };
 }
 
-pub fn crossVec3(result: *Vector3, vec1: *const Vector3, vec2: *const Vector3) void {
-    result.* = .{
+pub fn crossVec3(
+    vec1: *const Vector3,
+    vec2: *const Vector3,
+) Vector3 {
+    return .{
         vec1[1] * vec2[2] - vec1[2] * vec2[1],
         vec1[2] * vec2[0] - vec1[0] * vec2[2],
         vec1[0] * vec2[1] - vec1[1] * vec2[0],
@@ -213,10 +217,7 @@ test "expect multiplyMat4x4Vec3 with any vector by identity matrix return the or
         .{ 1, 4, 2, 7 },
     };
     const expected: Vector3 = .{ 56, 55, 28 };
-
-    var actual: Vector3 = undefined;
-    multiplyMat4x4Vec3(&actual, &m, &v);
-
+    const actual = multiplyMat4x4Vec3(&m, &v);
     try std.testing.expectEqual(expected, actual);
 }
 
@@ -231,10 +232,7 @@ test "expect multiplyMat4x4Vec3 return the product of m multiply by v" {
         .{ 0, 0, 1, 0 },
         .{ 0, 0, 0, 1 },
     };
-
-    var actual: Vector3 = undefined;
-    multiplyMat4x4Vec3(&actual, &m, &v);
-
+    const actual = multiplyMat4x4Vec3(&m, &v);
     try std.testing.expectEqual(v, actual);
 }
 
@@ -243,9 +241,7 @@ test "expect substractVec3 return the difference between vec1 and vec2" {
     const vec2: Vector3 = .{ 4, 0, 8 };
 
     const expected: Vector3 = .{ 3, 3, -2 };
-    var actual: Vector3 = undefined;
-
-    substractVec3(&actual, &vec1, &vec2);
+    const actual = substractVec3(&vec1, &vec2);
 
     try std.testing.expectEqual(expected, actual);
 }
@@ -255,9 +251,7 @@ test "expect normalizeVec3 normalize to length of 1" {
 
     const length = lengthVec3(&vec);
     const expected: Vector3 = .{ vec[0] / length, vec[1] / length, vec[2] / length };
-    var actual: Vector3 = undefined;
-
-    normalizeVec3(&actual, &vec);
+    const actual = normalizeVec3(&vec);
 
     try std.testing.expect(@abs(lengthVec3(&actual) - 1) <= 0.00001);
     try std.testing.expectEqual(expected, actual);
@@ -268,10 +262,7 @@ test "expect crossVec3 return 0 vector with parallel vector" {
     const vec2: Vector3 = .{ 3, 6, 9 };
 
     const expected: Vector3 = .{ 0, 0, 0 };
-    var actual: Vector3 = undefined;
-
-    crossVec3(&actual, &vec1, &vec2);
-
+    const actual = crossVec3(&vec1, &vec2);
     try std.testing.expectEqual(expected, actual);
 }
 
@@ -280,9 +271,7 @@ test "expect crossVec3 return the cross product of two vector" {
     const vec2: Vector3 = .{ 6, 2, 0 };
 
     const expected: Vector3 = .{ -8, 24, -16 };
-    var actual: Vector3 = undefined;
-
-    crossVec3(&actual, &vec1, &vec2);
+    const actual = crossVec3(&vec1, &vec2);
 
     try std.testing.expectEqual(expected, actual);
 }
