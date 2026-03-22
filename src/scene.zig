@@ -80,5 +80,3 @@ pub const Scene = struct {
         std.debug.assert(transforms.items.len == 1);
     }
 };
-
-
