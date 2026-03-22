@@ -149,6 +149,10 @@ pub const Geometry = struct {
 
 pub const Triangle = struct {
     vertices: [3]Vertex,
+    // refactor Vertex and Triangle
+    // TODO: vertices: Vec3f
+    // TODO: color: ?Vec3f
+    // TODO: texture: ?Vec2f
 
     pub fn init(v1: Vertex, v2: Vertex, v3: Vertex) Triangle {
         return .{
