@@ -212,8 +212,13 @@ pub fn main() !void {
 
     const window = glfw.glfwGetCurrentContext();
 
+    var arena: std.heap.ArenaAllocator = .init(std.heap.page_allocator);
+    defer arena.deinit();
+    const arena_allocator = arena.allocator();
+
     while (glfw.glfwWindowShouldClose(window) == 0) {
-        try app.render(allocator, &scene, &camera);
+        try app.render(arena_allocator, &scene, &camera);
+        _ = arena.reset(.retain_capacity);
 
         sunNode.get().transform.rotateY(0.04);
         earthNode.get().transform.rotateY(0.06);
