@@ -37,15 +37,14 @@ pub fn multiplyMat4x4(
 }
 
 pub fn multiplyMat4x4Vec3(
-    result: *Vector3,
     m: *const Mat4x4,
     v: *const Vector3,
-) void {
+) Vector3 {
     const x = v[0];
     const y = v[1];
     const z = v[2];
 
-    result.* = .{
+    return .{
         m[0][0] * x + m[0][1] * y + m[0][2] * z + m[0][3],
         m[1][0] * x + m[1][1] * y + m[1][2] * z + m[1][3],
         m[2][0] * x + m[2][1] * y + m[2][2] * z + m[2][3],
@@ -74,7 +73,6 @@ pub fn addVec2(
 }
 
 pub fn substractVec2(
-    // result: *Vec2f,
     vec1: *const Vec2f,
     vec2: *const Vec2f,
 ) Vec2f {
@@ -105,7 +103,10 @@ pub fn normalizeVec2(vec: *const Vec2f) Vec2f {
     };
 }
 
-pub fn crossVec3(vec1: *const Vector3, vec2: *const Vector3,) Vector3 {
+pub fn crossVec3(
+    vec1: *const Vector3,
+    vec2: *const Vector3,
+) Vector3 {
     return .{
         vec1[1] * vec2[2] - vec1[2] * vec2[1],
         vec1[2] * vec2[0] - vec1[0] * vec2[2],
@@ -216,10 +217,7 @@ test "expect multiplyMat4x4Vec3 with any vector by identity matrix return the or
         .{ 1, 4, 2, 7 },
     };
     const expected: Vector3 = .{ 56, 55, 28 };
-
-    var actual: Vector3 = undefined;
-    multiplyMat4x4Vec3(&actual, &m, &v);
-
+    const actual = multiplyMat4x4Vec3(&m, &v);
     try std.testing.expectEqual(expected, actual);
 }
 
@@ -234,10 +232,7 @@ test "expect multiplyMat4x4Vec3 return the product of m multiply by v" {
         .{ 0, 0, 1, 0 },
         .{ 0, 0, 0, 1 },
     };
-
-    var actual: Vector3 = undefined;
-    multiplyMat4x4Vec3(&actual, &m, &v);
-
+    const actual = multiplyMat4x4Vec3(&m, &v);
     try std.testing.expectEqual(v, actual);
 }
 

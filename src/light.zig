@@ -72,9 +72,7 @@ pub const Light = struct {
     }
 
     pub fn transformPosition(self: *const Self) Vec3 {
-        var result: Vec3 = undefined;
-        math.multiplyMat4x4Vec3(&result, &self.transform.mat, &self.position);
-        return result;
+        return math.multiplyMat4x4Vec3(&self.transform.mat, &self.position);
     }
 };
 

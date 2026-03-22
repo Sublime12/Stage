@@ -94,7 +94,7 @@ pub const Transform = struct {
 
     pub fn transformVertex(self: *const Self, v: *const Vertex) Vertex {
         var newVertex: Vertex = v.*;
-        math.multiplyMat4x4Vec3(&newVertex.position, &self.mat, &v.position);
+        newVertex.position = math.multiplyMat4x4Vec3(&self.mat, &v.position);
         return newVertex;
     }
 };
@@ -195,8 +195,6 @@ test "from tx=1 and rotateZ 90 expect (0, 0, 0) -> (0, 1, 0)" {
 
     const actual = resultTransform.transformVertex(&vertex);
 
-    // try std.testing.expectApproxEqRel(expected, actual, 0.0001);
-    // try std.testing.expectEqual(expected, actual);
     try std.testing.expect(areEqualApproxVertex(&expected, &actual));
 }
 
