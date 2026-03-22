@@ -1,7 +1,7 @@
 const math = @import("math.zig");
 const std = @import("std");
 
-const Vertex = @import("scene.zig").Vertex;
+const Vertex = @import("geometry.zig").Vertex;
 
 pub const Transform = struct {
     const Self = @This();

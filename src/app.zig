@@ -2,7 +2,7 @@ const std = @import("std");
 const Allocator = std.mem.Allocator;
 
 const Scene = @import("scene.zig").Scene;
-const Vertex = @import("scene.zig").Vertex;
+const Vertex = @import("geometry.zig").Vertex;
 const Camera = @import("camera.zig").Camera;
 const Light = @import("light.zig").Light;
 

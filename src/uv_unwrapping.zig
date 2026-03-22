@@ -1,19 +1,20 @@
 const std = @import("std");
 
-const scene = @import("scene.zig");
 const math = @import("math.zig");
 const link_list = @import("link_list.zig");
 const obj_parser_pkg = @import("obj_parser.zig");
+const geometry_pkg = @import("geometry.zig");
 
 const Allocator = std.mem.Allocator;
 
-const Triangle = scene.Triangle;
-const Triangle2d = scene.Triangle2d;
-const Vertex = scene.Vertex;
-const Geometry = scene.Geometry;
+const Triangle = geometry_pkg.Triangle;
+const Triangle2d = geometry_pkg.Triangle2d;
+const Vertex = geometry_pkg.Vertex;
+const Geometry = geometry_pkg.Geometry;
 const Vec3f = math.Vec3f;
 const Vec2f = math.Vec2f;
 const DoublyLinkedList = link_list.DoublyLinkedList;
+
 const obj_parse = obj_parser_pkg.obj_parse;
 
 const X = 0;

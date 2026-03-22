@@ -1,8 +1,8 @@
 const std = @import("std");
 const Allocator = std.mem.Allocator;
 
-const Geometry = @import("scene.zig").Geometry;
-const Vertex = @import("scene.zig").Vertex;
+const Geometry = @import("geometry.zig").Geometry;
+const Vertex = @import("geometry.zig").Vertex;
 const transform = @import("transform.zig");
 const math = @import("math.zig");
 const texture_pkg = @import("texture.zig");

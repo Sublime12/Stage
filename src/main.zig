@@ -2,6 +2,7 @@ const std = @import("std");
 const math = std.math;
 
 const scene_pkg = @import("scene.zig");
+const geometry_pkg = @import("geometry.zig");
 const node = @import("node.zig");
 const stage = @import("app.zig");
 const camera_pkg = @import("camera.zig");
@@ -12,7 +13,7 @@ const stb = @cImport(@cInclude("stb_image.h"));
 
 const obj_parse = @import("obj_parser.zig").obj_parse;
 
-const Geometry = scene_pkg.Geometry;
+const Geometry = geometry_pkg.Geometry;
 const Scene = scene_pkg.Scene;
 const Node = node.Node;
 const NodePool = node.NodePool;

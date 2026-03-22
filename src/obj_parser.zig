@@ -1,9 +1,10 @@
 const std = @import("std");
-const scene_pkg = @import("scene.zig");
+const geometry_pkg = @import("geometry.zig");
 const math = @import("math.zig");
-const Geometry = scene_pkg.Geometry;
-const Triangle = scene_pkg.Triangle;
-const Vertex = scene_pkg.Vertex;
+
+const Geometry = geometry_pkg.Geometry;
+const Triangle = geometry_pkg.Triangle;
+const Vertex = geometry_pkg.Vertex;
 const Allocator = std.mem.Allocator;
 const ArrayList = std.ArrayList;
 const Reader = std.io.Reader;
