@@ -153,7 +153,7 @@ pub const Node = struct {
 
         var n: Vector3 = undefined;
         math.crossVec3(&n, &u, &v);
-        math.normalizeVec3(&n, &n);
+        n = math.normalizeVec3(&n);
 
         return n;
     }

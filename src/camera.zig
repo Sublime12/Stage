@@ -65,11 +65,11 @@ pub const Camera = struct {
 
     pub fn lookAt(self: *Self, eye: Vector3, center: Vector3, up: Vector3) void {
         var f = math.substractVec3(&center, &eye);
-        math.normalizeVec3(&f, &f);
+        f = math.normalizeVec3(&f);
 
         var s: Vector3 = undefined;
         math.crossVec3(&s, &f, &up);
-        math.normalizeVec3(&s, &s);
+        s = math.normalizeVec3(&s);
 
         var u: Vector3 = undefined;
         math.crossVec3(&u, &s, &f);

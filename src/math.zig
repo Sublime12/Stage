@@ -84,9 +84,13 @@ pub fn substractVec2(
     };
 }
 
-pub fn normalizeVec3(result: *Vector3, vec: *const Vector3) void {
-    const length = @sqrt(vec[0] * vec[0] + vec[1] * vec[1] + vec[2] * vec[2]);
-    result.* = .{
+pub fn normalizeVec3(
+    vec: *const Vector3,
+) Vector3 {
+    const length = @sqrt(
+        vec[0] * vec[0] + vec[1] * vec[1] + vec[2] * vec[2],
+    );
+    return .{
         vec[0] / length,
         vec[1] / length,
         vec[2] / length,
@@ -252,9 +256,7 @@ test "expect normalizeVec3 normalize to length of 1" {
 
     const length = lengthVec3(&vec);
     const expected: Vector3 = .{ vec[0] / length, vec[1] / length, vec[2] / length };
-    var actual: Vector3 = undefined;
-
-    normalizeVec3(&actual, &vec);
+    const actual = normalizeVec3(&vec);
 
     try std.testing.expect(@abs(lengthVec3(&actual) - 1) <= 0.00001);
     try std.testing.expectEqual(expected, actual);
