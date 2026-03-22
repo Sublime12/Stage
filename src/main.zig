@@ -30,10 +30,10 @@ const GeometryGraph2d = uv_unwrapping_pkg.GeometryGraph2d;
 const NodeHandle = node.NodeHandle;
 const Random = std.Random;
 
-const chessboard = @import("scene.zig").makeChessboard;
-const diskboard = @import("scene.zig").makeDisk;
-const yellowboard = @import("scene.zig").makeYellowboard;
-const colorboard = @import("scene.zig").makeColorboard;
+const chessboard = scene_pkg.makeChessboard;
+const diskboard = scene_pkg.makeDisk;
+const yellowboard = texture_pkg.makeYellowboard;
+const colorboard = scene_pkg.makeColorboard;
 
 const BUFFER_LENGTH = 1024 * 10;
 
@@ -87,7 +87,7 @@ pub fn main() !void {
     const data = TextureData{ .rgba = &board };
 
     const starTexture = texturePool.create(
-        Texture.init(scene_pkg.DIMENSION, scene_pkg.DIMENSION, data),
+        Texture.init(texture_pkg.DIMENSION, texture_pkg.DIMENSION, data),
     );
 
     var width: c_int = 0;
